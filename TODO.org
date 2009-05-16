@@ -1,0 +1,8 @@
+* The Basics
+** DONE Get a blank game up and running
+** DONE Draw a square on the screen
+** DONE Apply a texture to square
+** TODO Move square with keyboard events
+   Easy enough. Need more infrastructure to actually do it.
+
+

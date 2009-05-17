@@ -9,7 +9,8 @@
 ;;; Level Prototype
 ;;;
 (defsheep =level= ()
-  ((event-queue (make-event-queue) :cloneform (make-event-queue))
+  ((event-queue (clone (=event-queue=) ())
+		:cloneform (clone (=event-queue=) ()))
    (player nil)
    (background nil) 
    (projectiles nil :cloneform nil)
@@ -40,8 +41,7 @@
     (incf current-frame)
     (update background)
     (mapc #'update projectiles)
-    (unless (dead-p player)
-      (update player))
+    (update player)
     (mapc #'update enemies)
     (mapc #'update messages)))
 
@@ -49,33 +49,9 @@
   (with-properties (background player projectiles enemies messages) level
     (draw background)
     (mapc #'draw messages)
-    (unless (dead-p player)
-      (draw player))
+    (draw player)
     (mapc #'draw enemies)
-    (mapc #'draw projectiles)
-#+nil(sdl:draw-string-shaded-* (format nil "Lives left: ~a" (lives (player level)))
-			      5 5 sdl:*red* (sdl:color :a 0))
-#+nil(sdl:draw-string-shaded-* (format nil "Enemies downed: ~a" (score (player level)))
-			      5 15 sdl:*red* (sdl:color :a 0))
-#+nil(sdl:draw-string-shaded-* (format nil "Current frame: ~a" (current-frame level))
-			      5 25 sdl:*red* (sdl:color :a 0))))
+    (mapc #'draw projectiles)))
 
 (defmessage resolve-collisions ((level =level=))
-  (with-properties (enemies projectiles player) level
-    (loop for enemy in enemies
-       do (loop for projectile in projectiles
-	     do (cond ((and (eql (weapon player)
-				 (shooter projectile))
-			    (collided-p projectile enemy))
-		       (decf (hp enemy))
-		       (setf projectiles (delete projectile projectiles)))
-		      ((collided-p projectile player)
-		       (explode! player)
-		       (explode! projectile)
-		       (return-from resolve-collisions))
-		      ((collided-p player enemy)
-		       (explode! player)
-		       (decf (hp enemy) 5)
-		       (return-from resolve-collisions))
-		      (t 
-		       (values)))))))
+  nil)

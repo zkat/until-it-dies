@@ -24,8 +24,8 @@
 (defsheep =file-texture= (=texture=)
   ((filename nil)))
 
-(defmessage load-texture ((texture =file-texture=))
-  (unless (name texture)
+(defmessage create-texture ((texture =file-texture=))
+  (when (name texture)
     (delete-texture texture))
   (setf (name texture)   
 	(let ((texture-name (car (gl:gen-textures 1)))
@@ -55,7 +55,7 @@
    (height 0)
    (image-data nil)))
 
-(defmessage load-texture ((texture =sequence-texture=))
+(defmessage create-texture ((texture =sequence-texture=))
   (when (name texture)
     (delete-texture texture))
   (let ((name (car (gl:gen-textures 1)))
@@ -78,7 +78,7 @@
   (with-properties (x y width height texture) 
       sprite
     (unless (name texture)
-      (load-texture texture))
+      (create-texture texture))
     (bind-texture texture)
     (gl:with-primitives :quads
      (rectangle x y width height))))

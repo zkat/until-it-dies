@@ -1,4 +1,4 @@
-;; This file is part of uid
+;; This file is part of Until It Dies
 
 ;; game.lisp
 ;;
@@ -48,8 +48,7 @@ done before entering the game loop."))
 ;;; Game messages
 (defmessage update ((game =game=) delta-t)
   "At the highest level, we simply forward the update message to the active level."
-  #+nil(update (current-level game) delta-t)
-  (update (sprite game) delta-t))
+  (update (current-level game) delta-t))
 
 (defmessage draw :before ((game =game=))
 	    (declare (ignore game))
@@ -99,13 +98,13 @@ done before entering the game loop."))
   (declare (ignore game x y dx dy))
   (values))
 
-
 ;;; Main loop
 (defvar *game*)
 (defmessage init ((game =game=))
   (sdl:window (screen-width game) (screen-height game)
 	      :title-caption (title game)
 	      :flags (logior sdl:sdl-opengl))
+  (setf (sdl:frame-rate) nil)
   (setf cl-opengl-bindings:*gl-get-proc-address* #'sdl-cffi::sdl-gl-get-proc-address)
   (setup-ortho-projection (screen-width game) (screen-height game))
 #+nil(load-level game "test-level"))

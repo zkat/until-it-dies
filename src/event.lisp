@@ -1,8 +1,6 @@
-;; This file is part of yashmup
+;; This file is part of Until It Dies
 
 ;; event.lisp
-;;
-;; Contains the event-queue and event classes, and code to interact with them.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :yashmup)

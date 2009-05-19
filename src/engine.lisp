@@ -7,6 +7,7 @@
 
 (defsheep =engine= ()
   ((running-p t)
+   (initialized-p nil)
    (keys-held-down (make-hash-table :test #'eq)
 		   :cloneform (make-hash-table :test #'eq))
    (current-game nil)
@@ -26,6 +27,10 @@ done before entering the engine loop."))
 (defbuzzword run (engine)
   (:documentation "Runs the engine. ENGINE is initialized inside this buzzword,
  followed by the main engine loop."))
+(defbuzzword attach (a b)
+  (:documentation "Registers B with A. Used in cases such as attaching components to games"))
+(defbuzzword detach (a b)
+  (:documentation "Detaches B from A. Used in cases such as detaching components from games"))
 (defbuzzword update (object delta-t)
   (:documentation "Updates the state of the object by DELTA-T (which is in milliseconds)"))
 (defbuzzword draw (object)

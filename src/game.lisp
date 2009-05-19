@@ -9,16 +9,16 @@
 ;;; Game Prototype
 ;;;
 (defsheep =game= ()
-  ((event-queue (clone (=event-queue=) ())
+  ((name 'default-uid-game)
+   (initialized-p nil)
+   (event-queue (clone (=event-queue=) ())
 		:cloneform (clone (=event-queue=) ()))
-   (player nil)
-   (background nil) 
-   (projectiles nil :cloneform nil)
-   (enemies nil :cloneform nil)))
+   (input-enabled-p t)
+   (components nil :cloneform nil)))
 
 (defbuzzword load-game (engine filename))
 (defmessage load-game ((engine =engine=) filename)
-  "Loads a game script and returns the configured GAME object."
+  "Loads a game definition file and returns the configured GAME object."
   (declare (ignore engine filename))
   #+nil(let ((*engine* (clone (=engine=)
 		       ((current-game (clone (=game=) ()))))))
@@ -42,18 +42,10 @@
   ;; texture deletion goes here
   )
 (defmessage update ((game =game=) delta-t)
-  (declare (ignore game delta-t))
   "Takes care of calling UPDATE on all of GAME's member objects. Also, resolves collisions"
-)
+  (mapc (lambda (obj)
+	  (update obj delta-t))
+	(components game)))
 
 (defmessage draw ((game =game=))
-  (with-properties (background player projectiles enemies messages) game
-    (draw background)
-    (mapc #'draw messages)
-    (draw player)
-    (mapc #'draw enemies)
-    (mapc #'draw projectiles)))
-
-(defmessage resolve-collisions ((game =game=))
-  (declare (ignore game))
-  nil)
+  (mapc #'draw (components game)))

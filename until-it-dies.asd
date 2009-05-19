@@ -26,6 +26,9 @@
 		       (:file "texture")
 		       (:file "particles")))
 	     (:file "config")
+	     (:file "event")
+	     (:file "engine")
 	     (:file "game")))))
+
 
 

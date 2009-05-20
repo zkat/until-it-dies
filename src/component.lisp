@@ -3,4 +3,5 @@
 (defsheep =component= ()
   ((parent nil)
    (initialized-p nil)
-   (components nil)))
+   (subcomponents nil)))
+

@@ -17,8 +17,8 @@ Returns both the difference in time and the current-time used in the computation
       (progn ,@body)
     (continue () :report "Continue")))
 
-(defun degrees-to-radians (degrees)
+(defun degrees->radians (degrees)
   (* (/ degrees 180) pi))
 
-(defun radians-to-degrees (radians)
+(defun radians->degrees (radians)
   (/ (* radians 180) pi))

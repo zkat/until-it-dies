@@ -49,3 +49,10 @@
 
 (defmessage draw ((game =game=))
   (mapc #'draw (components game)))
+
+(defmessage attach ((game =game=) (engine =engine=))
+  (push game (games engine)))
+
+(defmessage detach ((game =game=) (engine =engine=))
+  (setf (games engine)
+	(delete game (games engine))))

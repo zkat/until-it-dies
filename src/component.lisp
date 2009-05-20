@@ -11,17 +11,17 @@
 (defmessage draw ((component =component=))
   (values))
 
-(defmessage attach ((component =component=) (game =game=))
-  (push component (components game)))
+(defmessage attach ((component =component=) (screen =screen=))
+  (push component (components screen)))
 
-(defmessage detach ((component =component=) (game =game=))
-  (setf (components game)
-	(delete component (components game))))
+(defmessage detach ((component =component=) (screen =screen=))
+  (setf (components screen)
+	(delete component (components screen))))
 
 (defmessage attach ((component =component=) (engine =engine=))
-  (let ((game (car (games engine))))
-    (attach component game)))
+  (let ((screen (car (screens engine))))
+    (attach component screen)))
 
 (defmessage detach ((component =component=) (engine =engine=))
-  (let ((game (car (games engine))))
-    (detach component game)))
+  (let ((screen (car (screens engine))))
+    (detach component screen)))

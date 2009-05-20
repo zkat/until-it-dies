@@ -28,7 +28,8 @@
 	     (:file "config")
 	     (:file "event")
 	     (:file "engine")
-	     (:file "game")))))
+	     (:file "screen")
+	     (:file "component")))))
 
 
 

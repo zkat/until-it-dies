@@ -11,6 +11,7 @@
    (keys-held-down (make-hash-table :test #'eq)
 		   :cloneform (make-hash-table :test #'eq))
    (screens nil)
+   (default-screen nil)
    (paused-p  nil)
    (screen-width *screen-width*)
    (screen-height *screen-height*)
@@ -36,7 +37,7 @@ done before entering the engine loop."))
 (defbuzzword draw (object)
   (:documentation "Renders the object onto the screen in its current state."))
 
-;; Events
+;; Device Events
 (defbuzzword key-up (engine key mod-key unicode state scancode)
   (:documentation "Key event for a key being released."))
 (defbuzzword key-down (engine key mod-key unicode state scancode)

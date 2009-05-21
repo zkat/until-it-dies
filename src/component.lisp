@@ -19,9 +19,11 @@
 	(delete component (components screen))))
 
 (defmessage attach ((component =component=) (engine =engine=))
-  (let ((screen (car (screens engine))))
+  (let ((screen (or (default-screen engine)
+		    (car (screens engine)))))
     (attach component screen)))
 
 (defmessage detach ((component =component=) (engine =engine=))
-  (let ((screen (car (screens engine))))
+  (let ((screen (or (default-screen engine)
+		    (car (screens engine)))))
     (detach component screen)))

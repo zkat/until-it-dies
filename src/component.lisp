@@ -27,3 +27,12 @@
   (let ((screen (or (default-screen engine)
 		    (car (screens engine)))))
     (detach component screen)))
+
+(defsheep =2d-component= (=component=)
+  ((x 0)
+   (y 0)
+   (height 0)
+   (width 0)
+   (rotation 0)))
+
+

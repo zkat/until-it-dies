@@ -42,10 +42,10 @@
   (declare (ignore screen))
   ;; texture deletion goes here
   )
-(defmessage update ((screen =screen=) delta-t)
+(defmessage update ((screen =screen=) dt)
   "Takes care of calling UPDATE on all of SCREEN's member objects. Also, resolves collisions"
   (mapc (lambda (obj)
-	  (update obj delta-t))
+	  (update obj dt))
 	(components screen)))
 
 (defmessage draw ((screen =screen=))

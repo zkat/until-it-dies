@@ -31,8 +31,8 @@ done before entering the engine loop."))
   (:documentation "Registers A with B. Used in cases such as attaching components to screens"))
 (defbuzzword detach (a b)
   (:documentation "Detaches A from B. Used in cases such as detaching components from screens"))
-(defbuzzword update (object delta-t)
-  (:documentation "Updates the state of the object by DELTA-T (which is in milliseconds)"))
+(defbuzzword update (object dt)
+  (:documentation "Updates the state of the object by DT (which is in milliseconds)"))
 (defbuzzword draw (object)
   (:documentation "Renders the object onto the screen in its current state."))
 
@@ -52,10 +52,10 @@ done before entering the engine loop."))
 
 
 ;;; Engine messages
-(defmessage update ((engine =engine=) delta-t)
+(defmessage update ((engine =engine=) dt)
   "At the highest screen, we simply forward the update message to the active screen."
   (mapc (lambda (screen)
-	  (update screen delta-t))
+	  (update screen dt))
 	(screens engine)))
 
 (defmessage draw :before ((engine =engine=))
@@ -66,11 +66,6 @@ done before entering the engine loop."))
 
 (defmessage draw ((engine =engine=))
   "We need to do some setup here, and call SDL:UPDATE-DISPLAY once everything else is rendered."
-    ;; (gl:color 1 0 1)
-  ;; (gl:with-primitive :quads
-  ;;  (rectangle (/ *sIcreen-width* 2) 
-  ;; 	      (/ *screen-height* 2)
-  ;; 	      200 200))
   (mapc #'draw (screens engine)))
 
 (defmessage draw :after ((engine =engine=))
@@ -154,9 +149,9 @@ done before entering the engine loop."))
 			     (restartable (mouse-move engine x y delta-x delta-y)))
 	(:idle ()
 	       (let* ((now (now))
-		      (delta-t (- now last-time)))
+		      (dt (- now last-time)))
 		 (setf last-time now)
-		 (restartable (update engine delta-t)))
+		 (restartable (update engine dt)))
 	       (restartable (draw engine))))
       ;; Once out of the loop, we should tear everything down so resources get properly unloaded.
       (restartable (teardown engine))

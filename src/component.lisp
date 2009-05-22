@@ -23,8 +23,9 @@ velocities for each."
 (defmessage draw ((component =component=))
   "We'll just draw red squares for default =components="
   (with-properties (x y) component
-    (gl:color 1 0 0)
-    (rectangle x y 10 10)))
+    (gl:color 1 1 1)
+    (gl:with-primitives :quads
+     (rectangle x y 100 100))))
 
 (defmessage attach ((component =component=) (screen =screen=))
   (push component (components screen)))

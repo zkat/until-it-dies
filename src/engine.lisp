@@ -66,8 +66,12 @@ done before entering the engine loop."))
 
 (defmessage draw ((engine =engine=))
   "We need to do some setup here, and call SDL:UPDATE-DISPLAY once everything else is rendered."
-  (declare (ignore engine))
-  #+nil(mapc #'draw (screens engine)))
+    ;; (gl:color 1 0 1)
+  ;; (gl:with-primitive :quads
+  ;;  (rectangle (/ *sIcreen-width* 2) 
+  ;; 	      (/ *screen-height* 2)
+  ;; 	      200 200))
+  (mapc #'draw (screens engine)))
 
 (defmessage draw :after ((engine =engine=))
 	    (declare (ignore engine))
@@ -126,8 +130,8 @@ done before entering the engine loop."))
 	     (init (load-screen engine "menu"))))
 
 (defmessage teardown ((engine =engine=))
-  (when (current-screen engine)
-    (teardown (current-screen engine))))
+  (when (screens engine)
+    (mapc #'teardown (screens engine))))
 
 (defmessage run ((engine =engine=))
   (sdl:with-init ()

@@ -3,7 +3,7 @@
 ;; game.lisp
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(in-package :until-it-dies)
+ (in-package :until-it-dies)
 
 ;;;
 ;;; Game Prototype

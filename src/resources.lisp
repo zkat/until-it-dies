@@ -1,7 +1,20 @@
 (in-package :until-it-dies)
 
-(defsheep =resource= () ())
+;;;
+;;; Generic resources prototype
+;;;
+;;; - This doesn't do much right now, but I'll refactor texture stuff out to this later.
+(defsheep =resource= () 
+  ((loadedp nil)))
 
+(defbuzzword load-resource (resource)
+  (:documentation "Loads the resource's data into memory, activating it."))
+(defbuzzword unload-resource (resource)
+  (:documentation "Unloads the resource's data from memory, handling any freeing that needs to happen"))
+
+;;;
+;;; Standard textures
+;;;
 (defbuzzword load-texture (texture))
 (defbuzzword bind-texture (texture))
 (defbuzzword unload-texture (texture))
@@ -23,6 +36,13 @@
 	(gl:delete-texture id)
       #+cl-opengl-checks-errors(%gl::opengl-error (c) (values nil c)))))
 
+(defmessage loadedp ((texture =texture=))
+  (when (tex-id texture)
+    t))
+
+;;;
+;;; File textures
+;;;
 (defsheep =file-texture= (=texture=)
   ((filepath nil)))
 
@@ -55,6 +75,4 @@
 			  (when (gl:texturep id)
 			    (gl:delete-texture id)))))))
 
-(defmessage loadedp ((texture =texture=))
-  (when (tex-id texture)
-    t))
+

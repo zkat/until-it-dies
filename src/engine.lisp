@@ -8,13 +8,23 @@
 (defsheep =engine= ()
   ((running-p t)
    (initialized-p nil)
+   (fps nil)
    (keys-held-down (make-hash-table :test #'eq)
 		   :cloneform (make-hash-table :test #'eq))
    (screens nil)
    (paused-p  nil)
-   (screen-width *screen-width*)
-   (screen-height *screen-height*)
+   (window-width *window-width*)
+   (window-height *window-height*)
    (title "(Shoot it) Until it Dies")))
+
+(defmessage (setf fps) :after (new-value (engine =engine=))
+	    (declare (ignore new-value))
+	    (let ((new-fps (fps engine)))
+	      (setf (sdl:frame-rate) (or new-fps 0))))
+
+(defmessage reinitialize-sheep :after ((engine =engine=) &key)
+	    (let ((new-fps (fps engine)))
+	      (setf (sdl:frame-rate) (or new-fps 0))))
 
 ;;;
 ;;; Buzzwords
@@ -115,12 +125,13 @@ done before entering the engine loop."))
 ;;; Main loop
 (defvar *engine*)
 (defmessage init ((engine =engine=))
-  (sdl:window (screen-width engine) (screen-height engine)
+  (sdl:window (window-width engine) (window-height engine)
 	      :title-caption (title engine)
 	      :flags (logior sdl:sdl-opengl))
-  (setf (sdl:frame-rate) 0)
+  (let ((fps (fps engine)))
+   (setf (sdl:frame-rate) (or fps 0)))
   (setf cl-opengl-bindings:*gl-get-proc-address* #'sdl-cffi::sdl-gl-get-proc-address)
-  (setup-ortho-projection (screen-width engine) (screen-height engine))
+  (setup-ortho-projection (window-width engine) (window-height engine))
   #+nil(push (screens engine)
 	     (init (load-screen engine "menu"))))
 

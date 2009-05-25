@@ -5,8 +5,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
-(defparameter *screen-height* 600)
-(defparameter *screen-width* 500)
+(defparameter *window-height* 600)
+(defparameter *window-width* 500)
 (defparameter *bg-color* sdl:*black*)
 (defparameter *default-framerate* 60)
 (defparameter *resource-path-name* "resources/")

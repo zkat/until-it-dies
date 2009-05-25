@@ -4,43 +4,44 @@
 ;;; Generic resources prototype
 ;;;
 ;;; - This doesn't do much right now, but I'll refactor texture stuff out to this later.
-(defsheep =resource= () 
-  ((loadedp nil)))
+(defsheep =resource= () ())
 
 (defbuzzword load-resource (resource)
   (:documentation "Loads the resource's data into memory, activating it."))
 (defbuzzword unload-resource (resource)
   (:documentation "Unloads the resource's data from memory, handling any freeing that needs to happen"))
+(defbuzzword loadedp (resource))
 
 ;;;
 ;;; Standard textures
 ;;;
-(defbuzzword load-texture (texture))
 (defbuzzword bind-texture (texture))
-(defbuzzword unload-texture (texture))
-(defbuzzword loadedp (texture))
 
-(defsheep =texture= ()
+(defsheep =texture= (=resource=)
   ((tex-id nil)
    (target :texture-2d)
    (height 0)
    (width 0)))
 
 (defmessage bind-texture ((texture =texture=))
-  (when (null (tex-id texture))
-    (load-texture texture))
-  (gl:bind-texture (target texture) (tex-id texture)))
+  (with-properties (tex-id target) texture
+    (when (or (null tex-id)
+	      (not (gl:texturep tex-id)))
+      (load-texture texture))
+    (gl:bind-texture target tex-id)))
 
-(defmessage unload-texture ((texture =texture=))
-  (let* ((id (tex-id texture)))
+(defmessage unload-resource ((texture =texture=))
+  (let ((id (tex-id texture)))
     (setf (tex-id texture) nil)
     (handler-case
 	(gl:delete-texture id)
       #+cl-opengl-checks-errors(%gl::opengl-error (c) (values nil c)))))
 
 (defmessage loadedp ((texture =texture=))
-  (when (tex-id texture)
-    t))
+  (with-properties (tex-id) texture
+    (when (and tex-id
+	       (gl:texturep tex-id))
+     t)))
 
 ;;;
 ;;; File textures
@@ -48,7 +49,7 @@
 (defsheep =file-texture= (=texture=)
   ((filepath nil)))
 
-(defmessage load-texture ((texture =file-texture=))
+(defmessage load-resource ((texture =file-texture=))
   (when (tex-id texture)
     (unload-texture texture))
   (let ((id (let ((texture-name (gl:gen-texture))

@@ -2,6 +2,7 @@
 
 (defsheep =component= ()
   ((parent nil)
+   (visiblep t)
    (subcomponents nil)
    (x 0)
    (y 0)
@@ -14,9 +15,12 @@
   (values))
 
 (defmessage draw ((component =component=))
-  "We'll just draw red squares for default =components="
-  (declare (ignore component))
-  (values))
+  "We'll just draw a simple rectangle for default =components="
+  (when (visiblep component)
+   (with-properties (x y z width height) 
+       component
+     (gl:with-primitives :quads
+       (rectangle x y width height :z z)))))
 
 (defmessage attach ((component =component=) (screen =screen=))
   (push component (components screen))
@@ -40,20 +44,31 @@
 (defsheep =mobile= (=component=)
   ((x-velocity 0)
    (y-velocity 0)
-   (z-velocity 0)))
+   (z-velocity 0)
+   (x-accel 0)
+   (y-accel 0)
+   (z-accel 0)))
 
 (defmessage update ((mobile =mobile=) dt)
-  (with-properties (x y z x-velocity y-velocity z-velocity) mobile
+  (with-properties (x y z x-velocity y-velocity z-velocity
+		      x-accel y-accel z-accel) mobile
+    ;; First, we adjust the velocity according to current acceleration
+    (incf x-velocity (* x-accel dt 1/1000))
+    (incf y-velocity (* y-accel dt 1/1000))
+    (incf z-velocity (* z-accel dt 1/1000))
+    ;; Then, we adjust the actual coordinates based on the velocity
     (incf x (* x-velocity dt 1/1000))
     (incf y (* y-velocity dt 1/1000))
     (incf z (* z-velocity dt 1/1000))))
 
-(defsheep =sprite= (=mobile=)
+(defsheep =textured= (=component=)
   ((texture nil)))
 
-(defmessage draw ((sprite =sprite=))
-  (with-properties (x y z width height texture) 
-      sprite
-    (bind-texture texture)
-    (gl:with-primitives :quads
-     (rectangle x y width height :z z))))
+(defmessage draw :before ((component =textured=))
+	    (bind-texture (texture component)))
+
+(defsheep =sprite= (=mobile= =textured=)
+  ())
+
+
+

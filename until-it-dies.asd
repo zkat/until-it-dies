@@ -13,12 +13,13 @@
 	    :serial t
 	    :components
 	    ((:file "packages")
-	     (:file "opengl-hacks")
 	     (:module util
 		      :serial t
 		      :components
-		      ((:file "utils")
-		       (:file "priority-queue")))
+		      ((:file "trivial-garbage")
+		       (:file "opengl-hacks")
+		       (:file "priority-queue")
+		       (:file "utils")))
 	     (:file "config")
 	     (:file "resources")
 	     (:file "event")

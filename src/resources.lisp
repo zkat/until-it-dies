@@ -1,10 +1,12 @@
 (in-package :until-it-dies)
 
+(defvar *max-resource-id* 0)
+
 ;;;
 ;;; Generic resources prototype
 ;;;
-;;; - This doesn't do much right now, but I'll refactor texture stuff out to this later.
-(defsheep =resource= () ())
+(defsheep =resource= ()
+  ((id 0 :cloneform (incf *max-resource-id*))))
 
 (defbuzzword load-resource (resource)
   (:documentation "Loads the resource's data into memory, activating it."))
@@ -12,6 +14,9 @@
   (:documentation "Unloads the resource's data from memory, 
                    handling any freeing that needs to happen"))
 (defbuzzword loadedp (resource))
+
+(defsheep =file-resource= (=resource=)
+  ((filepath nil)))
 
 ;;;
 ;;; Resource management
@@ -71,13 +76,13 @@
 ;;;
 ;;; File textures
 ;;;
-(defsheep =file-texture= (=texture=)
-  ((filepath nil)))
+(defsheep =file-texture= (=file-resource= =texture=)
+  ())
 
 (defmessage load-resource ((texture =file-texture=))
   (when (tex-id texture)
     (unload-texture texture))
-  (prog1 (let ((texture-name (gl:gen-texture))
+  (prog2 (let ((texture-name (gl:gen-texture))
 	       (image (sdl-image:load-image (filepath texture)))
 	       (target (target texture)))
 	   (gl:bind-texture target texture-name)
@@ -100,6 +105,7 @@
 	   (setf (width texture) (sdl:width image))
 	   (setf (height texture) (sdl:height image))
 	   (setf (tex-id texture) texture-name))
+      texture
     (let ((id (tex-id texture)))
       (finalize texture (lambda ()
 			  (when (gl:texturep id)

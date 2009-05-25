@@ -5,11 +5,11 @@
    (subcomponents nil)
    (x 0)
    (y 0)
-   (z 0)))
+   (z 0)
+   (width 0)
+   (height 0)))
 
 (defmessage update ((component =component=) dt)
-  "By default, UPDATE simply changes the x, y, and z positions of COMPONENT based on its
-velocities for each."
   (declare (ignore component dt))
   (values))
 
@@ -40,7 +40,20 @@ velocities for each."
 (defsheep =mobile= (=component=)
   ((x-velocity 0)
    (y-velocity 0)
-   (z-velocity 0)
-   (x-rotation 0)
-   (y-rotation 0)
-   (z-rotation 0)))
+   (z-velocity 0)))
+
+(defmessage update ((mobile =mobile=) dt)
+  (with-properties (x y z x-velocity y-velocity z-velocity) mobile
+    (incf x (* x-velocity dt 1/1000))
+    (incf y (* y-velocity dt 1/1000))
+    (incf z (* z-velocity dt 1/1000))))
+
+(defsheep =sprite= (=mobile=)
+  ((texture nil)))
+
+(defmessage draw ((sprite =sprite=))
+  (with-properties (x y z width height texture) 
+      sprite
+    (bind-texture texture)
+    (gl:with-primitives :quads
+     (rectangle x y width height :z z))))

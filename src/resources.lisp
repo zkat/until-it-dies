@@ -1,12 +1,10 @@
 (in-package :until-it-dies)
 
-(defvar *max-resource-id* 0)
-
 ;;;
 ;;; Generic resources prototype
 ;;;
 (defsheep =resource= ()
-  ((id 0 :cloneform (incf *max-resource-id*))))
+  ())
 
 (defbuzzword load-resource (resource)
   (:documentation "Loads the resource's data into memory, activating it."))

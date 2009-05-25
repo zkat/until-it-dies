@@ -65,7 +65,8 @@
   ((texture nil)))
 
 (defmessage draw :before ((component =textured=))
-	    (bind-texture (texture component)))
+	    (when (texture component)
+	      (bind-texture (texture component))))
 
 (defsheep =sprite= (=mobile= =textured=)
   ())

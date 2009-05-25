@@ -12,7 +12,7 @@ Returns both the difference in time and the current-time used in the computation
   (let* ((time-now (now))
 	 (difference (- time-now time-before)))
     (if (minusp difference)
-	(time-difference time-now) ; protection for when sdl-get-ticks wraps
+	0 ; protection for when sdl-get-ticks wraps
 	(values (- time-now time-before)
 		time-now))))
 

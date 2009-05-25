@@ -22,7 +22,9 @@
 
 (defsheep =texture= ()
   ((tex-id nil)
-   (target :texture-2d)))
+   (target :texture-2d)
+   (height 0)
+   (width 0)))
 
 (defmessage bind-texture ((texture =texture=))
   (when (null (tex-id texture))
@@ -50,29 +52,29 @@
   (when (tex-id texture)
     (unload-texture texture))
   (let ((id (let ((texture-name (gl:gen-texture))
-	       (image (sdl-image:load-image (filepath texture)))
-	       (target (target texture)))
-	   (gl:bind-texture target texture-name)
-	   (gl:tex-parameter target :generate-mipmap t)
-	   (gl:tex-parameter target :texture-min-filter :linear-mipmap-linear)
-	   (sdl-base::with-pixel (pix (sdl:fp image))
-	     (let ((texture-format (ecase (sdl-base::pixel-bpp pix)
-				     (1 :luminance)
-				     (2 :luminance-alpha)
-				     (3 :rgb)
-				     (4 :rgba))))
-	       (assert (and (= (sdl-base::pixel-pitch pix)
-			       (* (sdl:width image) (sdl-base::pixel-bpp pix)))
-			    (zerop (rem (sdl-base::pixel-pitch pix) 4))))
-	       (gl:tex-image-2d target 0 :rgba
-				(sdl:width image) (sdl:height image)
-				0
-				texture-format
-				:unsigned-byte (sdl-base::pixel-data pix))))
-	   texture-name)))
+		  (image (sdl-image:load-image (filepath texture)))
+		  (target (target texture)))
+	      (gl:bind-texture target texture-name)
+	      (gl:tex-parameter target :generate-mipmap t)
+	      (gl:tex-parameter target :texture-min-filter :linear-mipmap-linear)
+	      (sdl-base::with-pixel (pix (sdl:fp image))
+		(let ((texture-format (ecase (sdl-base::pixel-bpp pix)
+					(1 :luminance)
+					(2 :luminance-alpha)
+					(3 :rgb)
+					(4 :rgba))))
+		  (assert (and (= (sdl-base::pixel-pitch pix)
+				  (* (sdl:width image) (sdl-base::pixel-bpp pix)))
+			       (zerop (rem (sdl-base::pixel-pitch pix) 4))))
+		  (gl:tex-image-2d target 0 :rgba
+				   (sdl:width image) (sdl:height image)
+				   0
+				   texture-format
+				   :unsigned-byte (sdl-base::pixel-data pix))))
+	      (setf (width texture) (sdl:width image))
+	      (setf (height texture) (sdl:height image))
+	      texture-name)))
     (prog1 (setf (tex-id texture) id)
       (finalize texture (lambda ()
 			  (when (gl:texturep id)
 			    (gl:delete-texture id)))))))
-
-

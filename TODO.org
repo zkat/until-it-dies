@@ -3,13 +3,15 @@
 ** DONE Draw a square on the screen
 ** DONE Apply a texture to square
 * Make it useful
-** TODO Figure out resource management
+** DONE Figure out resource management
    I don't really know how to handle resources right now. I want to be able to dynamically add/remove
    them, but it shouldn't rely on the GC, since it's unpredictable and resources can take up quite a
    bit of memory.
    Note: Maybe I should code this The Wrong Way™ first. (wrong way being "load new copies of
    resources into a slot every time, and require manual unloading of each")
-** TODO Write a proper texture system
+   UPDATE: I *think* this is enough. We'll see.
+** DONE Write a proper texture system
+   It's not complete, no, but it's useful enough.
 ** TODO Write a sprite prototype
    Everything I need to make a sprite should go into this sprite prototype. When I want
    to start animating stuff, it should all go into this sprite prototype. I'll refactor things out

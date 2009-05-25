@@ -55,7 +55,7 @@
   (with-properties (tex-id target) texture
     (when (or (null tex-id)
 	      (not (gl:texturep tex-id)))
-      (load-texture texture))
+      (load-resource texture))
     (gl:bind-texture target tex-id)))
 
 (defmessage unload-resource ((texture =texture=))
@@ -79,7 +79,7 @@
 
 (defmessage load-resource ((texture =file-texture=))
   (when (tex-id texture)
-    (unload-texture texture))
+    (unload-resource texture))
   (prog2 (let ((texture-name (gl:gen-texture))
 	       (image (sdl-image:load-image (filepath texture)))
 	       (target (target texture)))

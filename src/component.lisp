@@ -70,5 +70,3 @@
 (defsheep =sprite= (=mobile= =textured=)
   ())
 
-
-

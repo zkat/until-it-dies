@@ -48,7 +48,7 @@
 
 (defmessage load-texture ((texture =file-texture=))
   (when (tex-id texture)
-    (delete-texture texture))
+    (unload-texture texture))
   (let ((id (let ((texture-name (gl:gen-texture))
 	       (image (sdl-image:load-image (filepath texture)))
 	       (target (target texture)))

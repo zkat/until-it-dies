@@ -1,4 +1,4 @@
 (defpackage #:until-it-dies
   (:nicknames #:uid)
-  (:use #:cl #:sheeple))
+  (:use #:cl #:sheeple #:trivial-garbage))
 

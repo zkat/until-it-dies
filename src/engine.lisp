@@ -5,6 +5,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
+;;;
+;;; Engine Prototype
+;;;
+;;; - Engines are objects that contain information about -how- to run an application.
+;;;   The engine handles the following aspects of UID applications:
+;;;     * Framerate
+;;;     * Input
+;;;     * Global pausing
+;;;     * Window height/width/title
+;;;     * General initialization
+;;;     * Main loop, including updating and drawing of attached objects.
+;;;
+;;;   In general, it's a good idea to clone =engine= for each application being created,
+;;;   but it's not a mortal sin to just use it as a singleton.
 (defsheep =engine= ()
   ((running-p t)
    (initialized-p nil)
@@ -56,9 +70,10 @@ done before entering the engine loop."))
 (defbuzzword mouse-move (engine x y delta-x delta-y)
   (:documentation "Mouse has been moved to (X,Y)."))
 
+;;;
 ;;; Engine messages
-(defmessage detach-all ((engine =engine=))
-  (setf (screens engine) nil))
+;;;
+
 
 (defmessage update ((engine =engine=) dt)
   "At the highest screen, we simply forward the update message to the active screen."
@@ -67,6 +82,7 @@ done before entering the engine loop."))
 	(screens engine)))
 
 (defmessage draw :before ((engine =engine=))
+	    "Clearing, and initial setup before drawing."
 	    (declare (ignore engine))
 	    (gl:clear-color 0 0 0 0)
 	    (gl:clear :color-buffer-bit :depth-buffer-bit)
@@ -74,44 +90,54 @@ done before entering the engine loop."))
 	    (gl:blend-func :src-alpha :one-minus-src-alpha))
 
 (defmessage draw ((engine =engine=))
-  "We need to do some setup here, and call SDL:UPDATE-DISPLAY once everything else is rendered."
+  "The primary message will pass on the draw message to all of ENGINE's screens."
   (mapc #'draw (screens engine)))
 
 (defmessage draw :after ((engine =engine=))
+	    "Once everything is done, swap the back buffer in."
 	    (declare (ignore engine))
 	    (sdl:update-display))
 
 (defmessage window-resized (engine width height)
+  "We don't really care about resize events right now."
   (declare (ignore engine width height))
   (values))
 
 ;;; Key event handling
 (defmessage key-up :before ((engine =engine=) key mod-key unicode state scancode)
+  "If the key was released, it's no longer pressed!"
   (declare (ignore mod-key unicode state scancode))
   (with-properties (keys-held-down) engine
     (setf (gethash key keys-held-down) nil)))
 
 (defmessage key-up ((engine =engine=) key mod-key unicode state scancode)
+  "This is the 'real' KEY-UP. Blank by default."
   (declare (ignore engine key mod-key unicode state scancode))
   (values))
 
 (defmessage key-down :before ((engine =engine=) key mod-key unicode state scancode)
+  "If the key was pressed, then it's being held! :D"
   (declare (ignore mod-key unicode state scancode))
   (with-properties (keys-held-down) engine
     (setf (gethash key keys-held-down) t)))
 
 (defmessage key-down ((engine =engine=) key mod-key unicode state scancode)
+  "The 'real' key-down is blank, although it keeps an eye on Escape, for Boss Protection™"
   (declare (ignore engine mod-key unicode state scancode))
   (when (sdl:key= key :sdl-key-escape)
     (sdl:push-quit-event)))
 
 (defmessage key-down-p ((engine =engine=) key)
+  "Is KEY being held down?"
   (with-properties (keys-held-down) engine
     (let ((down-p (gethash key keys-held-down)))
       down-p)))
 
 ;;; Mouse event handling
-;;; Only stubs here for now
+;;;
+;;; - TODO: I should probably handle this, even with base =engine=. Keeping track of which mouse
+;;;   buttons are held down, and the current x/y position of the cursor is probably a good
+;;;   plan
 (defmessage mouse-up ((engine =engine=) button state x y)
   (declare (ignore engine button state x y))
   (values))
@@ -122,9 +148,16 @@ done before entering the engine loop."))
   (declare (ignore engine x y dx dy))
   (values))
 
+;;; Attaching/detaching
+(defmessage detach-all ((engine =engine=))
+  "This simply removes all references to ENGINE's screens."
+  (setf (screens engine) nil))
+
 ;;; Main loop
 (defvar *engine*)
 (defmessage init ((engine =engine=))
+  "By default, we take care of setting sdl window options, 
+and doing some very initial OpenGL setup."
   (sdl:window (window-width engine) (window-height engine)
 	      :title-caption (title engine)
 	      :flags (logior sdl:sdl-opengl))
@@ -135,39 +168,50 @@ done before entering the engine loop."))
 	     (init (load-screen engine "menu"))))
 
 (defmessage teardown ((engine =engine=))
+  "Simply pass the message along to ENGINE's screens."
   (when (screens engine)
     (mapc #'teardown (screens engine))))
 
 (defmessage run ((engine =engine=))
+  "Here's the main loop -- because of the way lb-sdl is set up, we handle all input right here.
+We also bind the engine parameter to *engine*, which might make things a little easier later on."
   (sdl:with-init ()
     (init engine)
     (let ((last-time (now))
 	  (*engine* engine))
-      (sdl:with-events ()
-	(:quit-event () (prog1 t
-			  (setf (running-p engine) nil)))
-	(:video-resize-event (:w width :h height)
-			     (window-resized engine width height))
-	(:key-down-event (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
-			 (restartable (key-down engine key mod-key unicode state scancode)))
-	(:key-up-event (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
-		       (restartable (key-up engine key mod-key unicode state scancode)))
-	(:mouse-button-up-event (:button button :state state :x x :y y)
-				(restartable (mouse-up engine button state x y)))
-	(:mouse-button-down-event (:button button :state state :x x :y y)
-				  (restartable (mouse-down engine button state x y)))
-	(:mouse-motion-event (:x x :y y :x-rel delta-x :y-rel delta-y)
-			     (restartable (mouse-move engine x y delta-x delta-y)))
-	(:idle ()
-	       (let* ((now (now))
-		      (dt (- now last-time)))
-		 (setf last-time now)
-		 (setf (fps engine) (/ 1000 (if (= 0 dt)
-						1 dt)))
-		 (restartable (update engine dt)))
-	       (restartable (draw engine))))
-      ;; Once out of the loop, we should tear everything down so resources get properly unloaded.
-      (restartable (teardown engine))
+      (unwind-protect
+	   ;; Better make sure we are always able to pass on
+	   ;; the TEARDOWN message at the end of the loop.
+	   (sdl:with-events ()
+	     (:quit-event () (prog1 t
+			       (setf (running-p engine) nil)))
+	     (:video-resize-event (:w width :h height)
+				  (window-resized engine width height))
+	     (:key-down-event (:key key :mod-key mod-key :unicode unicode 
+			       :state state :scancode scancode)
+			      (restartable (key-down engine key mod-key unicode state scancode)))
+	     (:key-up-event (:key key :mod-key mod-key :unicode unicode
+                             :state state :scancode scancode)
+			    (restartable (key-up engine key mod-key unicode state scancode)))
+	     (:mouse-button-up-event (:button button :state state :x x :y y)
+				     (restartable (mouse-up engine button state x y)))
+	     (:mouse-button-down-event (:button button :state state :x x :y y)
+				       (restartable (mouse-down engine button state x y)))
+	     (:mouse-motion-event (:x x :y y :x-rel delta-x :y-rel delta-y)
+				  (restartable (mouse-move engine x y delta-x delta-y)))
+	     (:idle ()
+		    (let* ((now (now))
+			   (dt (- now last-time)))
+		      (setf last-time now)
+		      ;; Update the current framerate for ENGINE
+		      (setf (fps engine) (/ 1000 (if (= 0 dt)
+						     1 dt)))
+		      ;; And pass on the UPDATE message.
+		      (restartable (update engine dt)))
+		    ;; Once everything's updated, draw the universe.
+		    (restartable (draw engine))))
+	;; Once out of the loop, we should tear everything down so resources get properly unloaded.
+	(restartable (teardown engine)))
       ;; We return the engine after everything's done.
       ;; It might be handy for inspection.
       engine)))

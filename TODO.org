@@ -12,8 +12,22 @@
    UPDATE: I *think* this is enough. We'll see.
 ** DONE Write a proper texture system
    It's not complete, no, but it's useful enough.
-** TODO Write a sprite prototype
+** DONE Write a sprite prototype
    Everything I need to make a sprite should go into this sprite prototype. When I want
    to start animating stuff, it should all go into this sprite prototype. I'll refactor things out
-   later, but first things first.
-** TODO Figure out what parts of OGL I need, factor those out.
+   later, but first things first. (animation comes later)
+
+
+* Write the library modules
+** graphics module prototypes
+*** engine
+*** screen   
+*** sprite
+*** animated sprite
+*** animation
+*** font
+    I want to be able to easily draw text on-screen. Using cl-ftgl might work.
+*** particle system
+** audio prototypes
+*** sample
+*** music

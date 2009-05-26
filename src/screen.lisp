@@ -57,3 +57,6 @@
 (defmessage detach ((screen =screen=) (engine =engine=))
   (setf (screens engine)
 	(delete screen (screens engine))))
+
+(defmessage detach-all ((screen =screen=))
+  (setf (components screen) nil))

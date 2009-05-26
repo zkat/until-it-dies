@@ -42,6 +42,8 @@ done before entering the engine loop."))
   (:documentation "Key event for a key being released."))
 (defbuzzword key-down (engine key mod-key unicode state scancode)
   (:documentation "Key event for a key being pressed."))
+(defbuzzword key-down-p (engine key)
+  (:documentation "Is KEY currently being held down?"))
 (defbuzzword window-resized (engine width height)
   (:documentation "Event called whenever the window is resized by the user"))
 (defbuzzword mouse-up (engine button state x y)
@@ -50,7 +52,6 @@ done before entering the engine loop."))
   (:documentation "A mouse button has been pressed."))
 (defbuzzword mouse-move (engine x y delta-x delta-y)
   (:documentation "Mouse has been moved to (X,Y)."))
-
 
 ;;; Engine messages
 (defmessage update ((engine =engine=) dt)
@@ -75,7 +76,8 @@ done before entering the engine loop."))
 	    (sdl:update-display))
 
 (defmessage window-resized (engine width height)
-  (declare (ignore engine width height)))
+  (declare (ignore engine width height))
+  (values))
 
 ;;; Key event handling
 (defmessage key-up :before ((engine =engine=) key mod-key unicode state scancode)
@@ -97,7 +99,7 @@ done before entering the engine loop."))
   (when (sdl:key= key :sdl-key-escape)
     (sdl:push-quit-event)))
 
-(defun key-down-p (key engine)
+(defmessage key-down-p ((engine =engine=) key)
   (with-properties (keys-held-down) engine
     (let ((down-p (gethash key keys-held-down)))
       down-p)))
@@ -134,7 +136,8 @@ done before entering the engine loop."))
 (defmessage run ((engine =engine=))
   (sdl:with-init ()
     (init engine)
-    (let ((last-time (now)))
+    (let ((last-time (now))
+	  (*engine* engine))
       (sdl:with-events ()
 	(:quit-event () (prog1 t
 			  (setf (running-p engine) nil)))

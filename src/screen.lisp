@@ -1,12 +1,12 @@
 ;; This file is part of Until It Dies
 
-;; game.lisp
+;; screen.lisp
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- (in-package :until-it-dies)
+(in-package :until-it-dies)
 
 ;;;
-;;; Game Prototype
+;;; Screen Prototype
 ;;;
 (defsheep =screen= ()
   ((name 'default-screen)
@@ -36,12 +36,12 @@
 ;;; Messages
 (defmessage init ((screen =screen=))
   (declare (ignore screen))
-  ;; texture initialization goes here
-  )
+  (values))
+
 (defmessage teardown ((screen =screen=))
   (declare (ignore screen))
-  ;; texture deletion goes here
-  )
+  (values))
+
 (defmessage update ((screen =screen=) dt)
   "Takes care of calling UPDATE on all of SCREEN's member objects. Also, resolves collisions"
   (mapc (lambda (obj)
@@ -52,7 +52,7 @@
   (mapc #'draw (components screen)))
 
 (defmessage attach ((screen =screen=) (engine =engine=))
-  (push screen (screens engine)))
+  (pushnew screen (screens engine)))
 
 (defmessage detach ((screen =screen=) (engine =engine=))
   (setf (screens engine)

@@ -71,3 +71,10 @@
 (defsheep =sprite= (=mobile= =textured=)
   ())
 
+(defmessage draw ((sprite =sprite=))
+  (bind-texture (texture sprite))
+  (when (visiblep sprite)
+   (with-properties (x y z width height) 
+       sprite
+     (gl:with-primitives :quads
+       (rectangle x y width height :z z)))))

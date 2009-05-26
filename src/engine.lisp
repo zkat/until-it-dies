@@ -12,19 +12,10 @@
    (keys-held-down (make-hash-table :test #'eq)
 		   :cloneform (make-hash-table :test #'eq))
    (screens nil)
-   (paused-p  nil)
+   (paused-p nil)
    (window-width *window-width*)
    (window-height *window-height*)
-   (title "(Shoot it) Until it Dies")))
-
-(defmessage (setf fps) :after (new-value (engine =engine=))
-	    (declare (ignore new-value))
-	    (let ((new-fps (fps engine)))
-	      (setf (sdl:frame-rate) (or new-fps 0))))
-
-(defmessage reinitialize-sheep :after ((engine =engine=) &key)
-	    (let ((new-fps (fps engine)))
-	      (setf (sdl:frame-rate) (or new-fps 0))))
+   (title "Until it Dies")))
 
 ;;;
 ;;; Buzzwords
@@ -70,6 +61,7 @@ done before entering the engine loop."))
 
 (defmessage draw :before ((engine =engine=))
 	    (declare (ignore engine))
+	    (gl:clear-color 0 0 0 0)
 	    (gl:clear :color-buffer-bit :depth-buffer-bit)
 	    (gl:enable :texture-2d :blend)
 	    (gl:blend-func :src-alpha :one-minus-src-alpha))

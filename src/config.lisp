@@ -5,10 +5,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
-(defparameter *window-height* 400)
-(defparameter *window-width* 400)
-(defparameter *bg-color* sdl:*black*)
-(defparameter *default-framerate* 60)
 (defparameter *resource-path-name* "resources/")
 (defparameter *level-path-name* "levels/")
 (defun get-resource-path ()

@@ -15,7 +15,7 @@
 ;;;     * Global pausing
 ;;;     * Window height/width/title
 ;;;     * General initialization
-;;;     * Main loop, including updating and drawing of attached objects.
+;;;     * The main loop
 ;;;
 ;;;   In general, it's a good idea to clone =engine= for each application being created,
 ;;;   but it's not a mortal sin to just use it as a singleton.
@@ -28,8 +28,8 @@
 		   :cloneform (make-hash-table :test #'eq))
    (screens nil)
    (paused-p nil)
-   (window-width *window-width*)
-   (window-height *window-height*)
+   (window-width 400)
+   (window-height 400)
    (title "Until it Dies")))
 
 ;;;
@@ -74,7 +74,6 @@ done before entering the engine loop."))
 ;;; Engine messages
 ;;;
 
-
 (defmessage update ((engine =engine=) dt)
   "At the highest screen, we simply forward the update message to the active screen."
   (mapc (lambda (screen)
@@ -104,6 +103,8 @@ done before entering the engine loop."))
   (values))
 
 ;;; Key event handling
+;;; 
+;;; TODO - should these also pass input events to all attached screens? Maybe not?
 (defmessage key-up :before ((engine =engine=) key mod-key unicode state scancode)
   "If the key was released, it's no longer pressed!"
   (declare (ignore mod-key unicode state scancode))
@@ -122,7 +123,7 @@ done before entering the engine loop."))
     (setf (gethash key keys-held-down) t)))
 
 (defmessage key-down ((engine =engine=) key mod-key unicode state scancode)
-  "The 'real' key-down is blank, although it keeps an eye on Escape, for Boss Protection™"
+  "The 'real' key-down is blank, although it keeps an eye on ESC, for Boss Protection™"
   (declare (ignore engine mod-key unicode state scancode))
   (when (sdl:key= key :sdl-key-escape)
     (sdl:push-quit-event)))

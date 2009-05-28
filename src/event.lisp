@@ -8,18 +8,19 @@
 ;;;
 ;;; Event prototype
 ;;;
-;;; - An event is a  block of code that is executed by an event-queue.
-;;;   Event firing can be delayed by milliseconds, and they are guaranteed to not fire
-;;;   until they are 'cooked'.
-;;;   Events can be asynchronously added to an event-queue, which can remain inactive
-;;;   until execution is ready to start again, and they will still be 'fired' in the
-;;;   order they were added.
 (defsheep =event= ()
   ((payload (lambda () (print "=event='s event fired.")))
-   (exec-time 0)))
+   (exec-time 0))
+  (:documentation "An event is a  block of code that is executed by an event-queue.
+                   Event firing can be delayed by milliseconds, and they are guaranteed
+                   to not fire until they are 'cooked'.
+                   Events can be asynchronously added to an event-queue, which can 
+                   remain inactive until execution is ready to start again, and they
+                   will still be 'fired' in the order they were added."))
 
+(defvar *event-queue*)
 (defun make-event (payload &key 
-		   (queue (event-queue *game*))
+		   (queue *event-queue*)
 		   (delay 0)
 		   (event-prototype =event=))
   "Generates one or more events that execute PAYLOAD."
@@ -34,19 +35,22 @@
   "Turns BODY into a function to be added as a payload to an =event= object, which
    will be delayed by DELAY milliseconds, and added to QUEUE."
   `(make-event (lambda () ,@body)
-	       ,@(when queue `(:level ,queue))
+	       ,@(when queue `(:queue ,queue))
 	       ,@(when delay `(:delay ,delay))))
 
+(defmacro with-event-queue (queue &body body)
+  `(let ((*event-queue* ,queue))
+     ,@body))
 
 ;;;
-;;; Event processing
+;;; Event processing buzzwords
 ;;;
 (defbuzzword execute-event (event)
   (:documentation "Takes care of executing a particular event."))
 (defbuzzword cookedp (event)
   (:documentation "Is the event ready to fire?"))
 
-;;; Methods
+;;; Messages
 (defmessage execute-event ((event =event=))
   "Executes a standard event. Nothing fancy, just a funcall."
   (funcall (payload event)))
@@ -60,12 +64,12 @@
 ;;;
 ;;; Event-queue
 ;;;
-;;; - An event queue is a container for events. Events are inserted into it and
-;;;   automatically sorted according to the event's execution time. The queue
-;;;   works like a min-priority queue. The top event can be peeked at, or popped.
 (defsheep =event-queue= ()
   ((queue (make-priority-queue :key #'exec-time) 
-	  :cloneform (make-priority-queue :key #'exec-time))))
+	  :cloneform (make-priority-queue :key #'exec-time)))
+  (:documentation "An event queue is a container for events. Events are inserted into it and
+                   automatically sorted according to the event's execution time. The queue
+                   works like a min-priority queue. The top event can be peeked at, or popped."))
 
 ;;; Buzzwords
 (defbuzzword push-event (event queue)

@@ -2,14 +2,25 @@
 
 ;; screen.lisp
 ;;
+;; * TODO - should collision detection go here?... (I think so...)
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
 ;;;
 ;;; Screen Prototype
 ;;;
+;;; - Screens are objects that contain components. They are rendered in sequence by the current
+;;;   engine object, but are otherwise decoupled from each other.
+;;;   Each screen also manages its own event-queue, which only fires its events if the screen
+;;;   is currently attached to a screen (thus receiving the UPDATE message)
+;;;   On update, =screen= objects take care of firing any cooked events in their event queue,
+;;;   checking for collisions, and passing on the UPDATE and DRAW messages to any 
+;;;   attached components. 
+;;;   Screens are meant to be containers for entire blocks of app execution, and can
+;;;   be loaded from file scripts (ideally without affecting the rest of the world).
 (defsheep =screen= ()
-  ((name 'default-screen)
+  ((name '=screen=)
    (initialized-p nil)
    (event-queue (clone (=event-queue=) ())
 		:cloneform (clone (=event-queue=) ()))

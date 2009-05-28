@@ -8,18 +8,6 @@
 ;;;
 ;;; Engine Prototype
 ;;;
-;;; - Engines are objects that contain information about -how- to run an application.
-;;;   The engine handles the following aspects of UID applications:
-;;;     * Framerate
-;;;     * Input
-;;;     * Global pausing
-;;;     * Global (default) event-queue
-;;;     * Window height/width/title
-;;;     * General initialization
-;;;     * The main loop
-;;;
-;;;   In general, it's a good idea to clone =engine= for each application being created,
-;;;   but it's not a mortal sin to just use it as a singleton.
 (defsheep =engine= ()
   ((running-p t)
    (initialized-p nil)
@@ -32,7 +20,21 @@
    (paused-p nil)
    (window-width 400)
    (window-height 400)
-   (title "Until it Dies")))
+   (title "Until it Dies"))
+  (:documentation "Engines are objects that contain information about
+                   -how- to run an application.
+The engine handles the following aspects of UID applications:
+    * Framerate
+    * Input
+    * Global pausing
+    * Global (default) event-queue
+    * Window height/width/title
+    * General initialization
+    * The main loop
+
+In general, it's a good idea to clone =engine= for each application being created,
+but it's not a mortal sin to just use it as a singleton."))
+
 
 ;;;
 ;;; Buzzwords

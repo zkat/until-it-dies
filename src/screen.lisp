@@ -10,24 +10,28 @@
 ;;;
 ;;; Screen Prototype
 ;;;
-;;; - Screens are objects that contain components. They are rendered in sequence by the current
-;;;   engine object, but are otherwise decoupled from each other.
-;;;   Each screen also manages its own event-queue, which only fires its events if the screen
-;;;   is currently attached to a screen (thus receiving the UPDATE message)
-;;;   On update, =screen= objects take care of firing any cooked events in their event queue,
-;;;   checking for collisions, and passing on the UPDATE and DRAW messages to any 
-;;;   attached components. 
-;;;   Screens are meant to be containers for entire blocks of app execution, and can
-;;;   be loaded from file scripts (ideally without affecting the rest of the world).
 (defsheep =screen= ()
   ((name '=screen=)
    (initialized-p nil)
    (event-queue (clone (=event-queue=) ())
 		:cloneform (clone (=event-queue=) ()))
    (input-enabled-p t)
-   (components nil :cloneform nil)))
+   (components nil :cloneform nil))
+  (:documentation "Screens are objects that contain components. They are rendered in
+                   sequence by the current engine object, but are otherwise decoupled
+                   from each other.
+                   Each screen also manages its own event-queue, which only fires its
+                   events if the screen is currently attached to a screen (thus 
+                   receiving the UPDATE message).
+                   On update, =screen= objects take care of firing any cooked events 
+                   in their event queue, checking for collisions, and passing on the
+                   UPDATE and DRAW messages to any attached components. Screens are 
+                   meant to be containers for entire blocks of app execution, and can
+                   be loaded from file scripts (ideally without affecting the rest of 
+                   the world)."))
 
-(defbuzzword load-screen (engine filename))
+(defbuzzword load-screen (engine filename)
+  (:documentation "Loads a screen object from a script file."))
 ;; TODO - get this to work again
 (defmessage load-screen ((engine =engine=) filename)
   "Loads a screen definition file and returns the configured SCREEN object."

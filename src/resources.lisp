@@ -8,13 +8,15 @@
 ;;;
 ;;; Generic resources prototype
 ;;;
-;;; - A resource is an object with some aspect that needs to be (or should be) manually 
-;;;   loaded and unloaded. Usually, this means things like images or music, which need to
-;;;   be freed from memory under some circumstances.
-;;;   A resource object should know everything necessary in order to load whatever it is managing
-;;;   into and out of memory (it should be ready to respond to LOAD-RESOURCE and UNLOAD-RESOURCE).
 (defsheep =resource= ()
-  ())
+  ()
+  (:documentation "A resource is an object with some aspect that needs to be
+                   (or should be) manually loaded and unloaded. Usually, this
+                   means things like images or music, which need to be freed 
+                   from memory under some circumstances. A resource object should
+                   know everything necessary in order to load whatever it is
+                   managing into and out of memory (it should be ready to respond
+                   to LOAD-RESOURCE and UNLOAD-RESOURCE)."))
 
 (defbuzzword load-resource (resource)
   (:documentation "Loads the resource's data into memory, activating it."))
@@ -30,16 +32,19 @@
                    the case of =texture= objects.)"))
 
 (defsheep =file-resource= (=resource=)
-  ((filepath nil)))
+  ((filepath nil))
+  (:documentation "File resources are resources that get loaded from files."))
 
 ;;;
 ;;; Resource management
 ;;;
-;;; - Resource managers can handle multiple resources at a time, and take care of loading/unloading
-;;;   all of them in big chunks. The with-resource-manager macro accepts a =resource-manager= object
-;;;   and binds -that- object to the *resource-manager* variable within its scope.
 (defsheep =resource-manager= ()
-  ((resources nil :cloneform nil)))
+  ((resources nil :cloneform nil))
+  (:documentation "Resource managers can handle multiple resources at a time,
+                   and take care of loading/unloading all of them in big chunks.
+                   The with-resource-manager macro accepts a =resource-manager= 
+                   object and binds -that- object to the *resource-manager* 
+                   variable within its scope."))
 
 (defmessage attach ((resource =resource=) (manager =resource-manager=))
   (pushnew resource (resources manager))) ; we don't want multiple copies.
@@ -97,7 +102,8 @@
 ;;; File textures
 ;;;
 (defsheep =file-texture= (=file-resource= =texture=)
-  ((filepath "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png")))
+  ((filepath "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))
+  (:documentation "A file texture is loaded from an image file."))
 
 (defmessage load-resource ((texture =file-texture=))
   (when (tex-id texture)

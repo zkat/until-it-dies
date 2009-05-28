@@ -13,6 +13,7 @@
 ;;;     * Framerate
 ;;;     * Input
 ;;;     * Global pausing
+;;;     * Global (default) event-queue
 ;;;     * Window height/width/title
 ;;;     * General initialization
 ;;;     * The main loop
@@ -26,6 +27,7 @@
    (fps-limit nil)
    (keys-held-down (make-hash-table :test #'eq)
 		   :cloneform (make-hash-table :test #'eq))
+   (event-queue (clone (=event-queue=) ()))
    (screens nil)
    (paused-p nil)
    (window-width 400)

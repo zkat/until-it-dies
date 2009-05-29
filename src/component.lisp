@@ -17,12 +17,12 @@
    (z 0)
    (width 0)
    (height 0))
-  (:documentation "A component is an object that can be drawn onto 
-                   the screen. Components also accept the INIT, TEARDOWN, 
-                   UPDATE, DRAW, ATTACH, and DETACH messages, which are
-                   usually passed down by the screen and/or engine the component
-                   is currently attached to."))
-
+  (:documentation
+"A component is an object that can be drawn onto 
+the screen. Components also accept the INIT, TEARDOWN, 
+UPDATE, DRAW, ATTACH, and DETACH messages, which are
+usually passed down by the screen and/or engine the component
+is currently attached to."))
 
 (defmessage init ((component =component=))
   (declare (ignore component))
@@ -78,9 +78,10 @@
    (x-accel 0)
    (y-accel 0)
    (z-accel 0))
-  (:documentation "A mobile component is a component with acceleration
-                   and velocity. Based on those values, the x, y, and z
-                   positions are updated by the UPDATE message."))
+  (:documentation 
+"A mobile component is a component with acceleration
+and velocity. Based on those values, the x, y, and z
+positions are updated by the UPDATE message."))
 
 (defmessage update ((mobile =mobile=) dt)
   (with-properties (x y z x-accel y-accel z-accel
@@ -100,9 +101,10 @@
 ;;;
 (defsheep =textured= (=component=)
   ((texture =texture=))
-  (:documentation "Not to be confused with =texture=; =textured= is a component 
-                   that can have a texture slapped on it. A :before message on
-                   =textured= takes care of binding the texture."))
+  (:documentation
+"Not to be confused with =texture=; =textured= is a component 
+that can have a texture slapped on it. A :before message on
+=textured= takes care of binding the texture."))
 
 (defmessage draw :before ((component =textured=))
 	    (when (texture component)
@@ -114,9 +116,10 @@
 ;;; - TODO: I can't get the width/height of the texture until it gets loaded. Find a way to do it.
 (defsheep =sprite= (=mobile= =textured=)
   ()
-  (:documentation "Sprites are mobile, textured components that
-                   are initialized to be the same size as the
-                   texture they are drawn with."))
+  (:documentation
+"Sprites are mobile, textured components that
+are initialized to be the same size as the
+texture they are drawn with."))
 
 #+nil(defmessage initialize-sheep :after ((sprite =sprite=) &key)
   (with-properties (width height texture)

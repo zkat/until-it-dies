@@ -9,10 +9,11 @@
 ;;; Engine Prototype
 ;;;
 (defsheep =engine= ()
-  ((running-p t)
-   (initialized-p nil)
+  ((runningp t)
+   (initializedp nil)
    (fps 0)
    (fps-limit nil)
+   (last-frame-time 0)
    (keys-held-down (make-hash-table :test #'eq)
 		   :cloneform (make-hash-table :test #'eq))
    (event-queue (clone (=event-queue=) ()))
@@ -35,7 +36,6 @@ The engine handles the following aspects of UID applications:
 In general, it's a good idea to clone =engine= for each application being created,
 but it's not a mortal sin to just use it as a singleton."))
 
-
 ;;;
 ;;; Buzzwords
 ;;;
@@ -53,6 +53,7 @@ done before entering the engine loop."))
   (:documentation "Detaches A from B. Used in cases such as detaching components from screens"))
 (defbuzzword detach-all (x)
   (:documentation "Detaches everything from X."))
+
 (defbuzzword update (object dt)
   (:documentation "Updates the state of the object by DT (which is in milliseconds)"))
 (defbuzzword draw (object)
@@ -73,11 +74,12 @@ done before entering the engine loop."))
   (:documentation "A mouse button has been pressed."))
 (defbuzzword mouse-move (engine x y delta-x delta-y)
   (:documentation "Mouse has been moved to (X,Y)."))
+(defbuzzword idle (engine)
+  (:documentation "Run once per game loop."))
 
 ;;;
 ;;; Engine messages
 ;;;
-
 (defmessage update ((engine =engine=) dt)
   "At the highest screen, we simply forward the update message to the active screen."
   (mapc (lambda (screen)
@@ -101,6 +103,14 @@ done before entering the engine loop."))
 	    (declare (ignore engine))
 	    (sdl:update-display))
 
+;;; Attaching/detaching
+(defmessage detach-all ((engine =engine=))
+  "This simply removes all references to ENGINE's screens."
+  (setf (screens engine) nil))
+
+;;;
+;;; Event handling
+;;;
 (defmessage window-resized (engine width height)
   "We don't really care about resize events right now."
   (declare (ignore engine width height))
@@ -153,10 +163,15 @@ done before entering the engine loop."))
   (declare (ignore engine x y dx dy))
   (values))
 
-;;; Attaching/detaching
-(defmessage detach-all ((engine =engine=))
-  "This simply removes all references to ENGINE's screens."
-  (setf (screens engine) nil))
+(defmessage idle ((engine =engine=))
+  (let* ((now (now))
+	 (dt (- now last-frame-time)))
+    (setf (last-frame-time engine) now)
+    ;; Update the current framerate for ENGINE
+    (setf (fps engine) (/ 1000 (if (= 0 dt) 1 dt)))
+    ;; And pass on the UPDATE message.
+    (update engine dt))
+  (draw engine))
 
 ;;; Main loop
 (defvar *engine*)
@@ -166,7 +181,8 @@ and doing some very initial OpenGL setup."
   (sdl:window (window-width engine) (window-height engine)
 	      :title-caption (title engine)
 	      :flags (logior sdl:sdl-opengl))
-  (setf (sdl:frame-rate) (or (fps-limit engine) 0))
+  (setf (sdl:frame-rate) 0)
+  (setf (last-frame-time engine) 0)
   (setf cl-opengl-bindings:*gl-get-proc-address* #'sdl-cffi::sdl-gl-get-proc-address)
   (setup-ortho-projection (window-width engine) (window-height engine))
   #+nil(push (screens engine)
@@ -182,14 +198,13 @@ and doing some very initial OpenGL setup."
 We also bind the engine parameter to *engine*, which might make things a little easier later on."
   (sdl:with-init ()
     (init engine)
-    (let ((last-time (now))
-	  (*engine* engine))
+    (let ((*engine* engine))
       (unwind-protect
 	   ;; Better make sure we are always able to pass on
 	   ;; the TEARDOWN message at the end of the loop.
 	   (sdl:with-events ()
 	     (:quit-event () (prog1 t
-			       (setf (running-p engine) nil)))
+			       (setf (runningp engine) nil)))
 	     (:video-resize-event (:w width :h height)
 				  (window-resized engine width height))
 	     (:key-down-event (:key key :mod-key mod-key :unicode unicode 
@@ -205,17 +220,9 @@ We also bind the engine parameter to *engine*, which might make things a little 
 	     (:mouse-motion-event (:x x :y y :x-rel delta-x :y-rel delta-y)
 				  (restartable (mouse-move engine x y delta-x delta-y)))
 	     (:idle ()
-		    (let* ((now (now))
-			   (dt (- now last-time)))
-		      (setf last-time now)
-		      ;; Update the current framerate for ENGINE
-		      (setf (fps engine) (/ 1000 (if (= 0 dt)
-						     1 dt)))
-		      ;; And pass on the UPDATE message.
-		      (restartable (update engine dt)))
-		    ;; Once everything's updated, draw the universe.
-		    (restartable (draw engine))))
-	;; Once out of the loop, we should tear everything down so resources get properly unloaded.
+		    (restartable (idle engine))))
+	;; Once out of the loop, we should tear everything 
+	;; down so resources get properly unloaded.
 	(restartable (teardown engine)))
       ;; We return the engine after everything's done.
       ;; It might be handy for inspection.

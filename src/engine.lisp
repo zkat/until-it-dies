@@ -19,6 +19,7 @@
    (keys-held-down (make-hash-table :test #'eq)
 		   :cloneform (make-hash-table :test #'eq))
    (event-queue (clone (=event-queue=) ()))
+   (resource-manager (clone (=resource-manager=) ()))
    (screens nil)
    (pausedp nil)
    (window-width 400)
@@ -170,7 +171,7 @@ followed by the main engine loop."))
 
 (defmessage key-down ((engine =engine=) key mod-key unicode state scancode)
   "The 'real' key-down is blank by default."
-  (declare (ignore engine mod-key unicode state scancode))
+  (declare (ignore engine key mod-key unicode state scancode))
   #+nil(when (sdl:key= key :sdl-key-escape)
 	 (sdl:push-quit-event))
   (values))
@@ -204,7 +205,7 @@ followed by the main engine loop."))
 (defmessage idle ((engine =engine=))
   "When the IDLE event fires, we should UPDATE all attached objects, then DRAW them."
   (let* ((now (now))
-	 (dt (- now last-frame-time)))
+	 (dt (- now (last-frame-time engine))))
     (setf (last-frame-time engine) now)
     ;; Update the current framerate for ENGINE
     (setf (fps engine) (/ 1000 (if (= 0 dt) 1 dt)))
@@ -232,38 +233,48 @@ and doing some very initial OpenGL setup."
   (when (screens engine)
     (mapc #'teardown (screens engine))))
 
+(defmacro with-init (engine &body body)
+  `(sdl:with-init ()
+     (init ,engine)
+     (unwind-protect
+	  ,@body
+       (teardown ,engine))))
+
 (defmessage run ((engine =engine=))
   "Here's the main loop -- because of the way lb-sdl is set up, 
 we handle all input right here. We also bind the engine parameter
 to *engine*, which might make things a little easier later on."
-  (sdl:with-init ()
-    (init engine)
+  (with-init engine
     (let ((*engine* engine))
-      (unwind-protect
-	   ;; Better make sure we are always able to pass on
-	   ;; the TEARDOWN message at the end of the loop.
-	   (sdl:with-events ()
-	     (:quit-event () (prog1 t
-			       (setf (runningp engine) nil)))
-	     (:video-resize-event (:w width :h height)
-				  (window-resized engine width height))
-	     (:key-down-event (:key key :mod-key mod-key :unicode unicode 
-			       :state state :scancode scancode)
-			      (restartable (key-down engine key mod-key unicode state scancode)))
-	     (:key-up-event (:key key :mod-key mod-key :unicode unicode
-                             :state state :scancode scancode)
-			    (restartable (key-up engine key mod-key unicode state scancode)))
-	     (:mouse-button-up-event (:button button :state state :x x :y y)
-				     (restartable (mouse-up engine button state x y)))
-	     (:mouse-button-down-event (:button button :state state :x x :y y)
-				       (restartable (mouse-down engine button state x y)))
-	     (:mouse-motion-event (:x x :y y :x-rel delta-x :y-rel delta-y)
-				  (restartable (mouse-move engine x y delta-x delta-y)))
-	     (:idle ()
-		    (restartable (idle engine))))
-	;; Once out of the loop, we should tear everything 
-	;; down so resources get properly unloaded.
-	(restartable (teardown engine)))
+      (with-event-queue (event-queue engine)
+	(with-resource-manager (resource-manager engine)
+	  (sdl:with-events ()
+	    (:quit-event 
+	     () 
+	     (prog1 t
+	       (setf (runningp engine) nil)))
+	    (:video-resize-event
+	     (:w width :h height)
+	     (window-resized engine width height))
+	    (:key-down-event
+	     (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
+	     (restartable (key-down engine key mod-key unicode state scancode)))
+	    (:key-up-event
+	     (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
+	     (restartable (key-up engine key mod-key unicode state scancode)))
+	    (:mouse-button-up-event
+	     (:button button :state state :x x :y y)
+	     (restartable (mouse-up engine button state x y)))
+	    (:mouse-button-down-event
+	     (:button button :state state :x x :y y)
+	     (restartable (mouse-down engine button state x y)))
+	    (:mouse-motion-event
+	     (:x x :y y :x-rel delta-x :y-rel delta-y)
+	     (restartable (mouse-move engine x y delta-x delta-y)))
+	    (:idle
+	     ()
+	     (restartable (idle engine))))))
       ;; We return the engine after everything's done.
       ;; It might be handy for inspection.
       engine)))
+

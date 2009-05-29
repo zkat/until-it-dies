@@ -40,17 +40,18 @@ is currently attached to."))
   "We wrap the main DRAW message so that components are only drawn 
    if they are marked as visible."
   (when (visiblep component)
-  (call-next-message)))
+    (call-next-message)))
 
+;; FIXME - this method is not being called. There's probably a bug in Sheeple.
 (defmessage draw ((component =component=))
-  "We'll just draw a simple rectangle for default =components="
+  "We'll just draw a simple rectangle for default =component="
   (with-properties (x y z width height) 
       component
     (gl:with-primitives :quads
       (rectangle x y width height :z z))))
 
 (defmessage attach ((component =component=) (screen =screen=))
-  (push component (components screen))
+  (pushnew component (components screen))
   (setf (parent component) screen))
 
 (defmessage detach ((component =component=) (screen =screen=))
@@ -106,9 +107,11 @@ positions are updated by the UPDATE message."))
 that can have a texture slapped on it. A :before message on
 =textured= takes care of binding the texture."))
 
+;; FIXME: this is broken too. Fuck.
 (defmessage draw :before ((component =textured=))
-	    (when (texture component)
-	      (bind-texture (texture component))))
+  "Before we draw textured components, we should bind its texture."
+  (when (texture component)
+    (bind-texture (texture component))))
 
 ;;;
 ;;; Sprite prototype
@@ -121,22 +124,11 @@ that can have a texture slapped on it. A :before message on
 are initialized to be the same size as the
 texture they are drawn with."))
 
-#+nil(defmessage initialize-sheep :after ((sprite =sprite=) &key)
-  (with-properties (width height texture)
-      sprite
-    (setf width (width texture))
-    (setf height (height texture))))
-
-#+nil(defmessage reinitialize-sheep :after ((sprite =sprite=) &key)
-  (with-properties (width height texture)
-      sprite
-    (setf width (width texture))
-    (setf height (height texture))))
-
 (defmessage draw ((sprite =sprite=))
-  (bind-texture (texture sprite))
   (when (visiblep sprite)
-   (with-properties (x y z width height) 
-       sprite
-     (gl:with-primitives :quads
-       (rectangle x y width height :z z)))))
+    (bind-texture (texture sprite))
+    (with-properties (x y z width height) 
+	sprite
+      (gl:with-primitives :quads
+	(rectangle x y width height :z z)))))
+

@@ -42,7 +42,7 @@ Returns both the difference in time and the current-time used in the computation
   (gl:matrix-mode :projection)
   (gl:load-identity)
   (gl:viewport 0 0 width height)
-  (gl:ortho 0 width 0 height 0 100) ;0,0 is at bottom left of screen. Much nicer for maths.
+  (gl:ortho 0 width 0 height 10 0) ;0,0 is at bottom left of screen. Much nicer for maths.
   (gl:matrix-mode :modelview))
 
 (defun rectangle (x y width height &key (z 0) (u1 0) (v1 0) (u2 1) (v2 1))

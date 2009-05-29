@@ -19,6 +19,10 @@
 	    (width width)
 	    (height height)))))
 
-;; UID> (attach =test-sprite= =test-engine=)
+(defparameter *test-sprite*
+  (create-sprite
+   "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))
+;; UID> (attach (create-sprite "/path/to/texture.png")
+;;              =test-engine=)
 ;;
 ;; UID> (run =test-engine=)

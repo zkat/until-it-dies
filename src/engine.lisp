@@ -2,6 +2,8 @@
 
 ;; engine.lisp
 ;;
+;; TODO - Wrap the sdl input stuff so that the key/modifier/mouseclick constants are
+;;        UID symbols instead of stuff like :sdl-key-escape and such.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
@@ -18,12 +20,14 @@
 		   :cloneform (make-hash-table :test #'eq))
    (event-queue (clone (=event-queue=) ()))
    (screens nil)
-   (paused-p nil)
+   (pausedp nil)
    (window-width 400)
    (window-height 400)
-   (title "Until it Dies"))
-  (:documentation "Engines are objects that contain information about
-                   -how- to run an application.
+   (title "Until It Dies application"))
+  (:documentation
+"Engines are objects that contain information about
+-how- to run an application.
+
 The engine handles the following aspects of UID applications:
     * Framerate
     * Input
@@ -33,49 +37,78 @@ The engine handles the following aspects of UID applications:
     * General initialization
     * The main loop
 
-In general, it's a good idea to clone =engine= for each application being created,
+It's a good idea to clone =engine= for each application being created,
 but it's not a mortal sin to just use it as a singleton."))
 
 ;;;
 ;;; Buzzwords
 ;;;
 (defbuzzword init (object)
-  (:documentation "This buzzword takes care of any initialization that needs to be 
+  (:documentation
+"This buzzword takes care of any initialization that needs to be 
 done before entering the engine loop."))
+
 (defbuzzword teardown (object)
-  (:documentation "Takes care of all the teardown necessary to clean up ENGINE."))
+  (:documentation
+"Takes care of all the teardown necessary to clean up ENGINE."))
+
 (defbuzzword run (engine)
-  (:documentation "Runs the engine. ENGINE is initialized inside this buzzword,
- followed by the main engine loop."))
+  (:documentation
+"Runs the engine. ENGINE is initialized inside this buzzword,
+followed by the main engine loop."))
+
 (defbuzzword attach (a b)
-  (:documentation "Registers A with B. Used in cases such as attaching components to screens"))
+  (:documentation
+"Registers A with B. Used in cases such as attaching components to screens"))
+
 (defbuzzword detach (a b)
-  (:documentation "Detaches A from B. Used in cases such as detaching components from screens"))
+  (:documentation
+"Detaches A from B. Used in cases such as detaching components from screens"))
+
 (defbuzzword detach-all (x)
-  (:documentation "Detaches everything from X."))
+  (:documentation
+"Detaches everything from X."))
 
 (defbuzzword update (object dt)
-  (:documentation "Updates the state of the object by DT (which is in milliseconds)"))
-(defbuzzword draw (object)
-  (:documentation "Renders the object onto the screen in its current state."))
+  (:documentation
+"Updates the state of the object by DT (which is in milliseconds)"))
 
-;; Device Events
+(defbuzzword draw (object)
+  (:documentation
+"Renders the object onto the screen in its current state."))
+
+;; Events
 (defbuzzword key-up (engine key mod-key unicode state scancode)
-  (:documentation "Key event for a key being released."))
+  (:documentation
+"Key event for a key being released."))
+
 (defbuzzword key-down (engine key mod-key unicode state scancode)
-  (:documentation "Key event for a key being pressed."))
+  (:documentation
+"Key event for a key being pressed."))
+
 (defbuzzword key-down-p (engine key)
-  (:documentation "Is KEY currently being held down?"))
-(defbuzzword window-resized (engine width height)
-  (:documentation "Event called whenever the window is resized by the user"))
+  (:documentation
+"Is KEY currently being held down?"))
+
 (defbuzzword mouse-up (engine button state x y)
-  (:documentation "A mouse button has been released."))
+  (:documentation
+"A mouse button has been released."))
+
 (defbuzzword mouse-down (engine button state x y)
-  (:documentation "A mouse button has been pressed."))
+  (:documentation
+"A mouse button has been pressed."))
+
 (defbuzzword mouse-move (engine x y delta-x delta-y)
-  (:documentation "Mouse has been moved to (X,Y)."))
+  (:documentation
+"Mouse has been moved to (X,Y)."))
+
+(defbuzzword window-resized (engine width height)
+  (:documentation
+"Event called whenever the window is resized by the user"))
+
 (defbuzzword idle (engine)
-  (:documentation "Run once per game loop."))
+  (:documentation
+"Run once per game loop."))
 
 ;;;
 ;;; Engine messages
@@ -87,21 +120,21 @@ done before entering the engine loop."))
 	(screens engine)))
 
 (defmessage draw :before ((engine =engine=))
-	    "Clearing, and initial setup before drawing."
-	    (declare (ignore engine))
-	    (gl:clear-color 0 0 0 0)
-	    (gl:clear :color-buffer-bit :depth-buffer-bit)
-	    (gl:enable :texture-2d :blend)
-	    (gl:blend-func :src-alpha :one-minus-src-alpha))
+  "Clearing, and initial setup before drawing."
+  (declare (ignore engine))
+  (gl:clear-color 0 0 0 0)
+  (gl:clear :color-buffer-bit :depth-buffer-bit)
+  (gl:enable :texture-2d :blend)
+  (gl:blend-func :src-alpha :one-minus-src-alpha))
 
 (defmessage draw ((engine =engine=))
   "The primary message will pass on the draw message to all of ENGINE's screens."
   (mapc #'draw (screens engine)))
 
 (defmessage draw :after ((engine =engine=))
-	    "Once everything is done, swap the back buffer in."
-	    (declare (ignore engine))
-	    (sdl:update-display))
+  "Once everything is done, swap the back buffer in."
+  (declare (ignore engine))
+  (sdl:update-display))
 
 ;;; Attaching/detaching
 (defmessage detach-all ((engine =engine=))
@@ -111,13 +144,12 @@ done before entering the engine loop."))
 ;;;
 ;;; Event handling
 ;;;
-(defmessage window-resized (engine width height)
-  "We don't really care about resize events right now."
-  (declare (ignore engine width height))
-  (values))
+
+(defmessage process-cooked-events ((engine =engine=))
+  (process-cooked-events (event-queue engine)))
 
 ;;; Key event handling
-;;; 
+
 ;;; TODO - should these also pass input events to all attached screens? Maybe not?
 (defmessage key-up :before ((engine =engine=) key mod-key unicode state scancode)
   "If the key was released, it's no longer pressed!"
@@ -137,10 +169,11 @@ done before entering the engine loop."))
     (setf (gethash key keys-held-down) t)))
 
 (defmessage key-down ((engine =engine=) key mod-key unicode state scancode)
-  "The 'real' key-down is blank, although it keeps an eye on ESC, for Boss Protection™"
+  "The 'real' key-down is blank by default."
   (declare (ignore engine mod-key unicode state scancode))
-  (when (sdl:key= key :sdl-key-escape)
-    (sdl:push-quit-event)))
+  #+nil(when (sdl:key= key :sdl-key-escape)
+	 (sdl:push-quit-event))
+  (values))
 
 (defmessage key-down-p ((engine =engine=) key)
   "Is KEY being held down?"
@@ -149,10 +182,9 @@ done before entering the engine loop."))
       down-p)))
 
 ;;; Mouse event handling
-;;;
+
 ;;; - TODO: I should probably handle this, even with base =engine=. Keeping track of which mouse
-;;;   buttons are held down, and the current x/y position of the cursor is probably a good
-;;;   plan
+;;;   buttons are held down, and the current x/y position of the cursor is probably a good plan.
 (defmessage mouse-up ((engine =engine=) button state x y)
   (declare (ignore engine button state x y))
   (values))
@@ -163,13 +195,20 @@ done before entering the engine loop."))
   (declare (ignore engine x y dx dy))
   (values))
 
+;;; Other events
+(defmessage window-resized (engine width height)
+  "We don't really care about resize events right now."
+  (declare (ignore engine width height))
+  (values))
+
 (defmessage idle ((engine =engine=))
+  "When the IDLE event fires, we should UPDATE all attached objects, then DRAW them."
   (let* ((now (now))
 	 (dt (- now last-frame-time)))
     (setf (last-frame-time engine) now)
     ;; Update the current framerate for ENGINE
     (setf (fps engine) (/ 1000 (if (= 0 dt) 1 dt)))
-    ;; And pass on the UPDATE message.
+    (process-cooked-events engine)
     (update engine dt))
   (draw engine))
 
@@ -194,8 +233,9 @@ and doing some very initial OpenGL setup."
     (mapc #'teardown (screens engine))))
 
 (defmessage run ((engine =engine=))
-  "Here's the main loop -- because of the way lb-sdl is set up, we handle all input right here.
-We also bind the engine parameter to *engine*, which might make things a little easier later on."
+  "Here's the main loop -- because of the way lb-sdl is set up, 
+we handle all input right here. We also bind the engine parameter
+to *engine*, which might make things a little easier later on."
   (sdl:with-init ()
     (init engine)
     (let ((*engine* engine))
@@ -227,4 +267,3 @@ We also bind the engine parameter to *engine*, which might make things a little 
       ;; We return the engine after everything's done.
       ;; It might be handy for inspection.
       engine)))
-

@@ -10,26 +10,30 @@
 ;;;
 (defsheep =resource= ()
   ()
-  (:documentation "A resource is an object with some aspect that needs to be
-                   (or should be) manually loaded and unloaded. Usually, this
-                   means things like images or music, which need to be freed 
-                   from memory under some circumstances. A resource object should
-                   know everything necessary in order to load whatever it is
-                   managing into and out of memory (it should be ready to respond
-                   to LOAD-RESOURCE and UNLOAD-RESOURCE)."))
+  (:documentation
+"A resource is an object with some aspect that needs to 
+be (or should be) manually loaded and unloaded. Usually, this
+means things like images or music, which need to be freed 
+from memory under some circumstances. A resource object should
+know everything necessary in order to load whatever it is
+managing into and out of memory (it should be ready to respond
+to LOAD-RESOURCE and UNLOAD-RESOURCE)."))
 
 (defbuzzword load-resource (resource)
-  (:documentation "Loads the resource's data into memory, activating it."))
+  (:documentation
+"Loads the resource's data into memory, activating it."))
 (defbuzzword unload-resource (resource)
-  (:documentation "Unloads the resource's data from memory, 
-                   handling any freeing that needs to happen"))
+  (:documentation
+"Unloads the resource's data from memory, 
+handling any freeing that needs to happen"))
 (defbuzzword loadedp (resource)
-  (:documentation "Is the resource currently correctly loaded and available for use?
-                   It's worth pointing out that a simple loadedp flag on the object may
-                   not be enough for all possible resource types. It's allowed, and even
-                   advisable, that this buzzword check other things to make sure it is 
-                   correctly loaded (such as confirming that the texture ID is valid, in
-                   the case of =texture= objects.)"))
+  (:documentation
+"Is the resource currently correctly loaded and available for use?
+It's worth pointing out that a simple loadedp flag on the object may
+not be enough for all possible resource types. It's allowed, and even
+advisable, that this buzzword check other things to make sure it is 
+correctly loaded (such as confirming that the texture ID is valid, in
+the case of =texture= objects.)"))
 
 (defsheep =file-resource= (=resource=)
   ((filepath nil))
@@ -40,11 +44,12 @@
 ;;;
 (defsheep =resource-manager= ()
   ((resources nil :cloneform nil))
-  (:documentation "Resource managers can handle multiple resources at a time,
-                   and take care of loading/unloading all of them in big chunks.
-                   The with-resource-manager macro accepts a =resource-manager= 
-                   object and binds -that- object to the *resource-manager* 
-                   variable within its scope."))
+  (:documentation
+"Resource managers can handle multiple resources at a time,
+and take care of loading/unloading all of them in big chunks.
+The with-resource-manager macro accepts a =resource-manager= 
+object and binds -that- object to the *resource-manager* 
+variable within its scope."))
 
 (defmessage attach ((resource =resource=) (manager =resource-manager=))
   (pushnew resource (resources manager))) ; we don't want multiple copies.

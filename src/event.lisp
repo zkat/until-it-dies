@@ -11,12 +11,13 @@
 (defsheep =event= ()
   ((payload (lambda () (print "=event='s event fired.")))
    (exec-time 0))
-  (:documentation "An event is a  block of code that is executed by an event-queue.
-                   Event firing can be delayed by milliseconds, and they are guaranteed
-                   to not fire until they are 'cooked'.
-                   Events can be asynchronously added to an event-queue, which can 
-                   remain inactive until execution is ready to start again, and they
-                   will still be 'fired' in the order they were added."))
+  (:documentation 
+"An event is a  block of code that is executed by an event-queue.
+Event firing can be delayed by milliseconds, and they are guaranteed
+to not fire until they are 'cooked'.
+Events can be asynchronously added to an event-queue, which can 
+remain inactive until execution is ready to start again, and they
+will still be 'fired' in the order they were added."))
 
 (defvar *event-queue*)
 (defun make-event (payload &key 
@@ -46,9 +47,12 @@
 ;;; Event processing buzzwords
 ;;;
 (defbuzzword execute-event (event)
-  (:documentation "Takes care of executing a particular event."))
+  (:documentation
+"Takes care of executing a particular event."))
+
 (defbuzzword cookedp (event)
-  (:documentation "Is the event ready to fire?"))
+  (:documentation
+"Is the event ready to fire?"))
 
 ;;; Messages
 (defmessage execute-event ((event =event=))

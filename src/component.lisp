@@ -117,7 +117,7 @@ that can have a texture slapped on it. A :before message on
 ;;; Sprite prototype
 ;;;
 ;;; - TODO: I can't get the width/height of the texture until it gets loaded. Find a way to do it.
-(defsheep =sprite= (=mobile= =textured=)
+(defsheep =sprite= (=textured= =mobile=)
   ()
   (:documentation
 "Sprites are mobile, textured components that
@@ -125,7 +125,8 @@ are initialized to be the same size as the
 texture they are drawn with."))
 
 (defmessage draw ((sprite =sprite=))
-  (when (visiblep sprite)
+  (call-next-message sprite)
+  #+nil(when (visiblep sprite)
     (bind-texture (texture sprite))
     (with-properties (x y z width height) 
 	sprite

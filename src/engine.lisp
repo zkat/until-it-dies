@@ -204,10 +204,10 @@ followed by the main engine loop."))
 
 (defmessage idle ((engine =engine=))
   "When the IDLE event fires, we should UPDATE all attached objects, then DRAW them."
-  (let* ((now (now))
-	 (dt (- now (last-frame-time engine))))
+  (multiple-value-bind (dt now)
+      (time-difference (last-frame-time engine))
     (setf (last-frame-time engine) now)
-    ;; Update the current framerate for ENGINE
+    ;;    Update the current framerate for ENGINE
     (setf (fps engine) (/ 1000 (if (= 0 dt) 1 dt)))
     (process-cooked-events engine)
     (update engine dt))

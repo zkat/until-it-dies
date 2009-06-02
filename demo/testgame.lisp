@@ -9,15 +9,18 @@
    (screens (list (clone (=screen=) ())))))
 
 (defun create-sprite (filepath &key (x 0) (y 0))
-  (let* ((texture (load-resource (create-texture filepath)))
-	 (width (width texture))
-	 (height (height texture)))
+  (let* ((texture (create-texture filepath)))
     (clone (=sprite=)
 	   ((x x)
 	    (y y)
-	    (texture texture)
-	    (width width)
-	    (height height)))))
+	    (texture texture)))))
+
+(defun load-sprite (sprite)
+  (let ((texture (texture sprite)))
+    (load-resource texture)
+    (setf (width sprite) (width texture))
+    (setf (height sprite) (height texture))
+    sprite))
 
 (defparameter *test-sprite*
   (create-sprite

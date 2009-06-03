@@ -109,8 +109,6 @@ that can have a texture slapped on it. A :before message on
 ;;;
 ;;; Sprite prototype
 ;;;
-;;; - TODO: I can't get the width/height of the texture until it gets loaded. Find a way to do it.
-;;;
 (defsheep =sprite= (=textured= =mobile=)
   ()
   (:documentation

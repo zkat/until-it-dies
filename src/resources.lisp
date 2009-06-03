@@ -52,7 +52,7 @@ object and binds -that- object to the *resource-manager*
 variable within its scope."))
 
 (defmessage attach ((resource =resource=) (manager =resource-manager=))
-  (pushnew resource (resources manager))) ; we don't want multiple copies.
+  (pushnew resource (resources manager)))
 (defmessage detach ((resource =resource=) (manager =resource-manager=))
   (with-properties (resources) manager
     (setf resources (delete resource resources))))
@@ -71,6 +71,7 @@ variable within its scope."))
        (unload-resource ,manager))))
 
 ;; We add some :after messages here to handle automatic attachment/detachment.
+;; TODO: Keep an eye on this. It might cause some nastyness.
 (defmessage load-resource :after ((resource =resource=))
   (attach resource *resource-manager*))
 (defmessage unload-resource :after ((resource =resource=))
@@ -121,23 +122,6 @@ variable within its scope."))
   (when (tex-id texture)
     (unload-resource texture)))
 
-;; TODO
-#+nil(defmessage load-resource ((texture =file-texture=))
-  (ilut:renderer :opengl)
-  (ilut:enable :opengl-conv)
-  (let ((il-img-name (il:gen-image)))
-    (il:bind-image il-img-name)
-    (il:load-image (filepath texture))
-    (setf (tex-id texture)
-	  (ilut:gl-bind-tex-image))
-    (setf (width texture)
-  	  (il:get-integer :image-width))
-    (setf (height texture)
-  	  (il:get-integer :image-height))
-    (il:bind-image 0)
-    (il:delete-images (list il-img-name)))
-  texture)
-
 (defmessage load-resource ((texture =file-texture=))
   (ilut:renderer :opengl)
   (ilut:enable :opengl-conv)
@@ -147,6 +131,7 @@ variable within its scope."))
 	  (il:get-integer :image-width))
     (setf (height texture)
 	  (il:get-integer :image-height)))
+  (il:bind-image 0)
   texture)
 
 (defmessage load-resource :after ((texture =texture=))

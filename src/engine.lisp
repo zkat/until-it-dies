@@ -259,7 +259,7 @@ to *engine*, which might make things a little easier later on."
 	 (setf (runningp engine) nil)))
       (:video-resize-event
        (:w width :h height)
-       (window-resized engine width height))
+       (restartable (window-resized engine width height)))
       (:key-down-event
        (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
        (restartable (key-down engine key mod-key unicode state scancode)))

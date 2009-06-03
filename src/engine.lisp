@@ -225,6 +225,8 @@ and doing some very initial OpenGL setup."
   (setf (last-frame-time engine) 0)
   (setf cl-opengl-bindings:*gl-get-proc-address* #'sdl-cffi::sdl-gl-get-proc-address)
   (setup-ortho-projection (window-width engine) (window-height engine))
+  (il:init)
+  (ilut:init)
   #+nil(push (screens engine)
 	     (init (load-screen engine "menu"))))
 

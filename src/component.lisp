@@ -117,3 +117,10 @@ that can have a texture slapped on it. A :before message on
 "Sprites are mobile, textured components that
 are initialized to be the same size as the
 texture they are drawn with."))
+
+(defmessage init ((sprite =sprite=))
+  (with-properties (height width texture)
+    sprite
+    (load-resource texture)
+    (setf height (height texture))
+    (setf width (width texture))))

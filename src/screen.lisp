@@ -54,12 +54,10 @@ rest of the world)."))
 
 ;;; Messages
 (defmessage init ((screen =screen=))
-  (declare (ignore screen))
-  (values))
+  (mapc #'init (components screen)))
 
 (defmessage teardown ((screen =screen=))
-  (declare (ignore screen))
-  (values))
+  (mapc #'teardown (components screen)))
 
 (defmessage update ((screen =screen=) dt)
   "Takes care of calling UPDATE on all of SCREEN's member objects. Also, resolves collisions"

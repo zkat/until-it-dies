@@ -240,45 +240,45 @@ and doing some very initial OpenGL setup."
 we're done with it."
   `(sdl:with-init ()
      (let ((*engine* ,engine))
-       (init ,engine)
-       (unwind-protect
-	    ,@body
-	 (teardown ,engine)))))
+       (with-event-queue (event-queue engine)
+	 (with-resource-manager (resource-manager engine)
+	  (init ,engine)
+	  (unwind-protect
+	       ,@body
+	    (teardown ,engine)))))))
 
 (defmessage run ((engine =engine=))
   "Here's the main loop -- because of the way lb-sdl is set up, 
 we handle all input right here. We also bind the engine parameter
 to *engine*, which might make things a little easier later on."
-  (with-event-queue (event-queue engine)
-    (with-resource-manager (resource-manager engine)
-      (with-engine engine
-	(sdl:with-events ()
-	  (:quit-event 
-	   () 
-	   (prog1 t
-	     (setf (runningp engine) nil)))
-	  (:video-resize-event
-	   (:w width :h height)
-	   (window-resized engine width height))
-	  (:key-down-event
-	   (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
-	   (restartable (key-down engine key mod-key unicode state scancode)))
-	  (:key-up-event
-	   (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
-	   (restartable (key-up engine key mod-key unicode state scancode)))
-	  (:mouse-button-up-event
-	   (:button button :state state :x x :y y)
-	   (restartable (mouse-up engine button state x y)))
-	  (:mouse-button-down-event
-	   (:button button :state state :x x :y y)
-	   (restartable (mouse-down engine button state x y)))
-	  (:mouse-motion-event
-	   (:x x :y y :x-rel delta-x :y-rel delta-y)
-	   (restartable (mouse-move engine x y delta-x delta-y)))
-	  (:idle
-	   ()
-	   (restartable (idle engine))))
-	;; We return the engine after everything's done.
-	;; It might be handy for inspection.
-	engine))))
+  (with-engine engine
+    (sdl:with-events ()
+      (:quit-event 
+       () 
+       (prog1 t
+	 (setf (runningp engine) nil)))
+      (:video-resize-event
+       (:w width :h height)
+       (window-resized engine width height))
+      (:key-down-event
+       (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
+       (restartable (key-down engine key mod-key unicode state scancode)))
+      (:key-up-event
+       (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
+       (restartable (key-up engine key mod-key unicode state scancode)))
+      (:mouse-button-up-event
+       (:button button :state state :x x :y y)
+       (restartable (mouse-up engine button state x y)))
+      (:mouse-button-down-event
+       (:button button :state state :x x :y y)
+       (restartable (mouse-down engine button state x y)))
+      (:mouse-motion-event
+       (:x x :y y :x-rel delta-x :y-rel delta-y)
+       (restartable (mouse-move engine x y delta-x delta-y)))
+      (:idle
+       ()
+       (restartable (idle engine))))
+    ;; We return the engine after everything's done.
+    ;; It might be handy for inspection.
+    engine))
 

@@ -208,7 +208,7 @@ followed by the main engine loop."))
       (time-difference (last-frame-time engine))
     (setf (last-frame-time engine) now)
     ;;    Update the current framerate for ENGINE
-    (setf (fps engine) (/ 1000 (if (= 0 dt) 1 dt)))
+    (setf (fps engine) (float (/ 1000 (if (= 0 dt) 1 dt))))
     (process-cooked-events engine)
     (update engine dt))
   (draw engine))

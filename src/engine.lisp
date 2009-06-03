@@ -22,8 +22,8 @@
    (resource-manager (clone (=resource-manager=) ()))
    (screens nil)
    (pausedp nil)
-   (window-width 400)
-   (window-height 400)
+   (window-width 400 :writer nil)
+   (window-height 400 :writer nil)
    (title "Until It Dies application"))
   (:documentation
 "Engines are objects that contain information about
@@ -236,6 +236,8 @@ and doing some very initial OpenGL setup."
   (setf (initializedp engine) nil))
 
 (defmacro with-init (engine &body body)
+  "This convenience macro simple makes sure the engine is torn down once
+we're done with it."
   `(sdl:with-init ()
      (init ,engine)
      (unwind-protect

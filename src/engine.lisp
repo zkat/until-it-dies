@@ -235,7 +235,7 @@ and doing some very initial OpenGL setup."
   (mapc #'teardown (screens engine))
   (setf (initializedp engine) nil))
 
-(defmacro with-init (engine &body body)
+(defmacro with-engine (engine &body body)
   "This convenience macro simple makes sure the engine is torn down once
 we're done with it."
   `(sdl:with-init ()
@@ -251,7 +251,7 @@ we handle all input right here. We also bind the engine parameter
 to *engine*, which might make things a little easier later on."
   (with-event-queue (event-queue engine)
     (with-resource-manager (resource-manager engine)
-      (with-init engine
+      (with-engine engine
 	(sdl:with-events ()
 	  (:quit-event 
 	   () 

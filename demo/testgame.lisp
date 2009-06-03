@@ -15,13 +15,6 @@
 	    (y y)
 	    (texture texture)))))
 
-(defun load-sprite (sprite)
-  (let ((texture (texture sprite)))
-    (load-resource texture)
-    (setf (width sprite) (width texture))
-    (setf (height sprite) (height texture))
-    sprite))
-
 (defparameter *test-sprite*
   (create-sprite
    "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))

@@ -20,6 +20,7 @@
 		   :cloneform (make-hash-table :test #'eq))
    (event-queue (clone (=event-queue=) ()))
    (resource-manager (clone (=resource-manager=) ()))
+   (default-font (clone (=font=) ()))
    (screens nil)
    (pausedp nil)
    (window-width 400 :writer nil)
@@ -242,10 +243,11 @@ we're done with it."
      (let ((*engine* ,engine))
        (with-event-queue (event-queue engine)
 	 (with-resource-manager (resource-manager engine)
-	  (init ,engine)
-	  (unwind-protect
-	       ,@body
-	    (teardown ,engine)))))))
+	   (with-font (default-font engine)
+	    (init ,engine)
+	    (unwind-protect
+		 ,@body
+	      (teardown ,engine))))))))
 
 (defmessage run ((engine =engine=))
   "Here's the main loop -- because of the way lb-sdl is set up, 

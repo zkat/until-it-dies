@@ -228,12 +228,14 @@ and doing some very initial OpenGL setup."
   (il:init)
   (ilut:init)
   #+nil(push (screens engine)
-	     (init (load-screen engine "menu"))))
+	     (init (load-screen engine "menu")))
+  (setf (initializedp engine) t))
 
 (defmessage teardown ((engine =engine=))
   "Simply pass the message along to ENGINE's screens."
   (when (screens engine)
-    (mapc #'teardown (screens engine))))
+    (mapc #'teardown (screens engine)))
+  (setf (initializedp engine) nil))
 
 (defmacro with-init (engine &body body)
   `(sdl:with-init ()
@@ -279,4 +281,3 @@ to *engine*, which might make things a little easier later on."
       ;; We return the engine after everything's done.
       ;; It might be handy for inspection.
       engine)))
-

@@ -16,13 +16,23 @@
    (y 0)
    (z 0)
    (width 0)
-   (height 0))
+   (height 0)
+   (depth 0))
   (:documentation
 "A component is an object that can be drawn onto 
 the screen. Components also accept the INIT, TEARDOWN, 
 UPDATE, DRAW, ATTACH, and DETACH messages, which are
 usually passed down by the screen and/or engine the component
 is currently attached to."))
+
+(defbuzzword scale (component factor)
+  (:documentation "Scales the size of COMPONENT by FACTOR."))
+(defmessage scale ((component =component=) factor)
+  (with-properties (width height)
+      component
+    (setf width (* width factor))
+    (setf height (* height factor))
+    t))
 
 (defmessage init ((component =component=))
   (declare (ignore component))
@@ -65,12 +75,16 @@ is currently attached to."))
 (defmessage attach ((component =component=) (engine =engine=))
   "If someone wants to be vague about it, we just assume they want the first screen."
   (let ((screen (first (screens engine))))
-    (attach component screen)))
+    (if screen
+	(attach component screen)
+	(error "Engine ~A does not have any screens attached." engine))))
 
 (defmessage detach ((component =component=) (engine =engine=))
   "Ditto here -- they probably just want to attach COMPONENT to ENGINE's first screen."
   (let ((screen (first (screens engine))))
-    (detach component screen)))
+    (if screen
+	(detach component screen)
+	(error "Engine ~A does not have any screens attached." engine))))
 
 ;;;
 ;;; Mobile prototype

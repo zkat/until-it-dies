@@ -17,7 +17,8 @@
    (z 0)
    (width 0)
    (height 0)
-   (depth 0))
+   (depth 0)
+   (color nil))
   (:documentation
 "A component is an object that can be drawn onto 
 the screen. Components also accept the INIT, TEARDOWN, 
@@ -61,6 +62,8 @@ is currently attached to."))
   (with-properties (x y z width height) 
       component
     (gl:with-primitives :quads
+      (when (color component)
+	(bind-color (color component)))
       (rectangle x y width height :z z))))
 
 (defmessage attach ((component =component=) (screen =screen=))
@@ -140,3 +143,4 @@ texture they are drawn with."))
     (load-resource texture)
     (setf height (height texture))
     (setf width (width texture))))
+

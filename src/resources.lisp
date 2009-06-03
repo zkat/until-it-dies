@@ -140,3 +140,70 @@ variable within its scope."))
 			(when (and (integerp id)
 				   (gl:texturep id))
 			  (gl:delete-texture id))))))
+
+;;;
+;;; Fonts
+;;;
+(defsheep =color= ()
+  ((r 0)
+   (g 0)
+   (b 0)
+   (a 0)))
+
+(defun make-color (&key (r 0) (g 0) (b 0) (a 0))
+  (clone (=color=) ((r r) (g g) (b b) (a a))))
+
+(defparameter *black* (make-color))
+(defparameter *white* (make-color :r 1 :g 1 :b 1 :a 1))
+
+(defun bind-color (color)
+  (with-properties (r g b a)
+      color
+    (gl:color r g b a)))
+
+(defvar *default-font*)
+(defsheep =font= (=file-resource=)
+  ((font-pointer nil)
+   (size 20)
+   (res 20)
+   (loadedp nil)
+   (color nil)
+   (filepath "/home/zkat/example.otf"))
+  (:documentation "A font is used by the text-drawing system to draw strings to screen."))
+
+(defmacro with-font (font &body body)
+  `(let ((*default-font* ,font))
+     ,@body))
+
+(defmessage load-resource :before ((font =font=))
+  (when (font-pointer font)
+    (unload-resource font)))
+
+(defmessage load-resource ((font =font=))
+  (setf (font-pointer font)
+	(ftgl:create-texture-font (filepath font)))
+  (ftgl:set-font-face-size (font-pointer font)
+			   (size font)
+			   (res font))
+  (setf (loadedp font) t)
+  font)
+
+(defmessage load-resource :after ((font =font=))
+  (let ((ptr (font-pointer font)))
+    (finalize font (lambda ()
+		     (ftgl:destroy-font ptr)))))
+
+(defmessage unload-resource ((font =font=))
+  (ftgl:destroy-font (font-pointer font))
+  (setf (font-pointer font) nil)
+  (setf (loadedp font) nil)
+  font)
+
+(defun draw-string (string &key (x 0) (y 0) (z 0) (font *default-font*))
+  (unless (loadedp font)
+    (load-resource font))
+  (gl:with-pushed-matrix
+    (when (color font)
+      (bind-color (color font)))
+    (gl:translate x y z)
+    (ftgl:render-font (font-pointer font) string :all)))

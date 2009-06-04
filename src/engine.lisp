@@ -215,7 +215,7 @@ followed by the main engine loop."))
   (draw engine))
 
 ;;; Main loop
-(defvar *engine*)
+(defvar *engine* =engine=)
 (defmessage init ((engine =engine=))
   "By default, we take care of setting sdl window options, 
 and doing some very initial OpenGL setup."

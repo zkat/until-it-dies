@@ -39,6 +39,11 @@ the case of =texture= objects.)"))
   ((filepath nil))
   (:documentation "File resources are resources that get loaded from files."))
 
+(defmessage load-resource :before ((resource =resource=))
+  "Before actually loading anything, we should make sure that the engine is initialized."	    
+  (unless (initializedp *engine*)
+    (error "Cannot load resource ~A: Engine ~A must be initialized." resource *engine*)))
+
 ;;;
 ;;; Resource management
 ;;;
@@ -56,6 +61,7 @@ variable within its scope."))
 (defmessage detach ((resource =resource=) (manager =resource-manager=))
   (with-properties (resources) manager
     (setf resources (delete resource resources))))
+
 
 (defmessage load-resource ((manager =resource-manager=))
   (mapc #'load-resource (resources manager)))
@@ -115,7 +121,7 @@ variable within its scope."))
 ;;; File textures
 ;;;
 (defsheep =file-texture= (=file-resource= =texture=)
-  ((filepath "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))
+  ((filepath "res/lisplogo_alien_256.png"))
   (:documentation "A file texture is loaded from an image file."))
 
 (defmessage load-resource :before ((texture =texture=))
@@ -144,23 +150,6 @@ variable within its scope."))
 ;;;
 ;;; Fonts
 ;;;
-(defsheep =color= ()
-  ((r 0)
-   (g 0)
-   (b 0)
-   (a 0)))
-
-(defun make-color (&key (r 0) (g 0) (b 0) (a 0))
-  (clone (=color=) ((r r) (g g) (b b) (a a))))
-
-(defparameter *black* (make-color))
-(defparameter *white* (make-color :r 1 :g 1 :b 1 :a 1))
-
-(defun bind-color (color)
-  (with-properties (r g b a)
-      color
-    (gl:color r g b a)))
-
 (defvar *default-font*)
 (defsheep =font= (=file-resource=)
   ((font-pointer nil)
@@ -168,10 +157,11 @@ variable within its scope."))
    (res 20)
    (loadedp nil)
    (color nil)
-   (filepath "/home/zkat/example.otf"))
+   (filepath "res/example.otf"))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
 
 (defmacro with-font (font &body body)
+  "Binds *default-font* to FONT within BODY."
   `(let ((*default-font* ,font))
      ,@body))
 
@@ -193,6 +183,17 @@ variable within its scope."))
     (finalize font (lambda ()
 		     (ftgl:destroy-font ptr)))))
 
+;; Anytime we change a font's dimensions while *engine* is initialized, we should reload it.
+(defmessage (setf size) :after (new-size (font =font=))
+  (declare (ignore new-size))
+  (when (initializedp *engine*)
+   (load-resource font)))
+
+(defmessage (setf res) :after (new-res (font =font=))
+  (declare (ignore new-size))
+  (when (initializedp *engine*))
+  (load-resource font))
+
 (defmessage unload-resource ((font =font=))
   (ftgl:destroy-font (font-pointer font))
   (setf (font-pointer font) nil)
@@ -200,6 +201,7 @@ variable within its scope."))
   font)
 
 (defun draw-string (string &key (x 0) (y 0) (z 0) (font *default-font*))
+  "Draws STRING at a certain position."
   (unless (loadedp font)
     (load-resource font))
   (gl:with-pushed-matrix
@@ -207,3 +209,4 @@ variable within its scope."))
       (bind-color (color font)))
     (gl:translate x y z)
     (ftgl:render-font (font-pointer font) string :all)))
+

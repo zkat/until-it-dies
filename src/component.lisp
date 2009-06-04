@@ -90,6 +90,41 @@ is currently attached to."))
 	(error "Engine ~A does not have any screens attached." engine))))
 
 ;;;
+;;; Colors for components
+;;;
+(defsheep =color= ()
+  ((r 1)
+   (g 1)
+   (b 1)
+   (a 1))
+  (:documentation "A =color= is an object that represents a certain RGBA value.
+The values are used directly by opengl, and should range between 0 and 1 (instead of 0-255)"))
+
+(defun make-color (&key (r 1) (g 1) (b 1) (a 1))
+  "A utility function for easily generating =color= objects."
+  (clone (=color=) ((r r) (g g) (b b) (a a))))
+
+;; Some standard colors
+(defsheep =black= (=color=) 
+  ((r 0) (g 0) (b 0)))
+(defsheep =white= (=color=)
+  ((r 1) (g 1) (b 1)))
+(defsheep =magenta= (=color=)
+  ((r 1) (g 0) (b 1)))
+(defsheep =red= (=color=)
+  ((r 1) (g 0) (b 0)))
+(defsheep =green= (=color=)
+  ((r 0) (g 1) (b 0)))
+(defsheep =blue= (=color=)
+  ((r 0) (g 0) (b 1)))
+
+(defun bind-color (color)
+  (with-properties (r g b a)
+      color
+    (gl:color r g b a)))
+
+
+;;;
 ;;; Mobile prototype
 ;;;
 (defsheep =mobile= (=component=)

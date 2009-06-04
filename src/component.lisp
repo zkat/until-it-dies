@@ -185,17 +185,25 @@ texture they are drawn with."))
    (frame-delay 50)
    (timer 0)
    (frame-width 15)
-   (frame-height 14)))
+   (frame-height 14)
+   (frame-step 1)
+   (animation-type :loop)))
 
 (defmessage update :before ((animated =animated=) dt)
-  (with-properties (timer num-frames current-frame frame-delay)
+  (with-properties (timer num-frames current-frame frame-delay animation-type frame-step)
       animated
     (incf timer dt)
     (when (> timer frame-delay)
-      (incf current-frame)
+      (incf current-frame frame-step)
       (setf timer 0)
       (when (> current-frame (1- num-frames))
-	(setf current-frame 0)))))
+	(case animation-type
+	 (:loop
+	  (setf current-frame 0))
+	 (:bounce
+	  (setf frame-step (* -1 frame-step)))
+	 (:once
+	  (setf frame-step 0)))))))
 
 (defsheep =animated-sprite= (=mobile= =animated=)
   ((width 20)

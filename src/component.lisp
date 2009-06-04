@@ -150,22 +150,21 @@ positions are updated by the UPDATE message."))
 ;;;
 ;;; Textured prototype
 ;;;
-(defsheep =textured= (=component=)
+(defsheep =textured= ()
   ((texture =texture=))
   (:documentation
-"Not to be confused with =texture=; =textured= is a component 
-that can have a texture slapped on it. A :before message on
-=textured= takes care of binding the texture."))
+"Not to be confused with =texture=; =textured= is a mixin that provides
+texture binding to drawable objects."))
 
-(defmessage draw :before ((component =textured=))
+(defmessage draw :before ((textured =textured=))
   "Before we draw textured components, we should bind its texture."
-  (when (texture component)
-    (bind-texture (texture component))))
+  (when (texture textured)
+    (bind-texture (texture textured))))
 
 ;;;
 ;;; Sprite prototype
 ;;;
-(defsheep =sprite= (=textured= =mobile=)
+(defsheep =sprite= (=mobile= =textured=)
   ()
   (:documentation
 "Sprites are mobile, textured components that
@@ -179,3 +178,56 @@ texture they are drawn with."))
     (setf height (height texture))
     (setf width (width texture))))
 
+(defsheep =animated= (=textured=)
+  ((texture (create-texture "/home/zkat/hackery/lisp/until-it-dies/res/explosion.png"))
+   (current-frame 0)
+   (num-frames 14)
+   (frame-delay 50)
+   (timer 0)
+   (frame-width 15)
+   (frame-height 14)))
+
+(defmessage update :before ((animated =animated=) dt)
+  (with-properties (timer num-frames current-frame frame-delay)
+      animated
+    (incf timer dt)
+    (when (> timer frame-delay)
+      (incf current-frame)
+      (setf timer 0)
+      (when (> current-frame (1- num-frames))
+	(setf current-frame 0)))))
+
+(defsheep =animated-sprite= (=mobile= =animated=)
+  ((width 20)
+   (height 20)
+   (x 100)
+   (y 100)))
+
+(defmessage init ((sprite =animated-sprite=))
+  (with-properties (height width texture)
+    sprite
+    (load-resource texture)
+    (setf height (frame-height sprite))
+    (setf width (frame-width sprite))))
+
+(defmessage draw ((sprite =animated-sprite=))
+  "We'll just draw a simple rectangle for default =component="
+  (with-properties (x y z width height color)
+      sprite
+    (let ((tex-coords (calculate-tex-coords sprite)))
+      (when tex-coords
+       (gl:with-primitives :quads
+	 (when color
+	   (bind-color color))
+	 (rectangle x y width height :z z
+		    :u1 (elt tex-coords 0)
+		    :v1 (elt tex-coords 1)
+		    :u2 (elt tex-coords 2)
+		    :v2 (elt tex-coords 3)))))))
+
+(defun calculate-tex-coords (animated)
+  (with-properties (current-frame num-frames frame-width frame-height texture)
+    animated
+    (when (loadedp texture)
+      (vector (/ (* current-frame frame-width) (width texture))
+	      0 (/ (* (1+ current-frame) frame-width) (width texture)) (/ frame-height (height texture))))))

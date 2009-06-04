@@ -41,7 +41,7 @@ the case of =texture= objects.)"))
 
 (defmessage load-resource :before ((resource =resource=))
   "Before actually loading anything, we should make sure that the engine is initialized."	    
-  (unless (initializedp *engine*)
+  #+nil(unless (initializedp *engine*)
     (error "Cannot load resource ~A: Engine ~A must be initialized." resource *engine*)))
 
 ;;;
@@ -147,6 +147,10 @@ variable within its scope."))
 				   (gl:texturep id))
 			  (gl:delete-texture id))))))
 
+(defun create-texture (filepath)
+  (clone (=file-texture=)
+	 ((filepath filepath))))
+
 ;;;
 ;;; Fonts
 ;;;
@@ -190,9 +194,9 @@ variable within its scope."))
    (load-resource font)))
 
 (defmessage (setf res) :after (new-res (font =font=))
-  (declare (ignore new-size))
-  (when (initializedp *engine*))
-  (load-resource font))
+  (declare (ignore new-res))
+  (when (initializedp *engine*)
+    (load-resource font)))
 
 (defmessage unload-resource ((font =font=))
   (ftgl:destroy-font (font-pointer font))

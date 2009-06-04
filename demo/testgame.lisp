@@ -1,9 +1,5 @@
 (in-package :until-it-dies)
 
-(defun create-texture (filepath)
-  (clone (=file-texture=)
-	 ((filepath filepath))))
-
 (defsheep =test-engine= (=engine=)
   ((title "Test Engine")
    (screens (list (clone (=screen=) ())))))

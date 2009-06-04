@@ -206,8 +206,8 @@ texture they are drawn with."))
 	  (setf frame-step 0)))))))
 
 (defsheep =animated-sprite= (=mobile= =animated=)
-  ((width 20)
-   (height 20)
+  ((width 40)
+   (height 40)
    (x 100)
    (y 100)))
 

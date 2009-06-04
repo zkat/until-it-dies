@@ -194,22 +194,24 @@ texture they are drawn with."))
       animated
     (incf timer dt)
     (when (> timer frame-delay)
-      (incf current-frame frame-step)
       (setf timer 0)
-      (when (> current-frame (1- num-frames))
-	(case animation-type
-	 (:loop
-	  (setf current-frame 0))
-	 (:bounce
-	  (setf frame-step (* -1 frame-step)))
-	 (:once
-	  (setf frame-step 0)))))))
+      (case animation-type
+	(:loop
+	 (incf current-frame frame-step)
+	 (when (or (> current-frame (1- num-frames))
+		   (< current-frame 0))
+	   (setf current-frame 0)))
+	(:bounce
+	 (incf current-frame frame-step)
+	 (when (or (> current-frame (1- num-frames))
+		   (<= current-frame 0))
+	  (setf frame-step (* -1 frame-step))))
+	(:once
+	 (unless (>= current-frame num-frames)
+	   (incf current-frame frame-step)))))))
 
 (defsheep =animated-sprite= (=mobile= =animated=)
-  ((width 40)
-   (height 40)
-   (x 100)
-   (y 100)))
+  ())
 
 (defmessage init ((sprite =animated-sprite=))
   (with-properties (height width texture)
@@ -237,5 +239,5 @@ texture they are drawn with."))
   (with-properties (current-frame num-frames frame-width frame-height texture)
     animated
     (when (loadedp texture)
-      (vector (/ (* current-frame frame-width) (width texture))
-	      0 (/ (* (1+ current-frame) frame-width) (width texture)) (/ frame-height (height texture))))))
+      (vector (/ (* (1- current-frame) frame-width) (width texture))
+	      0 (/ (* current-frame frame-width) (width texture)) (/ frame-height (height texture))))))

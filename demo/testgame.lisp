@@ -4,17 +4,16 @@
   ((title "Test Engine")
    (screens (list (clone (=screen=) ())))))
 
-(defun create-sprite (filepath &key (x 0) (y 0))
-  (let* ((texture (create-texture filepath)))
-    (clone (=sprite=)
-	   ((x x)
-	    (y y)
-	    (texture texture)))))
+(defparameter *test-image*
+  (create-image
+   "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"
+   :x 100
+   :y 100))
 
-(defparameter *test-sprite*
-  (create-sprite
-   "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))
-;; UID> (attach (create-sprite "/path/to/texture.png")
-;;              =test-engine=)
-;;
-;; UID> (run =test-engine=)
+(defmessage idle ((engine =test-engine=))
+  (declare (ignore engine))
+  (draw *test-image*))
+
+(defmessage init ((engine =test-engine=))
+  (init *test-image*)
+  (call-next-message))

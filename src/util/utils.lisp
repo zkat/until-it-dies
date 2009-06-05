@@ -45,18 +45,3 @@ Returns both the difference in time and the current-time used in the computation
   (gl:ortho 0 width 0 height 10 0) ;0,0 is at bottom left of screen. Much nicer for maths.
   (gl:matrix-mode :modelview))
 
-(defun rectangle (x y width height &key (z 0) (u1 0) (v1 0) (u2 1) (v2 1))
-  (let* ((w/2 (/ width 2.0))
-         (h/2 (/ height 2.0))
-         (x1 (- x w/2))
-         (x2 (+ x w/2))
-         (y1 (+ y h/2))
-         (y2 (- y h/2)))
-    (gl:tex-coord u1 v2)
-    (gl:vertex x1 y1 z)
-    (gl:tex-coord u2 v2)
-    (gl:vertex x2 y1 z)
-    (gl:tex-coord u2 v1)
-    (gl:vertex x2 y2 z)
-    (gl:tex-coord u1 v1)
-    (gl:vertex x1 y2 z)))

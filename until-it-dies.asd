@@ -20,6 +20,7 @@
 		       (:file "opengl-hacks")
 		       (:file "priority-queue")
 		       (:file "utils")))
+	     (:file "primitives")
 	     (:file "config")
 	     (:file "event")
 	     (:file "resources")

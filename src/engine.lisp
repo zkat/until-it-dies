@@ -23,6 +23,8 @@
    (default-font (clone (=font=) ()))
    (screens nil)
    (pausedp nil)
+   (mouse-x 0)
+   (mouse-y 0)
    (window-width 400 :writer nil)
    (window-height 400 :writer nil)
    (title "Until It Dies application"))
@@ -193,9 +195,16 @@ followed by the main engine loop."))
 (defmessage mouse-down ((engine =engine=) button state x y)
   (declare (ignore engine button state x y))
   (values))
+(defmessage mouse-move :before ((engine =engine=) x y dx dy)
+  (declare (ignore dx dy))
+  (with-properties (mouse-x mouse-y)
+      engine
+    (setf mouse-x x)
+    (setf mouse-y y)))
 (defmessage mouse-move ((engine =engine=) x y dx dy)
   (declare (ignore engine x y dx dy))
   (values))
+
 
 ;;; Other events
 (defmessage window-resized (engine width height)
@@ -276,11 +285,10 @@ to *engine*, which might make things a little easier later on."
        (restartable (mouse-down engine button state x y)))
       (:mouse-motion-event
        (:x x :y y :x-rel delta-x :y-rel delta-y)
-       (restartable (mouse-move engine x y delta-x delta-y)))
+       (restartable (mouse-move engine x (- (window-height engine) y) delta-x (* -1 delta-y))))
       (:idle
        ()
        (restartable (idle engine))))
     ;; We return the engine after everything's done.
     ;; It might be handy for inspection.
     engine))
-

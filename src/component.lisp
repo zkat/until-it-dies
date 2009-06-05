@@ -42,6 +42,16 @@ The values are used directly by opengl, and should range between 0 and 1 (instea
 (defsheep =brown= (=color=)
   ((r 0.65) (g 0.165) (b 0.165)))
 
+(defun mix-colors (color1 color2)
+  (with-properties ((r1 r) (g1 g) (b1 b) (a1 a))
+      color1
+    (with-properties ((r2 r) (g2 g) (b2 b) (a2 a))
+	color2
+      (make-color :r (/ (+ r1 r2) 2)
+		  :g (/ (+ g1 g2) 2)
+		  :b (/ (+ b1 b2) 2)
+		  :a (/ (+ a1 a2) 2)))))
+
 (defun bind-color (color)
   (with-properties (r g b a)
       color

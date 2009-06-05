@@ -31,7 +31,7 @@
 (defun make-point (&key (x 0) (y 0) (z 0))
   (clone (=point=) ((x x) (y y) (z z))))
 
-(defun draw-rectangle (x y width height &key (color =white=) (z 0))
+(defun draw-rectangle (x y width height &key (color *white*) (z 0))
   (with-properties (r g b a) color
     (gl:color r g b a))
   (gl:with-primitives :quads
@@ -46,43 +46,38 @@
     (gl:vertex x2 y2 z)
     (gl:vertex x1 y2 z))))
 
-(defun draw-triangle (p1 p2 p3 &key (color =white=))
-  (with-properties (r g b a) color
-    (gl:color r g b a))
+(defun draw-triangle (p1 p2 p3 &key (color *white*))
+  (bind-color color)
   (gl:with-primitives :triangles
     (mapc (lambda (point)
 	    (with-properties (x y z) point
 	      (gl:vertex x y z)))
 	  (list p1 p2 p3))))
 
-(defun draw-quad (p1 p2 p3 p4 &key (color =white=))
-  (with-properties (r g b a) color
-    (gl:color r g b a))
+(defun draw-quad (p1 p2 p3 p4 &key (color *white*))
+  (bind-color color)
   (gl:with-primitives :quads
     (mapc (lambda (point)
 	    (with-properties (x y z) point
 	      (gl:vertex x y z)))
 	  (list p1 p2 p3 p4))))
 
-(defun draw-point (point &key (color =white=))
-  (with-properties (r g b a) color
-    (gl:color r g b a))
+(defun draw-point (point &key (color *white*))
+  (bind-color color)
   (gl:with-primitives :points
     (with-properties (x y z) point
       (gl:vertex x y z))))
 
-(defun draw-line (p1 p2 &key (color =white=))
-  (with-properties (r g b a) color
-    (gl:color r g b a))
+(defun draw-line (p1 p2 &key (color *white*))
+  (bind-color color)
   (gl:with-primitives :lines
     (mapc (lambda (point)
 	    (with-properties (x y z) point
 	      (gl:vertex x y z)))
       (list p1 p2))))
 
-(defun draw-polygon (points-list &key (color =white=))
-  (with-properties (r g b a) color
-    (gl:color r g b a))
+(defun draw-polygon (points-list &key (color *white*))
+  (bind-color color)
   (gl:with-primitives :polygon
     (mapc (lambda (point)
 	    (with-properties (x y z) point

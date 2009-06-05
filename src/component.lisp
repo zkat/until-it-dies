@@ -6,6 +6,48 @@
 (in-package :until-it-dies)
 
 ;;;
+;;; Colors
+;;;
+(defsheep =color= ()
+  ((r 1)
+   (g 1)
+   (b 1)
+   (a 1))
+  (:documentation "A =color= is an object that represents a certain RGBA value.
+The values are used directly by opengl, and should range between 0 and 1 (instead of 0-255)"))
+
+(defun make-color (&key (r 1) (g 1) (b 1) (a 1))
+  "A utility function for easily generating =color= objects."
+  (clone (=color=) ((r r) (g g) (b b) (a a))))
+
+;; Some standard colors
+(defsheep =black= (=color=) 
+  ((r 0) (g 0) (b 0)))
+(defsheep =white= (=color=)
+  ((r 1) (g 1) (b 1)))
+(defsheep =grey= (=color=)
+  ((r 0.5) (g 0.5) (b 0.5)))
+(defsheep =magenta= (=color=)
+  ((r 1) (g 0) (b 1)))
+(defsheep =red= (=color=)
+  ((r 1) (g 0) (b 0)))
+(defsheep =green= (=color=)
+  ((r 0) (g 1) (b 0)))
+(defsheep =blue= (=color=)
+  ((r 0) (g 0) (b 1)))
+(defsheep =yellow= (=color=)
+  ((r 1) (g 1) (b 0)))
+(defsheep =orange= (=color=)
+  ((r 1) (g 0.65) (b 0)))
+(defsheep =brown= (=color=)
+  ((r 0.65) (g 0.165) (b 0.165)))
+
+(defun bind-color (color)
+  (with-properties (r g b a)
+      color
+    (gl:color r g b a)))
+
+;;;
 ;;; Component prototype
 ;;;
 (defsheep =component= ()
@@ -18,7 +60,8 @@
    (width 0)
    (height 0)
    (depth 0)
-   (color nil))
+   (rotation 0)
+   (color =white=))
   (:documentation
 "A component is an object that can be drawn onto 
 the screen. Components also accept the INIT, TEARDOWN, 
@@ -54,16 +97,22 @@ is currently attached to."))
 (defmessage draw :around ((component =component=))
   "We wrap the main DRAW message so that components are only drawn 
    if they are marked as visible."
-  (when (visiblep component)
-    (call-next-message)))
+  (with-properties (visiblep rotation) component
+    (when visiblep
+     (gl:with-pushed-matrix
+       #+nil(when (/= rotation 0)
+	 (gl:rotate rotation 0 0 1))
+       (call-next-message)))))
+
+(defmessage draw :before ((component =component=))
+  "Since all components are colored, we bind its color before doing any actual drawing."
+  (bind-color (color component)))
 
 (defmessage draw ((component =component=))
   "We'll just draw a simple rectangle for default =component="
   (with-properties (x y z width height) 
       component
     (gl:with-primitives :quads
-      (when (color component)
-	(bind-color (color component)))
       (rectangle x y width height :z z))))
 
 (defmessage attach ((component =component=) (screen =screen=))
@@ -88,41 +137,6 @@ is currently attached to."))
     (if screen
 	(detach component screen)
 	(error "Engine ~A does not have any screens attached." engine))))
-
-;;;
-;;; Colors for components
-;;;
-(defsheep =color= ()
-  ((r 1)
-   (g 1)
-   (b 1)
-   (a 1))
-  (:documentation "A =color= is an object that represents a certain RGBA value.
-The values are used directly by opengl, and should range between 0 and 1 (instead of 0-255)"))
-
-(defun make-color (&key (r 1) (g 1) (b 1) (a 1))
-  "A utility function for easily generating =color= objects."
-  (clone (=color=) ((r r) (g g) (b b) (a a))))
-
-;; Some standard colors
-(defsheep =black= (=color=) 
-  ((r 0) (g 0) (b 0)))
-(defsheep =white= (=color=)
-  ((r 1) (g 1) (b 1)))
-(defsheep =magenta= (=color=)
-  ((r 1) (g 0) (b 1)))
-(defsheep =red= (=color=)
-  ((r 1) (g 0) (b 0)))
-(defsheep =green= (=color=)
-  ((r 0) (g 1) (b 0)))
-(defsheep =blue= (=color=)
-  ((r 0) (g 0) (b 1)))
-
-(defun bind-color (color)
-  (with-properties (r g b a)
-      color
-    (gl:color r g b a)))
-
 
 ;;;
 ;;; Mobile prototype
@@ -154,31 +168,60 @@ positions are updated by the UPDATE message."))
   ((texture =texture=))
   (:documentation
 "Not to be confused with =texture=; =textured= is a mixin that provides
-texture binding to drawable objects."))
+facilities for drawing textured onto components."))
+
+(defbuzzword calculate-tex-coords (obj))
+(defmessage calculate-tex-coords ((textured =textured=))
+  (declare (ignore textured))
+  (vector 0 0 1 1))
 
 (defmessage draw :before ((textured =textured=))
   "Before we draw textured components, we should bind its texture."
   (when (texture textured)
     (bind-texture (texture textured))))
 
+(defmessage draw ((textured =textured=))
+  (with-properties (x y z width height color)
+      textured
+    (let ((tex-coords (calculate-tex-coords textured)))
+      (when tex-coords
+       (gl:with-primitives :quads
+	 (when color
+	   (bind-color color))
+	 (rectangle x y width height :z z
+		    :u1 (elt tex-coords 0)
+		    :v1 (elt tex-coords 1)
+		    :u2 (elt tex-coords 2)
+		    :v2 (elt tex-coords 3)))))))
+
+(defmessage draw :after ((textured =textured=))
+  (unbind-texture (texture textured)))
+
 ;;;
-;;; Sprite prototype
+;;; Image prototype
 ;;;
-(defsheep =sprite= (=mobile= =textured=)
-  ()
+(defsheep =image= (=component= =textured=)
+  ((texture (create-texture "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png")))
   (:documentation
-"Sprites are mobile, textured components that
+"Images are textured components that
 are initialized to be the same size as the
 texture they are drawn with."))
 
-(defmessage init ((sprite =sprite=))
+(defun create-image (filepath &key (x 0) (y 0))
+  (let* ((texture (create-texture filepath)))
+    (clone (=image=)
+	   ((x x)
+	    (y y)
+	    (texture texture)))))
+
+(defmessage init ((image =image=))
   (with-properties (height width texture)
-    sprite
+    image
     (load-resource texture)
     (setf height (height texture))
     (setf width (width texture))))
 
-(defsheep =animated= (=textured=)
+(defsheep =animation= (=image=)
   ((texture (create-texture "/home/zkat/hackery/lisp/until-it-dies/res/explosion.png"))
    (current-frame 0)
    (num-frames 14)
@@ -187,11 +230,23 @@ texture they are drawn with."))
    (frame-width 15)
    (frame-height 14)
    (frame-step 1)
-   (animation-type :loop)))
+   (animation-type :loop))
+  (:documentation
+"Animations are like images, but they use the provided texture
+as a sprite sheet. Based on certain provided parameters, they
+figure out which frames to draw."))
 
-(defmessage update :before ((animated =animated=) dt)
+(defmessage init ((animation =animation=))
+  "By default, an animation's actual height and width are based on the animation 
+frame's height and width."
+  (with-properties (height width frame-height frame-width texture)
+      animation
+    (setf height frame-height)
+    (setf width frame-width)))
+
+(defmessage update ((animation =animation=) dt)
   (with-properties (timer num-frames current-frame frame-delay animation-type frame-step)
-      animated
+      animation
     (incf timer dt)
     (when (> timer frame-delay)
       (setf timer 0)
@@ -203,40 +258,22 @@ texture they are drawn with."))
 	   (setf current-frame 0)))
 	(:bounce
 	 (incf current-frame frame-step)
-	 (when (or (> current-frame (1- num-frames))
-		   (<= current-frame 0))
-	  (setf frame-step (* -1 frame-step))))
+	 (when (or (= current-frame num-frames)
+		   (= current-frame 0))
+	   (setf frame-step (* -1 frame-step)))
+	 (when (or (> current-frame num-frames)
+		   (< current-frame 0))
+	   (setf current-frame 0)))
 	(:once
-	 (unless (>= current-frame num-frames)
-	   (incf current-frame frame-step)))))))
+	 (unless (= current-frame num-frames)
+	   (incf current-frame frame-step))
+	 (when (or (> current-frame num-frames)
+		   (< current-frame 0))
+	   (setf current-frame 0)))))))
 
-(defsheep =animated-sprite= (=mobile= =animated=)
-  ())
-
-(defmessage init ((sprite =animated-sprite=))
-  (with-properties (height width texture frame-height frame-width)
-    sprite
-    (setf height frame-height)
-    (setf width frame-width)))
-
-(defmessage draw ((sprite =animated-sprite=))
-  "We'll just draw a simple rectangle for default =component="
-  (with-properties (x y z width height color)
-      sprite
-    (let ((tex-coords (calculate-tex-coords sprite)))
-      (when tex-coords
-       (gl:with-primitives :quads
-	 (when color
-	   (bind-color color))
-	 (rectangle x y width height :z z
-		    :u1 (elt tex-coords 0)
-		    :v1 (elt tex-coords 1)
-		    :u2 (elt tex-coords 2)
-		    :v2 (elt tex-coords 3)))))))
-
-(defun calculate-tex-coords (animated)
+(defmessage calculate-tex-coords ((animation =animation=))
   (with-properties (current-frame num-frames frame-width frame-height texture)
-    animated
+      animation
     (when (loadedp texture)
       (vector (/ (* (1- current-frame) frame-width) (width texture))
 	      0 (/ (* current-frame frame-width) (width texture)) (/ frame-height (height texture))))))

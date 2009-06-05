@@ -88,6 +88,7 @@ variable within its scope."))
 ;;;
 ;;; - Textures manage opengl texture objects, and handle their binding.
 (defbuzzword bind-texture (texture))
+(defbuzzword unbind-texture (texture))
 
 (defsheep =texture= (=resource=)
   ((tex-id nil)
@@ -101,6 +102,10 @@ variable within its scope."))
 	      (not (gl:texturep tex-id)))
       (load-resource texture))
     (gl:bind-texture target tex-id)))
+
+(defmessage unbind-texture ((texture =texture=))
+  (with-properties (target) texture
+    (gl:bind-texture target 0)))
 
 (defmessage unload-resource ((texture =texture=))
   (let ((id (tex-id texture)))

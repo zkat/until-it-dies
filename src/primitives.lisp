@@ -31,7 +31,7 @@
 (defun make-point (&key (x 0) (y 0) (z 0))
   (clone (=point=) ((x x) (y y) (z z))))
 
-(defun draw-rectangle (x y width height &key (color =white=))
+(defun draw-rectangle (x y width height &key (color =white=) (z 0))
   (with-properties (r g b a) color
     (gl:color r g b a))
   (gl:with-primitives :quads

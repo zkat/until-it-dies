@@ -11,8 +11,14 @@
    :y 100))
 
 (defmessage idle ((engine =test-engine=))
+  (values))
+
+(defmessage draw ((engine =test-engine=))
   (declare (ignore engine))
-  (draw *test-image*))
+  (draw *test-image*)
+  (dotimes (i 600)
+    (draw-rectangle (random 400) (random 400)
+		    30 30)))
 
 (defmessage init ((engine =test-engine=))
   (init *test-image*)

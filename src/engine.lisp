@@ -13,11 +13,7 @@
 (defsheep =engine= ()
   ((runningp t)
    (initializedp nil)
-   (fps 0)
-   (fps-limit nil)
    (last-frame-time 0)
-   (last-frame-count 0)
-   (frame-count 0)
    (dt 0)
    (keys-held-down (make-hash-table :test #'eq)
 		   :cloneform (make-hash-table :test #'eq))
@@ -30,7 +26,14 @@
    (mouse-y 0)
    (window-width 400 :writer nil)
    (window-height 400 :writer nil)
-   (title "Until It Dies application"))
+   (title "Until It Dies application")
+   ;; fps calculation
+   (fps 0)
+   (fps-limit nil) ; only used during init time
+   (fps-check-delay 2000)
+   (last-fps-check-time 0)
+   (last-fps-check-frame-count 0)
+   (frame-count 0))
   (:documentation
 "Engines are objects that contain information about
 -how- to run an application.
@@ -126,13 +129,12 @@ followed by the main engine loop."))
 	  (update screen dt))
 	(screens engine)))
 
-(defmessage draw :before ((engine =engine=))
-  "Clearing, and initial setup before drawing."
-  (declare (ignore engine))
-)
-
 (defmessage draw ((engine =engine=))
-  "The primary message will pass on the draw message to all of ENGINE's screens."
+  (declare (ignore engine))
+  (values))
+
+(defmessage draw :before ((engine =engine=))
+  "Things attached to the engine will be drawn before everything else."
   (mapc #'draw (screens engine)))
 
 ;;; Attaching/detaching
@@ -207,18 +209,22 @@ followed by the main engine loop."))
   (values))
 
 (defun update-time (engine)
-  (with-properties (last-frame-time last-frame-count fps frame-count) engine
+  (with-properties (frame-count last-frame-time) engine
     (incf frame-count)
    (multiple-value-bind (dt now)
        (time-difference last-frame-time)
-     (setf (last-frame-time engine) now)
+     (setf last-frame-time now)
+     (setf (dt engine) dt)
      ;;    Update the current framerate for ENGINE
-     (let ((frames (- frame-count last-frame-count))
-	   (seconds (/ dt 1000)))
-       (setf fps (float (if (zerop dt)
-			    0 (/ frames seconds))))
-       (setf (dt engine) dt))
-     (setf last-frame-count frame-count)
+     (with-properties (last-fps-check-time last-fps-check-frame-count fps-check-delay fps frame-count)
+	 engine
+      (when (>= now (+ last-fps-check-time))
+	(let ((frames (- frame-count last-fps-check-frame-count))
+	      (seconds (/ dt 1000)))
+	  (setf fps (float (if (zerop dt)
+			       0 (/ frames seconds))))
+	  (setf last-fps-check-time now)
+	  (setf last-fps-check-frame-count frame-count))))
      (process-cooked-events engine))))
 
 (defmessage idle :before ((engine =engine=))

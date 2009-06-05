@@ -214,11 +214,10 @@ texture they are drawn with."))
   ())
 
 (defmessage init ((sprite =animated-sprite=))
-  (with-properties (height width texture)
+  (with-properties (height width texture frame-height frame-width)
     sprite
-    (load-resource texture)
-    (setf height (frame-height sprite))
-    (setf width (frame-width sprite))))
+    (setf height frame-height)
+    (setf width frame-width)))
 
 (defmessage draw ((sprite =animated-sprite=))
   "We'll just draw a simple rectangle for default =component="

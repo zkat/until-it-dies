@@ -16,6 +16,7 @@
    (fps 0)
    (fps-limit nil)
    (last-frame-time 0)
+   (dt 0)
    (keys-held-down (make-hash-table :test #'eq)
 		   :cloneform (make-hash-table :test #'eq))
    (event-queue (clone (=event-queue=) ()))
@@ -126,19 +127,11 @@ followed by the main engine loop."))
 (defmessage draw :before ((engine =engine=))
   "Clearing, and initial setup before drawing."
   (declare (ignore engine))
-  (gl:clear-color 0 0 0 0)
-  (gl:clear :color-buffer-bit :depth-buffer-bit)
-  (gl:enable :texture-2d :blend)
-  (gl:blend-func :src-alpha :one-minus-src-alpha))
+)
 
 (defmessage draw ((engine =engine=))
   "The primary message will pass on the draw message to all of ENGINE's screens."
   (mapc #'draw (screens engine)))
-
-(defmessage draw :after ((engine =engine=))
-  "Once everything is done, swap the back buffer in."
-  (declare (ignore engine))
-  (sdl:update-display))
 
 ;;; Attaching/detaching
 (defmessage detach-all ((engine =engine=))
@@ -205,27 +198,38 @@ followed by the main engine loop."))
   (declare (ignore engine x y dx dy))
   (values))
 
-
 ;;; Other events
 (defmessage window-resized (engine width height)
   "We don't really care about resize events right now."
   (declare (ignore engine width height))
   (values))
 
-(defmessage idle ((engine =engine=))
-  "When the IDLE event fires, we should UPDATE all attached objects, then DRAW them."
+(defmessage idle :before ((engine =engine=))
+  (gl:clear-color 0 0 0 0)
+  (gl:clear :color-buffer-bit :depth-buffer-bit)
+  (gl:enable :texture-2d :blend)
+  (gl:blend-func :src-alpha :one-minus-src-alpha)
   (multiple-value-bind (dt now)
       (time-difference (last-frame-time engine))
     (setf (last-frame-time engine) now)
     ;;    Update the current framerate for ENGINE
     (setf (fps engine) (float (/ 1000 (if (= 0 dt) 1 dt))))
+    (setf (dt engine) dt)
     (process-cooked-events engine)
     (update engine dt))
   (draw engine))
 
+(defmessage idle ((engine =engine=))
+  (declare (ignore engine))
+  (values))
+
+(defmessage idle :after ((engine =engine=))
+  (declare (ignore engine))
+  (sdl:update-display))
+
 ;;; Main loop
 (defvar *engine* =engine=)
-(defmessage init ((engine =engine=))
+(defmessage init :before ((engine =engine=))
   "By default, we take care of setting sdl window options, 
 and doing some very initial OpenGL setup."
   (sdl:window (window-width engine) (window-height engine)
@@ -240,6 +244,10 @@ and doing some very initial OpenGL setup."
   (mapc #'init (screens engine))
   (setf (initializedp engine) t))
 
+(defmessage init ((engine =engine=))
+  (declare (ignore engine))
+  (values))
+
 (defmessage teardown ((engine =engine=))
   "Simply pass the message along to ENGINE's screens."
   (mapc #'teardown (screens engine))
@@ -248,15 +256,17 @@ and doing some very initial OpenGL setup."
 (defmacro with-engine (engine &body body)
   "This convenience macro simple makes sure the engine is torn down once
 we're done with it."
-  `(sdl:with-init ()
-     (let ((*engine* ,engine))
-       (with-event-queue (event-queue engine)
-	 (with-resource-manager (resource-manager engine)
-	   (with-font (default-font engine)
-	    (init ,engine)
-	    (unwind-protect
-		 ,@body
-	      (teardown ,engine))))))))
+  (let ((engine-var (gensym "ENGINE-")))
+    `(sdl:with-init ()
+       (let* ((,engine-var ,engine)
+	      (*engine* ,engine-var))
+	 (with-event-queue (event-queue ,engine-var)
+	   (with-resource-manager (resource-manager ,engine-var)
+	     (with-font (default-font ,engine-var)
+	       (init ,engine-var)
+	       (unwind-protect
+		    ,@body
+		 (teardown ,engine-var)))))))))
 
 (defmessage run ((engine =engine=))
   "Here's the main loop -- because of the way lb-sdl is set up, 

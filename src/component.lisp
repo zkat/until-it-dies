@@ -8,52 +8,53 @@
 ;;;
 ;;; Colors
 ;;;
-(defsheep =color= ()
-  ((r 1)
-   (g 1)
-   (b 1)
-   (a 1))
-  (:documentation "A =color= is an object that represents a certain RGBA value.
-The values are used directly by opengl, and should range between 0 and 1 (instead of 0-255)"))
-
-(defun make-color (&key (r 1) (g 1) (b 1) (a 1))
-  "A utility function for easily generating =color= objects."
-  (clone (=color=) ((r r) (g g) (b b) (a a))))
+(defstruct color
+  ;; A color is an object that represents a certain RGBA value. 
+  ;; The values are used directly by opengl, and should range between 0 and 1 (instead of 0-255)"
+  (r 1)
+  (g 1)
+  (b 1)
+  (a 1))
 
 ;; Some standard colors
-(defsheep =black= (=color=) 
-  ((r 0) (g 0) (b 0)))
-(defsheep =white= (=color=)
-  ((r 1) (g 1) (b 1)))
-(defsheep =grey= (=color=)
-  ((r 0.5) (g 0.5) (b 0.5)))
-(defsheep =magenta= (=color=)
-  ((r 1) (g 0) (b 1)))
-(defsheep =red= (=color=)
-  ((r 1) (g 0) (b 0)))
-(defsheep =green= (=color=)
-  ((r 0) (g 1) (b 0)))
-(defsheep =blue= (=color=)
-  ((r 0) (g 0) (b 1)))
-(defsheep =yellow= (=color=)
-  ((r 1) (g 1) (b 0)))
-(defsheep =orange= (=color=)
-  ((r 1) (g 0.65) (b 0)))
-(defsheep =brown= (=color=)
-  ((r 0.65) (g 0.165) (b 0.165)))
+(defparameter *black*
+  (make-color :r 0 :g 0 :b 0))
+(defparameter *white*
+  (make-color :r 1 :g 1 :b 1))
+(defparameter *magenta*
+  (make-color :r 1 :g 0 :b 1))
+(defparameter *red*
+  (make-color :r 1 :g 0 :b 0))
+(defparameter *green*
+  (make-color :r 0 :g 1 :b 0))
+(defparameter *blue*
+  (make-color :r 0 :g 0 :b 1))
+(defparameter *yellow*
+  (make-color :r 1 :g 1 :b 0))
+(defparameter *orange*
+  (make-color :r 1 :g 0.65 :b 0))
+(defparameter *brown*
+  (make-color :r 0.65 :g 0.165 :b 0.165))
 
 (defun mix-colors (color1 color2)
-  (with-properties ((r1 r) (g1 g) (b1 b) (a1 a))
-      color1
-    (with-properties ((r2 r) (g2 g) (b2 b) (a2 a))
-	color2
+  (let* ((r1 (r color1))
+	 (g1 (g color1))
+	 (b1 (b color1))
+	 (a1 (a color1))
+	 (r2 (r color2))
+	 (g2 (g color2))
+	 (b2 (b color2))
+	 (a2 (a color2)))
       (make-color :r (/ (+ r1 r2) 2)
 		  :g (/ (+ g1 g2) 2)
 		  :b (/ (+ b1 b2) 2)
-		  :a (/ (+ a1 a2) 2)))))
+		  :a (/ (+ a1 a2) 2))))
 
 (defun bind-color (color)
-  (with-properties (r g b a)
+  (with-accessors ((r r)
+		   (g g)
+		   (b b)
+		   (a a))
       color
     (gl:color r g b a)))
 
@@ -71,7 +72,7 @@ The values are used directly by opengl, and should range between 0 and 1 (instea
    (height 0)
    (depth 0)
    (rotation 0)
-   (color =white=))
+   (color *white*))
   (:documentation
 "A component is an object that can be drawn onto 
 the screen. Components also accept the INIT, TEARDOWN, 

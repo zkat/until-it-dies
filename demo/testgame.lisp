@@ -10,16 +10,13 @@
    :x 100
    :y 100))
 
-(defmessage idle ((engine =test-engine=))
-  (values))
+(defmessage init ((engine =test-engine=))
+  (declare (ignore engine))
+  (call-next-message))
 
 (defmessage draw ((engine =test-engine=))
   (declare (ignore engine))
-  (draw *test-image*)
-  (dotimes (i 600)
-    (draw-rectangle (random 400) (random 400)
-		    30 30)))
-
-(defmessage init ((engine =test-engine=))
-  (init *test-image*)
-  (call-next-message))
+  (dotimes (i 10000)
+    (draw-point (make-point :x (random 400)
+                            :y (random 400))
+                :color *yellow*)))

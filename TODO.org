@@ -17,7 +17,6 @@
    to start animating stuff, it should all go into this sprite prototype. I'll refactor things out
    later, but first things first. (animation comes later)
 
-
 * Write the library modules
 ** graphics module prototypes
 *** engine

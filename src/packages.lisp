@@ -41,6 +41,8 @@
    ;; primitives
    :make-color
    :mix-colors
+   :*color*
+   :with-color
    :*black*
    :*white*
    :*magenta*

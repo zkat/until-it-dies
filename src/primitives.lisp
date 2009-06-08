@@ -47,6 +47,7 @@
 (defparameter *brown*
   (make-color :r 0.34 :g 0.165 :b 0.165))
 
+(defvar *color* *white*)
 (defun mix-colors (color1 color2)
   (let* ((r1 (r color1))
 	 (g1 (g color1))
@@ -60,6 +61,15 @@
 		  :g (/ (+ g1 g2) 2)
 		  :b (/ (+ b1 b2) 2)
 		  :a (/ (+ a1 a2) 2))))
+
+(defmacro with-color (color &body body)
+  (let ((color-name (gensym "COLOR-")))
+    `(progn
+       (let* ((,color-name ,color)
+              (*color* ,color-name))
+         (bind-color *color*)
+         ,@body)
+       (bind-color *color*))))
 
 (defun bind-color (color)
   (with-accessors ((r r)
@@ -95,8 +105,9 @@
              (aref point 1)
              (aref point 2)))
 
-(defun draw-rectangle (x y width height &key (color *white*) (z 0))
-  (bind-color color)
+(defun draw-rectangle (x y width height &key color (z 0))
+  (when color
+    (bind-color color))
   (gl:with-primitives :quads
       (let* ((w/2 (/ width 2.0))
          (h/2 (/ height 2.0))
@@ -107,37 +118,54 @@
     (gl:vertex x1 y1 z)
     (gl:vertex x2 y1 z)
     (gl:vertex x2 y2 z)
-    (gl:vertex x1 y2 z))))
+    (gl:vertex x1 y2 z)))
+  (when color
+    (bind-color *color*)))
 
-(defun draw-triangle (p1 p2 p3 &key (color *white*))
-  (bind-color color)
+(defun draw-triangle (p1 p2 p3 &key color)
+  (when color
+   (bind-color color))
   (gl:with-primitives :triangles
     (mapc (lambda (point)
             (set-point point))
-	  (list p1 p2 p3))))
+	  (list p1 p2 p3)))
+  (when color
+    (bind-color *color*)))
 
-(defun draw-quad (p1 p2 p3 p4 &key (color *white*))
-  (bind-color color)
+(defun draw-quad (p1 p2 p3 p4 &key color)
+  (when color
+    (bind-color color))
   (gl:with-primitives :quads
     (mapc (lambda (point)
             (set-point point))
-	  (list p1 p2 p3 p4))))
+	  (list p1 p2 p3 p4)))
+  (when color
+    (bind-color *color*)))
 
-(defun draw-point (point &key (color *white*))
-  (bind-color color)
+(defun draw-point (point &key color)
+  (when color
+    (bind-color color))
   (gl:with-primitives :points
-    (set-point point)))
+    (set-point point))
+  (when color
+    (bind-color *color*)))
 
-(defun draw-line (p1 p2 &key (color *white*))
-  (bind-color color)
+(defun draw-line (p1 p2 &key color)
+  (when color
+   (bind-color color))
   (gl:with-primitives :lines
     (mapc (lambda (point)
             (set-point point))
-      (list p1 p2))))
+      (list p1 p2)))
+  (when color
+    (bind-color *color*)))
 
-(defun draw-polygon (points-list &key (color *white*))
-  (bind-color color)
+(defun draw-polygon (points-list &key color)
+  (when color
+   (bind-color color))
   (gl:with-primitives :polygon
     (mapc (lambda (point)
             (set-point point))
-	  points-list)))
+	  points-list))
+  (when color
+    (bind-color *color*)))

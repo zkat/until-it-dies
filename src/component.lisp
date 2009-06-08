@@ -2,6 +2,8 @@
 
 ;; component.lisp
 ;;
+;; TODO - FUCK THIS NOISE!
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
@@ -159,7 +161,9 @@ facilities for drawing textured onto components."))
 ;;; Image prototype
 ;;;
 (defsheep =image= (=component= =textured=)
-  ((texture (create-texture "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png")))
+  ((texture (create-texture "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))
+   (height 10)
+   (width 10))
   (:documentation
 "Images are textured components that
 are initialized to be the same size as the

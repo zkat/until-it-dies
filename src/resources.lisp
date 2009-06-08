@@ -142,6 +142,7 @@ variable within its scope."))
 	  (il:get-integer :image-width))
     (setf (height texture)
 	  (il:get-integer :image-height)))
+  (gl:bind-texture :texture-2d 0)
   (il:bind-image 0)
   texture)
 
@@ -159,7 +160,6 @@ variable within its scope."))
 ;;;
 ;;; Fonts
 ;;;
-(defvar *default-font*)
 (defsheep =font= (=file-resource=)
   ((font-pointer nil)
    (size 20)
@@ -168,6 +168,8 @@ variable within its scope."))
    (color nil)
    (filepath "res/example.otf"))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
+
+(defvar *default-font* =font=)
 
 (defmacro with-font (font &body body)
   "Binds *default-font* to FONT within BODY."

@@ -1,8 +1,7 @@
-* The Basics
+* DONE The Basics
 ** DONE Get a blank game up and running
 ** DONE Draw a square on the screen
 ** DONE Apply a texture to square
-* Make it useful
 ** DONE Figure out resource management
    I don't really know how to handle resources right now. I want to be able to dynamically add/remove
    them, but it shouldn't rely on the GC, since it's unpredictable and resources can take up quite a
@@ -17,16 +16,20 @@
    to start animating stuff, it should all go into this sprite prototype. I'll refactor things out
    later, but first things first. (animation comes later)
 
-* Write the library modules
-** graphics module prototypes
-*** engine
-*** screen   
-*** sprite
-*** animated sprite
-*** animation
-*** font
+* TODO Write the library modules
+** TODO graphics module prototypes
+*** DONE engine
+*** TODO image
+*** TODO animation
+*** TODO font
     I want to be able to easily draw text on-screen. Using cl-ftgl might work.
-*** particle system
-** audio prototypes
-*** sample
-*** music
+    UPDATE: Improve the interface a bit, and this should be set?
+*** TODO particle system
+    Should I include this in the engine? Maybe this should be client-side.
+** TODO audio prototypes
+   cl-OpenAL seems pretty good so far. I think I can probably give this a shot already.
+*** TODO sample
+*** TODO music
+* TODO Write tetris!
+* TODO Forget this attach/detach thing.
+   That should be left for a higher-level interface.

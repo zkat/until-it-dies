@@ -81,34 +81,30 @@ followed by the main engine loop."))
 
 (defbuzzword update (object dt)
   (:documentation
-"Updates the state of the object by DT (which is in milliseconds)"))
+"Updates the state of the object by DT (in seconds)"))
 
 (defbuzzword draw (object)
   (:documentation
 "Renders the object onto the screen in its current state."))
 
 ;; Events
-(defbuzzword key-up (engine key mod-key unicode state scancode)
+(defbuzzword key-up (engine key mod-keys)
   (:documentation
 "Key event for a key being released."))
 
-(defbuzzword key-down (engine key mod-key unicode state scancode)
+(defbuzzword key-down (engine key mod-keys)
   (:documentation
 "Key event for a key being pressed."))
 
-(defbuzzword key-down-p (engine key)
-  (:documentation
-"Is KEY currently being held down?"))
-
-(defbuzzword mouse-up (engine button state x y)
+(defbuzzword mouse-up (engine button x y)
   (:documentation
 "A mouse button has been released."))
 
-(defbuzzword mouse-down (engine button state x y)
+(defbuzzword mouse-down (engine button x y)
   (:documentation
 "A mouse button has been pressed."))
 
-(defbuzzword mouse-move (engine x y delta-x delta-y)
+(defbuzzword mouse-move (engine x y)
   (:documentation
 "Mouse has been moved to (X,Y)."))
 
@@ -152,33 +148,31 @@ followed by the main engine loop."))
 ;;; Key event handling
 
 ;;; TODO - should these also pass input events to all attached screens? Maybe not?
-(defmessage key-up :before ((engine =engine=) key mod-key unicode state scancode)
+(defmessage key-up :before ((engine =engine=) key mod-keys)
   "If the key was released, it's no longer pressed!"
-  (declare (ignore mod-key unicode state scancode))
+  (declare (ignore mod-keys))
   (with-properties (keys-held-down) engine
     (setf (gethash key keys-held-down) nil)))
 
-(defmessage key-up ((engine =engine=) key mod-key unicode state scancode)
+(defmessage key-up ((engine =engine=) key mod-keys)
   "This is the 'real' KEY-UP. Blank by default."
-  (declare (ignore engine key mod-key unicode state scancode))
+  (declare (ignore engine key mod-keys))
   (values))
 
-(defmessage key-down :before ((engine =engine=) key mod-key unicode state scancode)
+(defmessage key-down :before ((engine =engine=) key mod-keys)
   "If the key was pressed, then it's being held! :D"
-  (declare (ignore mod-key unicode state scancode))
+  (declare (ignore mod-keys))
   (with-properties (keys-held-down) engine
     (setf (gethash key keys-held-down) t)))
 
-(defmessage key-down ((engine =engine=) key mod-key unicode state scancode)
+(defmessage key-down ((engine =engine=) key mod-keys)
   "The 'real' key-down is blank by default."
-  (declare (ignore engine key mod-key unicode state scancode))
-  #+nil(when (sdl:key= key :sdl-key-escape)
-	 (sdl:push-quit-event))
+  (declare (ignore engine key mod-keys))
   (values))
 
-(defmessage key-down-p ((engine =engine=) key)
+(defun key-down-p (key)
   "Is KEY being held down?"
-  (with-properties (keys-held-down) engine
+  (with-properties (keys-held-down) *engine*
     (let ((down-p (gethash key keys-held-down)))
       down-p)))
 
@@ -186,20 +180,19 @@ followed by the main engine loop."))
 
 ;;; - TODO: I should probably handle this, even with base =engine=. Keeping track of which mouse
 ;;;   buttons are held down, and the current x/y position of the cursor is probably a good plan.
-(defmessage mouse-up ((engine =engine=) button state x y)
-  (declare (ignore engine button state x y))
+(defmessage mouse-up ((engine =engine=) button x y)
+  (declare (ignore engine button x y))
   (values))
-(defmessage mouse-down ((engine =engine=) button state x y)
-  (declare (ignore engine button state x y))
+(defmessage mouse-down ((engine =engine=) button x y)
+  (declare (ignore engine button x y))
   (values))
-(defmessage mouse-move :before ((engine =engine=) x y dx dy)
-  (declare (ignore dx dy))
+(defmessage mouse-move :before ((engine =engine=) x y)
   (with-properties (mouse-x mouse-y)
       engine
     (setf mouse-x x)
     (setf mouse-y y)))
-(defmessage mouse-move ((engine =engine=) x y dx dy)
-  (declare (ignore engine x y dx dy))
+(defmessage mouse-move ((engine =engine=) x y)
+  (declare (ignore engine x y))
   (values))
 
 ;;; Other events
@@ -218,16 +211,16 @@ followed by the main engine loop."))
      ;;    Update the current framerate for ENGINE
      (with-properties (last-fps-check-time last-fps-check-frame-count fps-check-delay fps frame-count)
 	 engine
-      (when (>= now (+ last-fps-check-time))
+      (when (>= now (+ last-fps-check-time dt))
 	(let ((frames (- frame-count last-fps-check-frame-count))
-	      (seconds (/ dt 1000)))
+	      (seconds dt))
 	  (setf fps (float (if (zerop dt)
 			       0 (/ frames seconds))))
 	  (setf last-fps-check-time now)
 	  (setf last-fps-check-frame-count frame-count))))
      (process-cooked-events engine))))
 
-(defmessage idle :before ((engine =engine=))
+(defmessage idle ((engine =engine=))
   (gl:clear-color 0 0 0 0)
   (gl:clear :color-buffer-bit :depth-buffer-bit)
   (gl:enable :texture-2d :blend)
@@ -235,10 +228,6 @@ followed by the main engine loop."))
   (update-time engine)
   (update engine (dt engine))
   (draw engine))
-
-(defmessage idle ((engine =engine=))
-  (declare (ignore engine))
-  (values))
 
 (defmessage idle :after ((engine =engine=))
   (declare (ignore engine))
@@ -259,6 +248,7 @@ and doing some very initial OpenGL setup."
   (setup-ortho-projection (window-width engine) (window-height engine))
   (il:init)
   (ilut:init)
+  (alut:init)
   (mapc #'init (screens engine))
   (setf (initializedp engine) t))
 
@@ -268,6 +258,8 @@ and doing some very initial OpenGL setup."
 
 (defmessage teardown ((engine =engine=))
   "Simply pass the message along to ENGINE's screens."
+  (il:shutdown)
+  (alut:exit)
   (mapc #'teardown (screens engine))
   (setf (initializedp engine) nil))
 
@@ -275,48 +267,48 @@ and doing some very initial OpenGL setup."
   "This convenience macro simple makes sure the engine is torn down once
 we're done with it."
   (let ((engine-var (gensym "ENGINE-")))
-    `(sdl:with-init ()
-       (let* ((,engine-var ,engine)
-	      (*engine* ,engine-var))
-	 (with-event-queue (event-queue ,engine-var)
-	   (with-resource-manager (resource-manager ,engine-var)
-	     (with-font (default-font ,engine-var)
-	       (init ,engine-var)
-	       (unwind-protect
-		    ,@body
-		 (teardown ,engine-var)))))))))
+    `(let* ((,engine-var ,engine)
+            (*engine* ,engine-var))
+       (with-event-queue (event-queue ,engine-var)
+         (with-resource-manager (resource-manager ,engine-var)
+           (with-font (default-font ,engine-var)
+             (init ,engine-var)
+             (unwind-protect
+                  ,@body
+               (teardown ,engine-var))))))))
 
 (defmessage run ((engine =engine=))
   "Here's the main loop -- because of the way lb-sdl is set up, 
 we handle all input right here. We also bind the engine parameter
 to *engine*, which might make things a little easier later on."
-  (with-engine engine
-    (sdl:with-events ()
-      (:quit-event 
-       () 
-       (prog1 t
-	 (setf (runningp engine) nil)))
-      (:video-resize-event
-       (:w width :h height)
-       (restartable (window-resized engine width height)))
-      (:key-down-event
-       (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
-       (restartable (key-down engine key mod-key unicode state scancode)))
-      (:key-up-event
-       (:key key :mod-key mod-key :unicode unicode :state state :scancode scancode)
-       (restartable (key-up engine key mod-key unicode state scancode)))
-      (:mouse-button-up-event
-       (:button button :state state :x x :y y)
-       (restartable (mouse-up engine button state x y)))
-      (:mouse-button-down-event
-       (:button button :state state :x x :y y)
-       (restartable (mouse-down engine button state x y)))
-      (:mouse-motion-event
-       (:x x :y y :x-rel delta-x :y-rel delta-y)
-       (restartable (mouse-move engine x (- (window-height engine) y) delta-x (* -1 delta-y))))
-      (:idle
-       ()
-       (restartable (idle engine))))
-    ;; We return the engine after everything's done.
-    ;; It might be handy for inspection.
-    engine))
+  (sdl:with-init ()
+    (with-engine engine
+     (sdl:with-events ()
+       (:quit-event 
+        () 
+        (prog1 t
+          (setf (runningp engine) nil)))
+       (:video-resize-event
+        (:w width :h height)
+        (restartable (window-resized engine width height)))
+       (:key-down-event
+        (:key key :mod-key mod-keys)
+        (restartable (key-down engine (translate-key key) (translate-key-list mod-keys))))
+       (:key-up-event
+        (:key key :mod-key mod-keys)
+        (restartable (key-up engine (translate-key key) (translate-key-list mod-keys))))
+       (:mouse-button-up-event
+        (:button button :x x :y y)
+        (restartable (mouse-up engine button x y)))
+       (:mouse-button-down-event
+        (:button button :x x :y y)
+        (restartable (mouse-down engine button x y)))
+       (:mouse-motion-event
+        (:x x :y y)
+        (restartable (mouse-move engine x (- (window-height engine) y))))
+       (:idle
+        ()
+        (restartable (idle engine))))
+     ;; We return the engine after everything's done.
+     ;; It might be handy for inspection.
+     engine)))

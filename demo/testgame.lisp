@@ -2,37 +2,39 @@
   (:use :cl :sheeple :until-it-dies))
 (in-package :uid-demo)
 
-(defsheep =test-engine= (uid::=engine=)
+(defsheep =test-engine= (=engine=)
   ((title "Test Engine")
    (window-width 600)
    (window-height 600)))
 
 (defparameter *test-image*
-  (uid::create-image
-   "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))
+  (create-image "res/lisplogo_alien_256.png"))
 
 (defparameter *x* 50)
 (defparameter *y* 50)
-(defparameter *speed* 200)
+(defparameter *speed* 400)
 
-(defmessage uid::update ((engine =test-engine=) dt)
-  (declare (ignore engine))
-  (when (uid::key-down-p :right)
+(defmessage update ((engine =test-engine=) dt)
+  (when (and (key-down-p :right)
+             (< *x* (window-width engine)))
     (incf *x* (* *speed* dt)))
-  (when (uid::key-down-p :left)
+  (when (and (key-down-p :left)
+             (< 0 *x*))
     (decf *x* (* *speed* dt)))
-  (when (uid::key-down-p :up)
+  (when (and (key-down-p :up)
+             (< *y* (window-height engine)))
     (incf *y* (* *speed* dt)))
-  (when (uid::key-down-p :down)
+  (when (and (key-down-p :down)
+             (< 0 *y*))
     (decf *y* (* *speed* dt))))
 
-(defmessage uid::draw ((engine =test-engine=))
+(defmessage draw ((engine =test-engine=))
   (declare (ignore engine))
-  #+nil(gl:with-pushed-matrix
-    (gl:translate 50 50 0)
-    (ftgl:render-font (uid::font-pointer uid::*font*) "foobar" :all))
-  (dotimes (i 500)
-   (uid::draw-sprite "foo" 
-                     (random 600)
-                     (random 600)))
-  (uid::draw-sprite *test-image* *x* *y*))
+  (with-color *green*
+    (dotimes (i 1000)
+      (draw-point (make-point :x (random 600)
+                              :y (random 600)))))
+  (with-color *blue*
+    (draw-sprite "Yo listen up here's the story, about a little guy..."
+                 60 50 :x-scale 2 :y-scale 2))
+  (draw-sprite *test-image* *x* *y*))

@@ -61,7 +61,8 @@ variable within its scope."))
 (defmessage detach ((resource =resource=) (manager =resource-manager=))
   (with-properties (resources) manager
     (setf resources (delete resource resources))))
-
+(defmessage detach-all ((manager =resource-manager=))
+  (setf (resources manager) nil))
 
 (defmessage load-resource ((manager =resource-manager=))
   (mapc #'load-resource (resources manager)))
@@ -142,6 +143,8 @@ variable within its scope."))
 	  (il:get-integer :image-width))
     (setf (height texture)
 	  (il:get-integer :image-height)))
+  ;; (gl:tex-parameter :texture-2d :generate-mipmap t)
+  ;; (gl:tex-parameter :texture-2d :texture-min-filter :linear-mipmap-linear)
   (gl:bind-texture :texture-2d 0)
   (il:bind-image 0)
   texture)
@@ -162,18 +165,20 @@ variable within its scope."))
 ;;;
 (defsheep =font= (=file-resource=)
   ((font-pointer nil)
-   (size 20)
+   (size 12)
    (res 20)
    (loadedp nil)
-   (color nil)
    (filepath "res/example.otf"))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
 
-(defvar *default-font* =font=)
+(defun create-font (filepath &key (size 12) (res 20))
+  (clone (=font=) ((filepath filepath) (size size) (res res))))
+
+(defvar *font* =font=)
 
 (defmacro with-font (font &body body)
   "Binds *default-font* to FONT within BODY."
-  `(let ((*default-font* ,font))
+  `(let ((*font* ,font))
      ,@body))
 
 (defmessage load-resource :before ((font =font=))
@@ -210,14 +215,3 @@ variable within its scope."))
   (setf (font-pointer font) nil)
   (setf (loadedp font) nil)
   font)
-
-(defun draw-string (string &key (x 0) (y 0) (z 0) (font *default-font*))
-  "Draws STRING at a certain position."
-  (unless (loadedp font)
-    (load-resource font))
-  (gl:with-pushed-matrix
-    (when (color font)
-      (bind-color (color font)))
-    (gl:translate x y z)
-    (ftgl:render-font (font-pointer font) string :all)))
-

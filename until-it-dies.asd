@@ -24,9 +24,9 @@
 	     (:file "config")
 	     (:file "event")
 	     (:file "resources")
-	     (:file "engine")
-	     (:file "screen")
-	     (:file "component")))))
+             (:file "sprite")
+	     (:file "engine")))))
+
 
 
 

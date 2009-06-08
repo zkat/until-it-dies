@@ -2,10 +2,87 @@
   (:nicknames #:uid)
   (:use #:cl #:sheeple #:trivial-garbage)
   (:export 
+   ;; core
+   :init
+   :teardown
+   :run
+   :update
+   :draw
 
-   ;; TODO - export the API (once I know wtf it is)
-
+   ;; events
+   :key-up
+   :key-down
+   :key-down-p
+   :mouse-up
+   :mouse-down
+   :mouse-move
+   :window-resized
+   :idle
+   
    ;; Engine
    :=engine=
-   ))
+   :*engine*
+   :with-engine
+   :runningp
+   :initializedp
+   :dt
+   :event-queue
+   :resource-manager
+   :default-font
+   :clear-color
+   :pausedp
+   :mouse-x
+   :mouse-y
+   :window-width
+   :window-height
+   :title
+   :fps
+   
+   ;; primitives
+   :make-color
+   :mix-colors
+   :*black*
+   :*white*
+   :*magenta*
+   :*red*
+   :*green*
+   :*blue*
+   :*yellow*
+   :*orange*
+   :*brown*
+   :make-point
+   :draw-rectangle
+   :draw-triangle
+   :draw-quad
+   :draw-point
+   :draw-line
+   :draw-polygon
 
+   ;; resources
+   :=resource=
+   :=resource-manager=
+   :*resource-manager*
+   :create-font
+   :*font*
+   :with-font
+   :size
+   :res
+
+   ;; sprites
+   :draw-sprite
+   :create-image
+   :width
+   :height
+   :filepath
+   :create-animation
+   :num-frames
+   :frame-delay
+   :frame-width
+   :frame-height
+   :animation-type
+
+   ;; events
+   :*event-queue*
+   :fork
+   :with-event-queue
+   ))

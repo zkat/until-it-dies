@@ -20,7 +20,7 @@
    (event-queue (clone (=event-queue=) ()))
    (resource-manager (clone (=resource-manager=) ()))
    (default-font (clone (=font=) ()))
-   (screens nil)
+   (clear-color (make-color :r 0 :g 0 :b 0 :a 0))
    (pausedp nil)
    (mouse-x 0)
    (mouse-y 0)
@@ -121,22 +121,12 @@ followed by the main engine loop."))
 ;;;
 (defmessage update ((engine =engine=) dt)
   "At the highest screen, we simply forward the update message to the active screen."
-  (mapc (lambda (screen)
-	  (update screen dt))
-	(screens engine)))
+  (declare (ignore engine dt))
+  (values))
 
 (defmessage draw ((engine =engine=))
   (declare (ignore engine))
   (values))
-
-(defmessage draw :before ((engine =engine=))
-  "Things attached to the engine will be drawn before everything else."
-  (mapc #'draw (screens engine)))
-
-;;; Attaching/detaching
-(defmessage detach-all ((engine =engine=))
-  "This simply removes all references to ENGINE's screens."
-  (setf (screens engine) nil))
 
 ;;;
 ;;; Event handling
@@ -221,7 +211,11 @@ followed by the main engine loop."))
      (process-cooked-events engine))))
 
 (defmessage idle ((engine =engine=))
-  (gl:clear-color 0 0 0 0)
+  (let ((color (clear-color engine)))
+   (gl:clear-color (elt color 0)
+                   (elt color 1)
+                   (elt color 2)
+                   (elt color 3)))
   (gl:clear :color-buffer-bit :depth-buffer-bit)
   (gl:enable :texture-2d :blend)
   (gl:blend-func :src-alpha :one-minus-src-alpha)
@@ -249,18 +243,21 @@ and doing some very initial OpenGL setup."
   (il:init)
   (ilut:init)
   (alut:init)
-  (mapc #'init (screens engine))
   (setf (initializedp engine) t))
 
 (defmessage init ((engine =engine=))
+  "Do nothing by default."
   (declare (ignore engine))
   (values))
 
 (defmessage teardown ((engine =engine=))
-  "Simply pass the message along to ENGINE's screens."
+  "Do nothing by default."
+  (declare (ignore engine))
+  (values))
+(defmessage teardown :after ((engine =engine=))
+  "Once the real teardown stuff is done, we shut down our libs."
   (il:shutdown)
   (alut:exit)
-  (mapc #'teardown (screens engine))
   (setf (initializedp engine) nil))
 
 (defmacro with-engine (engine &body body)

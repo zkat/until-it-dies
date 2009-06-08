@@ -1,6 +1,6 @@
 (asdf:defsystem until-it-dies
   :version "0"
-  :description "Until It Dies - a CL 2d game engine."
+  :description "Until It Dies - a 2d game engine."
   :maintainer "Kat <kzm@sykosomatic.org>"
   :author "Kat <kzm@sykosomatic.org>"
   :licence "BSD-style"

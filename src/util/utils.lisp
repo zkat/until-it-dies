@@ -1,6 +1,14 @@
 (in-package :until-it-dies)
 
 ;;;
+;;; Pathnames
+;;;
+(defun current-working-directory ()
+  #+ccl(ccl:current-directory)
+  #+sbcl(merge-pathnames "")
+  #+ccl(ext:default-directory))
+
+;;;
 ;;; Time
 ;;;
 (defun now ()
@@ -16,6 +24,8 @@ Returns both the difference in time and the current-time used in the computation
 	0 ; just in case
 	(values (- time-now time-before)
 		time-now))))
+
+
 
 ;;;
 ;;; Restarting and interactivity

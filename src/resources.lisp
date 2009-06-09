@@ -168,7 +168,7 @@ variable within its scope."))
    (size 12)
    (res 100)
    (loadedp nil)
-   (filepath "res/example.otf"))
+   (filepath "/home/zkat/hackery/lisp/until-it-dies/res/example.otf"))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
 
 (defun create-font (filepath &key (size 12) (res 20))

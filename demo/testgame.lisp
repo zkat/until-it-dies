@@ -8,13 +8,17 @@
    (window-height 600)))
 
 (defparameter *test-image*
-  (create-image "res/lisplogo_alien_256.png"))
+  (create-image "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))
+(defparameter *test-anim*
+  (create-animation "/home/zkat/hackery/lisp/until-it-dies/res/explosion.png"
+                    15 14 0.05 14))
 
 (defparameter *x* 50)
 (defparameter *y* 50)
-(defparameter *speed* 400)
+(defparameter *speed* 300)
 
 (defmessage update ((engine =test-engine=) dt)
+  (update *test-anim* dt)
   (when (and (key-down-p :right)
              (< *x* (window-width engine)))
     (incf *x* (* *speed* dt)))
@@ -33,8 +37,11 @@
   (with-color *green*
     (dotimes (i 1000)
       (draw-point (make-point :x (random 600)
-                              :y (random 600)))))
-  (with-color *blue*
+                              :y (random 600)
+                              :z 0))))
+  (let ((scale-factor 5))
     (draw-sprite "Yo listen up here's the story, about a little guy..."
-                 60 50 :x-scale 2 :y-scale 2))
-  (draw-sprite *test-image* *x* *y*))
+                 60 50 :x-scale scale-factor :y-scale scale-factor :rotation 45)
+    (draw-sprite *test-anim* *x* *y* :rotation 10 :x-scale scale-factor :y-scale scale-factor)))
+
+

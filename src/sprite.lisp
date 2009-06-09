@@ -63,17 +63,18 @@ texture they are drawn with."))
   (with-properties (texture) image
     (filepath texture)))
 
-(defmessage draw-sprite ((image =image=) x y &key x-scale y-scale rotation-theta)
+(defmessage draw-sprite ((image =image=) x y 
+                         &key x-scale y-scale
+                         rotation (z 0))
   (let ((tex-coords (calculate-tex-coords image))
-        (height (height (texture image)))
-        (width (width (texture image))))
+        (height (height image))
+        (width (width image)))
     (when tex-coords
       (gl:with-pushed-matrix
-        (gl:scale (or x-scale 1) (or y-scale 1) 1)
-        (when rotation-theta
-          (gl:rotate rotation-theta 0 0 1))
+        (when rotation
+          (gl:rotate rotation 0 0 1))
         (gl:with-primitives :quads
-          (rectangle x y width height
+          (rectangle x y (* width (or x-scale 1)) (* height (or y-scale 1)) :z z
                      :u1 (elt tex-coords 0)
                      :v1 (elt tex-coords 1)
                      :u2 (elt tex-coords 2)
@@ -93,6 +94,11 @@ texture they are drawn with."))
 "Animations are like images, but they use the provided texture
 as a sprite sheet. Based on certain provided parameters, they
 figure out which frames to draw."))
+
+(defmessage height ((animation =animation=))
+  (frame-height animation))
+(defmessage width ((animation =animation=))
+  (frame-width animation))
 
 (defun create-animation (filepath frame-width frame-height frame-delay 
                          num-frames &optional (type :loop))
@@ -148,31 +154,31 @@ figure out which frames to draw."))
 (defmessage draw-sprite ((string =string=) x y 
                          &key x-scale y-scale 
                          rotation (font *font*)
-                         wrap)
+                         wrap (z 0))
   (when wrap
     (warn "UID doesn't support wrapping of text right now."))
   (unless (loadedp font)
     (load-resource font))
   (gl:with-pushed-matrix
-    (gl:translate x y 0)
-    (gl:scale (or x-scale 1) (or y-scale 1) 1)
+    (gl:translate x y z)
     (when rotation
       (gl:rotate rotation 0 0 1))
+    (gl:scale (or x-scale 1) (or y-scale 1) 1)
     (ftgl:render-font (font-pointer font) string :all)))
 
 (defmessage draw-sprite ((text =text=) x y
                          &key x-scale y-scale
                          rotation (font *font*)
-                         wrap)
+                         wrap (z 1))
   (when wrap
     (warn "UID doesn't support wrapping of text right now."))
   (unless (loadedp font)
     (load-resource font))
   (gl:with-pushed-matrix
-    (gl:translate x y 0)
-    (gl:scale (or x-scale 1) (or y-scale 1) 1)
+    (gl:translate x y z)
     (when rotation
       (gl:rotate rotation 0 0 1))
+    (gl:scale (or x-scale 1) (or y-scale 1) 1)
     (ftgl:render-font (font-pointer font) (string-to-draw text) :all)))
 
 (defun create-text (string)

@@ -41,7 +41,7 @@
                               :z 0))))
   (let ((scale-factor 5))
     (draw-sprite "Yo listen up here's the story, about a little guy..."
-                 60 50 :x-scale scale-factor :y-scale scale-factor :rotation 45)
-    (draw-sprite *test-anim* *x* *y* :rotation 10 :x-scale scale-factor :y-scale scale-factor)))
+                 60 50 :x-scale scale-factor :y-scale scale-factor)
+    (draw-sprite *test-anim* *x* *y* :x-scale scale-factor :y-scale scale-factor)))
 
 

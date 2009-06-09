@@ -72,7 +72,8 @@ texture they are drawn with."))
     (when tex-coords
       (gl:with-pushed-matrix
         (when rotation
-          (gl:rotate rotation 0 0 1))
+          nil
+          #+nil(gl:rotate rotation 0 0 1))
         (gl:with-primitives :quads
           (rectangle x y (* width (or x-scale 1)) (* height (or y-scale 1)) :z z
                      :u1 (elt tex-coords 0)
@@ -162,7 +163,8 @@ figure out which frames to draw."))
   (gl:with-pushed-matrix
     (gl:translate x y z)
     (when rotation
-      (gl:rotate rotation 0 0 1))
+      nil
+      #+nil(gl:rotate rotation 0 0 1))
     (gl:scale (or x-scale 1) (or y-scale 1) 1)
     (ftgl:render-font (font-pointer font) string :all)))
 
@@ -170,16 +172,12 @@ figure out which frames to draw."))
                          &key x-scale y-scale
                          rotation (font *font*)
                          wrap (z 1))
-  (when wrap
-    (warn "UID doesn't support wrapping of text right now."))
-  (unless (loadedp font)
-    (load-resource font))
-  (gl:with-pushed-matrix
-    (gl:translate x y z)
-    (when rotation
-      (gl:rotate rotation 0 0 1))
-    (gl:scale (or x-scale 1) (or y-scale 1) 1)
-    (ftgl:render-font (font-pointer font) (string-to-draw text) :all)))
+  (draw-sprite (string-to-draw text) x y :z z
+               :x-scale x-scale
+               :y-scale y-scale
+               :rotation rotation
+               :font font
+               :wrap wrap))
 
 (defun create-text (string)
   (clone (=text=) ((string-to-draw string))))

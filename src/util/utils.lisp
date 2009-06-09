@@ -12,8 +12,7 @@
 ;;; Time
 ;;;
 (defun now ()
-  (/ (get-internal-real-time) internal-time-units-per-second)
-  #-(and)(sdl:get-ticks))
+  (/ (get-internal-real-time) internal-time-units-per-second))
 
 (defun time-difference (time-before)
   "Checks the difference between the internal-time provided and the current time.
@@ -24,8 +23,6 @@ Returns both the difference in time and the current-time used in the computation
 	0 ; just in case
 	(values (- time-now time-before)
 		time-now))))
-
-
 
 ;;;
 ;;; Restarting and interactivity
@@ -56,6 +53,9 @@ Returns both the difference in time and the current-time used in the computation
   (gl:ortho 0 width 0 height 10 0) ;0,0 is at bottom left of screen. Much nicer for maths.
   (gl:matrix-mode :modelview))
 
+;;;
+;;; SDL key/mouse constant translation
+;;;
 (defparameter *all-keys*
   '((:sdl-key-up :up) (:sdl-key-down :down) (:sdl-key-left :left) (:sdl-key-right :right)
     (:sdl-key-a :a) (:sdl-key-b :b) (:sdl-key-c :c) (:sdl-key-d :d) (:sdl-key-e :e) (:sdl-key-f :f)

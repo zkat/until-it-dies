@@ -157,7 +157,9 @@ followed by the main engine loop."))
 
 (defmessage key-down ((engine =engine=) key mod-keys)
   "The 'real' key-down is blank by default."
-  (declare (ignore engine key mod-keys))
+  (declare (ignore engine mod-keys))
+  (when (eq key :escape)
+    (sdl:push-quit-event))
   (values))
 
 (defun key-down-p (key)
@@ -175,7 +177,6 @@ followed by the main engine loop."))
   (values))
 (defmessage mouse-down ((engine =engine=) button x y)
   (declare (ignore engine x y))
-  (when (eq button :))
   (values))
 (defmessage mouse-move :before ((engine =engine=) x y)
   (with-properties (mouse-x mouse-y)

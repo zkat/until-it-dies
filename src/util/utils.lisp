@@ -6,7 +6,7 @@
 (defun current-working-directory ()
   #+ccl(ccl:current-directory)
   #+sbcl(merge-pathnames "")
-  #+ccl(ext:default-directory))
+  #+clisp(ext:default-directory))
 
 ;;;
 ;;; Time

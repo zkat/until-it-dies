@@ -17,8 +17,8 @@
    (dt 0)
    (keys-held-down (make-hash-table :test #'eq))
    (event-queue (object :parents =event-queue=))
-   (resource-manager (object :parents =resource-manager= ()))
-   (default-font (object :parents =font= ()))
+   (resource-manager (object :parents =resource-manager=))
+   (default-font (object :parents =font=))
    (clear-color (make-color :r 0 :g 0 :b 0 :a 0))
    pausedp
    (mouse-x 0)

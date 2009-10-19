@@ -44,4 +44,6 @@
                  60 50 :x-scale scale-factor :y-scale scale-factor)
     (draw-sprite *test-anim* *x* *y* :x-scale scale-factor :y-scale scale-factor)))
 
-
+(defmessage mouse-down ((engine =test-engine=) button x y)
+  (declare (ignore x y button engine))
+  (values))

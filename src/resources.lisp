@@ -55,7 +55,7 @@ and take care of loading/unloading all of them in big chunks.
 The with-resource-manager macro accepts a =resource-manager= 
 object and binds -that- object to the *resource-manager* 
 variable within its scope."))
-(defreply init-object :after ((obj =resource-manage=) &key)
+(defreply init-object :after ((obj =resource-manager=) &key)
   (setf (resources obj) nil))
 
 (defreply attach ((resource =resource=) (manager =resource-manager=))

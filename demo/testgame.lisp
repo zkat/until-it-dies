@@ -2,7 +2,7 @@
   (:use :cl :sheeple :until-it-dies))
 (in-package :uid-demo)
 
-(defsheep =test-engine= (=engine=)
+(defproto =test-engine= (=engine=)
   ((title "Test Engine")
    (window-width 600)
    (window-height 600)))
@@ -17,7 +17,7 @@
 (defparameter *y* 50)
 (defparameter *speed* 300)
 
-(defmessage update ((engine =test-engine=) dt)
+(defreply update ((engine =test-engine=) dt)
   (update *test-anim* dt)
   (when (and (key-down-p :right)
              (< *x* (window-width engine)))
@@ -32,18 +32,18 @@
              (< 0 *y*))
     (decf *y* (* *speed* dt))))
 
-(defmessage draw ((engine =test-engine=))
+(defreply draw ((engine =test-engine=))
   (declare (ignore engine))
-  (with-color *green*
-    (dotimes (i 1000)
-      (draw-point (make-point :x (random 600)
-                              :y (random 600)
-                              :z 0))))
   (let ((scale-factor 5))
-    (draw-sprite "Yo listen up here's the story, about a little guy..."
-                 60 50 :x-scale scale-factor :y-scale scale-factor)
-    (draw-sprite *test-anim* *x* *y* :x-scale scale-factor :y-scale scale-factor)))
+    (with-color *green*
+      (dotimes (i 1000)
+        (draw-point (make-point :x (random 600)
+                                :y (random 600)
+                                :z 0))
+        (draw-sprite *test-anim* *x* *y* :x-scale scale-factor :y-scale scale-factor)))
+    (draw-sprite "HURR DURR HURR!"
+                 60 50 :x-scale scale-factor :y-scale scale-factor)))
 
-(defmessage mouse-down ((engine =test-engine=) button x y)
+(defreply mouse-down ((engine =test-engine=) button x y)
   (declare (ignore x y button engine))
   (values))

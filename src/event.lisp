@@ -69,11 +69,13 @@ will still be 'fired' in the order they were added."))
 ;;; Event-queue
 ;;;
 (defproto =event-queue= ()
-  ((queue (make-priority-queue :key #'exec-time) 
-	  :cloneform (make-priority-queue :key #'exec-time)))
+  ((queue (make-priority-queue :key #'exec-time)))
   (:documentation "An event queue is a container for events. Events are inserted into it and
                    automatically sorted according to the event's execution time. The queue
                    works like a min-priority queue. The top event can be peeked at, or popped."))
+
+(defreply init-object :after ((obj =event-queue=) &key)
+  (setf (queue obj) (make-priority-queue :key #'exec-time)))
 
 ;;; Buzzwords
 (defmessage push-event (event queue)

@@ -12,7 +12,7 @@
 ;;; Time
 ;;;
 (defun now ()
-  (/ (get-internal-real-time) internal-time-units-per-second))
+  (/ (get-internal-run-time) internal-time-units-per-second))
 
 (defun time-difference (time-before)
   "Checks the difference between the internal-time provided and the current time.
@@ -42,6 +42,25 @@ Returns both the difference in time and the current-time used in the computation
 
 (defun radians->degrees (radians)
   (/ (* radians 180) pi))
+
+;;;
+;;; String formatting
+;;;
+(defun out (&rest objects)
+  (princ (apply #'build-string objects)))
+
+(defun build-string (&rest objects)
+  (apply #'concatenate 'string
+         (mapcar (lambda (obj)
+                   (cond ((eq :% obj)
+                          (format nil "~%"))
+                         ((and (symbolp obj)
+                               (numberp (read-from-string (symbol-name obj))))
+                          (apply #'concatenate 'string
+                                 (loop for i below (read-from-string (symbol-name obj))
+                                    collect " ")))
+                         (t (format nil "~A" obj))))
+                 objects)))
 
 ;;;
 ;;; OpengGL utils

@@ -8,7 +8,7 @@
 ;;;
 ;;; Event prototype
 ;;;
-(defsheep =event= ()
+(defproto =event= ()
   ((payload (lambda () (print "=event='s event fired.")))
    (exec-time 0))
   (:documentation 
@@ -25,9 +25,9 @@ will still be 'fired' in the order they were added."))
 		   (delay 0)
 		   (event-prototype =event=))
   "Generates one or more events that execute PAYLOAD."
-  (push-event (clone (event-prototype)
-		     ((payload payload)
-		      (exec-frame (+ delay (now)))))
+  (push-event (defobject (event-prototype)
+                  ((payload payload)
+                   (exec-frame (+ delay (now)))))
 	      queue))
 
 ;; TODO: FORK was simplified. I may need to add looping to it again. Keep it like this for now.
@@ -46,20 +46,20 @@ will still be 'fired' in the order they were added."))
 ;;;
 ;;; Event processing buzzwords
 ;;;
-(defbuzzword execute-event (event)
+(defmessage execute-event (event)
   (:documentation
 "Takes care of executing a particular event."))
 
-(defbuzzword cookedp (event)
+(defmessage cookedp (event)
   (:documentation
 "Is the event ready to fire?"))
 
 ;;; Messages
-(defmessage execute-event ((event =event=))
+(defreply execute-event ((event =event=))
   "Executes a standard event. Nothing fancy, just a funcall."
   (funcall (payload event)))
 
-(defmessage cookedp ((event =event=))
+(defreply cookedp ((event =event=))
   "Simply checks that it doesn't shoot its load prematurely.."
   (let  ((time-difference (- (exec-time event) (now))))
     (when (<= time-difference 0)
@@ -68,7 +68,7 @@ will still be 'fired' in the order they were added."))
 ;;;
 ;;; Event-queue
 ;;;
-(defsheep =event-queue= ()
+(defproto =event-queue= ()
   ((queue (make-priority-queue :key #'exec-time) 
 	  :cloneform (make-priority-queue :key #'exec-time)))
   (:documentation "An event queue is a container for events. Events are inserted into it and
@@ -76,21 +76,21 @@ will still be 'fired' in the order they were added."))
                    works like a min-priority queue. The top event can be peeked at, or popped."))
 
 ;;; Buzzwords
-(defbuzzword push-event (event queue)
+(defmessage push-event (event queue)
   (:documentation "Adds EVENT to QUEUE"))
-(defbuzzword peek-next-event (queue)
+(defmessage peek-next-event (queue)
   (:documentation "Peeks at the next event in QUEUE without removing it.
                    Returns NIL if there are no queued events."))
-(defbuzzword pop-next-event (queue)
+(defmessage pop-next-event (queue)
   (:documentation "Returns the next available event, and removes it from QUEUE.
                    Returns NIL if there is nothing in the queue."))
-(defbuzzword event-available-p (queue)
+(defmessage event-available-p (queue)
   (:documentation "Is there a cooked event available?"))
-(defbuzzword clear-events (queue)
+(defmessage clear-events (queue)
   (:documentation "Clears all events off the event queue"))
-(defbuzzword process-next-event (queue)
+(defmessage process-next-event (queue)
   (:documentation "Grabs the next event from QUEUE and executes it."))
-(defbuzzword process-cooked-events (queue)
+(defmessage process-cooked-events (queue)
   (:documentation "Processes all cooked events in QUEUE"))
 
 ;;; Messages
@@ -98,32 +98,31 @@ will still be 'fired' in the order they were added."))
 ;;; - Most of these messages wrap around the priority queue API in util/priority-queue.lisp
 ;;;   It is pretty much a standard by-the-book min-priority-queue, with items sorted by
 ;;;   #'exec-time.
-(defmessage push-event ((event =event=) (queue =event-queue=))
+(defreply push-event ((event =event=) (queue =event-queue=))
   (priority-queue-insert (queue queue) event)
   t)
 
-(defmessage peek-next-event ((queue =event-queue=))
+(defreply peek-next-event ((queue =event-queue=))
   (priority-queue-minimum (queue queue)))
 
-(defmessage pop-next-event ((queue =event-queue=))
+(defreply pop-next-event ((queue =event-queue=))
   (priority-queue-extract-minimum (queue queue)))
 
-(defmessage event-available-p ((queue =event-queue=))
+(defreply event-available-p ((queue =event-queue=))
   "Simply peeks to see if there's an event in the queue, and if it's cooked."
   (when (and (peek-next-event queue)
 	     (cookedp (peek-next-event queue)))
     t))
 
-(defmessage clear-events ((queue =event-queue=))
+(defreply clear-events ((queue =event-queue=))
   (setf (queue queue) (make-priority-queue :key #'exec-time)))
 
-(defmessage process-next-event ((queue =event-queue=))
+(defreply process-next-event ((queue =event-queue=))
   (when (event-available-p queue)
     (execute-event (pop-next-event queue))))
 
-(defmessage process-cooked-events ((queue =event-queue=))
+(defreply process-cooked-events ((queue =event-queue=))
   (loop
      while (event-available-p queue)
      do (process-next-event queue)))
-
 

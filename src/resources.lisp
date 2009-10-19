@@ -8,7 +8,7 @@
 ;;;
 ;;; Generic resources prototype
 ;;;
-(defsheep =resource= ()
+(defproto =resource= ()
   ()
   (:documentation
 "A resource is an object with some aspect that needs to 
@@ -19,14 +19,14 @@ know everything necessary in order to load whatever it is
 managing into and out of memory (it should be ready to respond
 to LOAD-RESOURCE and UNLOAD-RESOURCE)."))
 
-(defbuzzword load-resource (resource)
+(defmessage load-resource (resource)
   (:documentation
 "Loads the resource's data into memory, activating it."))
-(defbuzzword unload-resource (resource)
+(defmessage unload-resource (resource)
   (:documentation
 "Unloads the resource's data from memory, 
 handling any freeing that needs to happen"))
-(defbuzzword loadedp (resource)
+(defmessage loadedp (resource)
   (:documentation
 "Is the resource currently correctly loaded and available for use?
 It's worth pointing out that a simple loadedp flag on the object may
@@ -35,11 +35,11 @@ advisable, that this buzzword check other things to make sure it is
 correctly loaded (such as confirming that the texture ID is valid, in
 the case of =texture= objects.)"))
 
-(defsheep =file-resource= (=resource=)
+(defproto =file-resource= (=resource=)
   ((filepath nil))
   (:documentation "File resources are resources that get loaded from files."))
 
-(defmessage load-resource :before ((resource =resource=))
+(defreply load-resource :before ((resource =resource=))
   "Before actually loading anything, we should make sure that the engine is initialized."	    
   #+nil(unless (initializedp *engine*)
     (error "Cannot load resource ~A: Engine ~A must be initialized." resource *engine*)))
@@ -47,26 +47,28 @@ the case of =texture= objects.)"))
 ;;;
 ;;; Resource management
 ;;;
-(defsheep =resource-manager= ()
-  ((resources nil :cloneform nil))
+(defproto =resource-manager= ()
+  (resources)
   (:documentation
 "Resource managers can handle multiple resources at a time,
 and take care of loading/unloading all of them in big chunks.
 The with-resource-manager macro accepts a =resource-manager= 
 object and binds -that- object to the *resource-manager* 
 variable within its scope."))
+(defreply init-object :after ((obj =resource-manage=) &key)
+  (setf (resources obj) nil))
 
-(defmessage attach ((resource =resource=) (manager =resource-manager=))
+(defreply attach ((resource =resource=) (manager =resource-manager=))
   (pushnew resource (resources manager)))
-(defmessage detach ((resource =resource=) (manager =resource-manager=))
+(defreply detach ((resource =resource=) (manager =resource-manager=))
   (with-properties (resources) manager
     (setf resources (delete resource resources))))
-(defmessage detach-all ((manager =resource-manager=))
+(defreply detach-all ((manager =resource-manager=))
   (setf (resources manager) nil))
 
-(defmessage load-resource ((manager =resource-manager=))
+(defreply load-resource ((manager =resource-manager=))
   (mapc #'load-resource (resources manager)))
-(defmessage unload-resource ((manager =resource-manager=))
+(defreply unload-resource ((manager =resource-manager=))
   (mapc #'unload-resource (resources manager)))
 
 (defvar *resource-manager*)
@@ -79,36 +81,36 @@ variable within its scope."))
 
 ;; We add some :after messages here to handle automatic attachment/detachment.
 ;; TODO: Keep an eye on this. It might cause some nastyness.
-(defmessage load-resource :after ((resource =resource=))
+(defreply load-resource :after ((resource =resource=))
   (attach resource *resource-manager*))
-(defmessage unload-resource :after ((resource =resource=))
+(defreply unload-resource :after ((resource =resource=))
   (detach resource *resource-manager*))
 
 ;;;
 ;;; Standard textures
 ;;;
 ;;; - Textures manage opengl texture objects, and handle their binding.
-(defbuzzword bind-texture (texture))
-(defbuzzword unbind-texture (texture))
+(defmessage bind-texture (texture))
+(defmessage unbind-texture (texture))
 
-(defsheep =texture= (=resource=)
+(defproto =texture= (=resource=)
   ((tex-id nil)
    (target :texture-2d)
    (height 0)
    (width 0)))
 
-(defmessage bind-texture ((texture =texture=))
+(defreply bind-texture ((texture =texture=))
   (with-properties (tex-id target) texture
     (when (or (null tex-id)
 	      (not (gl:texturep tex-id)))
       (load-resource texture))
     (gl:bind-texture target tex-id)))
 
-(defmessage unbind-texture ((texture =texture=))
+(defreply unbind-texture ((texture =texture=))
   (with-properties (target) texture
     (gl:bind-texture target 0)))
 
-(defmessage unload-resource ((texture =texture=))
+(defreply unload-resource ((texture =texture=))
   (let ((id (tex-id texture)))
     (setf (tex-id texture) nil)
     (handler-case
@@ -117,7 +119,7 @@ variable within its scope."))
 	 (gl:delete-texture id))
       #+cl-opengl-checks-errors(%gl::opengl-error (c) (values nil c)))))
 
-(defmessage loadedp ((texture =texture=))
+(defreply loadedp ((texture =texture=))
   (with-properties (tex-id) texture
     (when (and tex-id
 	       (gl:texturep tex-id))
@@ -126,15 +128,15 @@ variable within its scope."))
 ;;;
 ;;; File textures
 ;;;
-(defsheep =file-texture= (=file-resource= =texture=)
+(defproto =file-texture= (=file-resource= =texture=)
   ((filepath "res/lisplogo_alien_256.png"))
   (:documentation "A file texture is loaded from an image file."))
 
-(defmessage load-resource :before ((texture =texture=))
+(defreply load-resource :before ((texture =texture=))
   (when (tex-id texture)
     (unload-resource texture)))
 
-(defmessage load-resource ((texture =file-texture=))
+(defreply load-resource ((texture =file-texture=))
   (ilut:renderer :opengl)
   (ilut:enable :opengl-conv)
   (let ((texture-name (ilut:gl-load-image (filepath texture))))
@@ -149,7 +151,7 @@ variable within its scope."))
   (il:bind-image 0)
   texture)
 
-(defmessage load-resource :after ((texture =texture=))
+(defreply load-resource :after ((texture =texture=))
   (let ((id (tex-id texture)))
     (finalize texture (lambda ()
 			(when (and (integerp id)
@@ -157,13 +159,13 @@ variable within its scope."))
 			  (gl:delete-texture id))))))
 
 (defun create-texture (filepath)
-  (clone (=file-texture=)
-	 ((filepath filepath))))
+  (defobject (=file-texture=)
+      ((filepath filepath))))
 
 ;;;
 ;;; Fonts
 ;;;
-(defsheep =font= (=file-resource=)
+(defproto =font= (=file-resource=)
   ((font-pointer nil)
    (size 12)
    (res 100)
@@ -172,7 +174,7 @@ variable within its scope."))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
 
 (defun create-font (filepath &key (size 12) (res 20))
-  (clone (=font=) ((filepath filepath) (size size) (res res))))
+  (defobject (=font=) ((filepath filepath) (size size) (res res))))
 
 (defvar *font* =font=)
 
@@ -181,11 +183,11 @@ variable within its scope."))
   `(let ((*font* ,font))
      ,@body))
 
-(defmessage load-resource :before ((font =font=))
+(defreply load-resource :before ((font =font=))
   (when (font-pointer font)
     (unload-resource font)))
 
-(defmessage load-resource ((font =font=))
+(defreply load-resource ((font =font=))
   (setf (font-pointer font)
 	(ftgl:create-texture-font (filepath font)))
   (ftgl:set-font-face-size (font-pointer font)
@@ -194,23 +196,23 @@ variable within its scope."))
   (setf (loadedp font) t)
   font)
 
-(defmessage load-resource :after ((font =font=))
+(defreply load-resource :after ((font =font=))
   (let ((ptr (font-pointer font)))
     (finalize font (lambda ()
 		     (ftgl:destroy-font ptr)))))
 
 ;; Anytime we change a font's dimensions while *engine* is initialized, we should reload it.
-(defmessage (setf size) :after (new-size (font =font=))
+(defreply (setf size) :after (new-size (font =font=))
   (declare (ignore new-size))
   (when (initializedp *engine*)
    (load-resource font)))
 
-(defmessage (setf res) :after (new-res (font =font=))
+(defreply (setf res) :after (new-res (font =font=))
   (declare (ignore new-res))
   (when (initializedp *engine*)
     (load-resource font)))
 
-(defmessage unload-resource ((font =font=))
+(defreply unload-resource ((font =font=))
   (ftgl:destroy-font (font-pointer font))
   (setf (font-pointer font) nil)
   (setf (loadedp font) nil)

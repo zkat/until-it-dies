@@ -39,10 +39,10 @@
       (dotimes (i 1000)
         (draw-point (make-point :x (random 600)
                                 :y (random 600)
-                                :z 0))
-        (draw-sprite *test-anim* *x* *y* :x-scale scale-factor :y-scale scale-factor)))
+                                :z 0))))
     (draw-sprite "HURR DURR HURR!"
-                 60 50 :x-scale scale-factor :y-scale scale-factor)))
+                 60 50 :x-scale scale-factor :y-scale scale-factor)
+    (draw-sprite *test-anim* *x* *y* :x-scale scale-factor :y-scale scale-factor)))
 
 (defreply mouse-down ((engine =test-engine=) button x y)
   (declare (ignore x y button engine))

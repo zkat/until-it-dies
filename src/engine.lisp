@@ -81,11 +81,11 @@ followed by the main engine loop."))
   (:documentation
 "Detaches everything from X."))
 
-(defmessage update (object dt)
+(defmessage update (object dt &key)
   (:documentation
 "Updates the state of the object by DT (in seconds)"))
 
-(defmessage draw (object)
+(defmessage draw (object &key)
   (:documentation
 "Renders the object onto the screen in its current state."))
 
@@ -121,10 +121,10 @@ followed by the main engine loop."))
 ;;;
 ;;; Engine messages
 ;;;
-(defreply update ((engine =engine=) dt)
+(defreply update ((engine =engine=) dt &key)
   (values))
 
-(defreply draw ((engine =engine=))
+(defreply draw ((engine =engine=) &key)
   (values))
 
 ;;;

@@ -70,18 +70,6 @@ done before entering the engine loop."))
 "Runs the engine. ENGINE is initialized inside this buzzword,
 followed by the main engine loop."))
 
-(defmessage attach (a b)
-  (:documentation
-"Registers A with B. Used in cases such as attaching components to screens"))
-
-(defmessage detach (a b)
-  (:documentation
-"Detaches A from B. Used in cases such as detaching components from screens"))
-
-(defmessage detach-all (x)
-  (:documentation
-"Detaches everything from X."))
-
 (defmessage update (object dt &key)
   (:documentation
 "Updates the state of the object by DT (in seconds)"))

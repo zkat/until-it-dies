@@ -17,7 +17,7 @@
 (defparameter *y* 50)
 (defparameter *speed* 300)
 
-(defreply update ((engine =test-engine=) dt)
+(defreply update ((engine =test-engine=) dt &key)
   (update *test-anim* dt)
   (when (and (key-down-p :right)
              (< *x* (window-width engine)))
@@ -32,7 +32,7 @@
              (< 0 *y*))
     (decf *y* (* *speed* dt))))
 
-(defreply draw ((engine =test-engine=))
+(defreply draw ((engine =test-engine=) &key)
   (declare (ignore engine))
   (let ((scale-factor 5))
     (with-color *green*
@@ -40,9 +40,9 @@
         (draw-point (make-point :x (random 600)
                                 :y (random 600)
                                 :z 0))))
-    (draw-sprite "HURR DURR HURR!"
-                 60 50 :x-scale scale-factor :y-scale scale-factor)
-    (draw-sprite *test-anim* *x* *y* :x-scale scale-factor :y-scale scale-factor)))
+    (draw "HURR DURR HURR!"
+          :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor)
+    (draw *test-anim* :x *x* :y *y* :x-scale scale-factor :y-scale scale-factor)))
 
 (defreply mouse-down ((engine =test-engine=) button x y)
   (declare (ignore x y button engine))

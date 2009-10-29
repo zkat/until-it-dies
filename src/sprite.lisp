@@ -12,7 +12,6 @@
 (defproto =sprite= ()
   ())
 
-(defmessage draw-sprite (sprite x y &key))
 
 ;;;
 ;;; Textured prototype
@@ -28,13 +27,13 @@ facilities for drawing textured onto components."))
   (declare (ignore textured))
   (vector 0 0 1 1))
 
-(defreply draw-sprite :before ((textured =textured=) x y &key)
+(defreply draw :before ((textured =textured=) &key x y )
   "Before we a draw textured sprite, we should bind its texture."
   (declare (ignore x y))
   (when (texture textured)
     (bind-texture (texture textured))))
 
-(defreply draw-sprite :after ((textured =textured=) x y &key)
+(defreply draw :after ((textured =textured=) &key x y)
   "Once we're done drawing it, we should unbind the texture."
   (declare (ignore x y))
   (unbind-texture (texture textured)))
@@ -63,9 +62,9 @@ texture they are drawn with."))
   (with-properties (texture) image
     (filepath texture)))
 
-(defreply draw-sprite ((image =image=) x y
-                         &key x-scale y-scale
-                         rotation (z 0))
+(defreply draw ((image =image=)
+                &key x y x-scale y-scale
+                rotation (z 0))
   (let ((tex-coords (calculate-tex-coords image))
         (height (height image))
         (width (width image)))
@@ -111,7 +110,7 @@ figure out which frames to draw."))
           (num-frames num-frames)
           (animation-type type))))
 
-(defreply update ((animation =animation=) dt)
+(defreply update ((animation =animation=) dt &key)
   (with-properties (timer num-frames current-frame frame-delay animation-type frame-step)
       animation
     (incf timer dt)
@@ -152,10 +151,10 @@ figure out which frames to draw."))
 (defproto =text= (=sprite=)
   ((string-to-draw "Hello World")))
 
-(defreply draw-sprite ((string =string=) x y
-                         &key x-scale y-scale
-                         rotation (font *font*)
-                         wrap (z 0))
+(defreply draw ((string =string=)
+                &key x y x-scale y-scale
+                rotation (font *font*)
+                wrap (z 0))
   (when wrap
     (warn "UID doesn't support wrapping of text right now."))
   (unless (loadedp font)
@@ -168,11 +167,11 @@ figure out which frames to draw."))
     (gl:scale (or x-scale 1) (or y-scale 1) 1)
     (ftgl:render-font (font-pointer font) string :all)))
 
-(defreply draw-sprite ((text =text=) x y
-                         &key x-scale y-scale
-                         rotation (font *font*)
-                         wrap (z 1))
-  (draw-sprite (string-to-draw text) x y :z z
+(defreply draw ((text =text=)
+                &key x y x-scale y-scale
+                rotation (font *font*)
+                wrap (z 1))
+  (draw (string-to-draw text) x y :z z
                :x-scale x-scale
                :y-scale y-scale
                :rotation rotation

@@ -10,6 +10,7 @@
 ;;;
 ;;; Engine Prototype
 ;;;
+(defvar *engine*)
 (defproto =engine= ()
   ((runningp t)
    initializedp
@@ -119,9 +120,10 @@ followed by the main engine loop."))
 "Run once per game loop."))
 
 ;;;
-;;; Engine messages
+;;; Engine replies
 ;;;
 (defreply update ((engine =engine=) dt &key)
+  (declare (ignore dt))
   (values))
 
 (defreply draw ((engine =engine=) &key)
@@ -174,7 +176,7 @@ followed by the main engine loop."))
   (declare (ignore engine button x y))
   (values))
 (defreply mouse-down ((engine =engine=) button x y)
-  (declare (ignore engine x y))
+  (declare (ignore engine button x y))
   (values))
 (defreply mouse-move :before ((engine =engine=) x y)
   (with-properties (mouse-x mouse-y)
@@ -228,7 +230,6 @@ followed by the main engine loop."))
   (sdl:update-display))
 
 ;;; Main loop
-(defvar *engine* =engine=)
 (defreply init :before ((engine =engine=))
   "By default, we take care of setting sdl window options, 
 and doing some very initial OpenGL setup."

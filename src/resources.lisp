@@ -181,18 +181,7 @@ variable within its scope."))
 (defreply load-resource :after ((font =font=))
   (let ((ptr (font-pointer font)))
     (finalize font (lambda ()
-         (ftgl:destroy-font ptr)))))
-
-;; Anytime we change a font's dimensions while *engine* is initialized, we should reload it.
-(defreply (setf size) :after (new-size (font =font=))
-  (declare (ignore new-size))
-  (when (initializedp *engine*)
-    (load-resource font)))
-
-(defreply (setf res) :after (new-res (font =font=))
-  (declare (ignore new-res))
-  (when (initializedp *engine*)
-    (load-resource font)))
+                     (ftgl:destroy-font ptr)))))
 
 (defreply unload-resource ((font =font=))
   (ftgl:destroy-font (font-pointer font))

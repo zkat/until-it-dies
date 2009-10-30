@@ -13,7 +13,6 @@
   "For efficiency, points are vectors using the format #(x y z)"
   (vector x y z))
 
-(declaim (inline set-point draw-rectangle draw-triangle draw-point draw-line draw-polygon))
 (defun set-point (point)
   (gl:vertex (aref point 0)
              (aref point 1)

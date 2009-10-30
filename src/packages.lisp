@@ -1,7 +1,9 @@
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
+
 (defpackage #:until-it-dies
   (:nicknames #:uid)
   (:use #:cl #:sheeple #:trivial-garbage)
-  (:export 
+  (:export
    ;; core
    :init
    :teardown
@@ -18,7 +20,7 @@
    :mouse-move
    :window-resized
    :idle
-   
+
    ;; Engine
    :=engine=
    :*engine*
@@ -37,7 +39,7 @@
    :window-height
    :title
    :fps
-   
+
    ;; primitives
    :make-color
    :mix-colors

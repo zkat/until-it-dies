@@ -1,7 +1,9 @@
-;; This file is part of Until It Dies
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
 
-;; event.lisp
-;;
+;;;; This file is part of Until It Dies
+
+;;;; event.lisp
+;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
@@ -11,33 +13,32 @@
 (defproto =event= ()
   ((payload (lambda () (print "=event='s event fired.")))
    (exec-time 0))
-  (:documentation 
-"An event is a  block of code that is executed by an event-queue.
+  (:documentation
+   "An event is a  block of code that is executed by an event-queue.
 Event firing can be delayed by milliseconds, and they are guaranteed
 to not fire until they are 'cooked'.
-Events can be asynchronously added to an event-queue, which can 
+Events can be asynchronously added to an event-queue, which can
 remain inactive until execution is ready to start again, and they
 will still be 'fired' in the order they were added."))
 
 (defvar *event-queue*)
-(defun make-event (payload &key 
-		   (queue *event-queue*)
-		   (delay 0)
-		   (event-prototype =event=))
+(defun make-event (payload &key
+                   (queue *event-queue*)
+                   (delay 0)
+                   (event-prototype =event=))
   "Generates one or more events that execute PAYLOAD."
   (push-event (defobject (event-prototype)
                   ((payload payload)
                    (exec-frame (+ delay (now)))))
-	      queue))
+              queue))
 
 ;; TODO: FORK was simplified. I may need to add looping to it again. Keep it like this for now.
-(defmacro fork ((&key queue delay) 
-		&body body)
+(defmacro fork ((&key queue delay) &body body)
   "Turns BODY into a function to be added as a payload to an =event= object, which
    will be delayed by DELAY milliseconds, and added to QUEUE."
   `(make-event (lambda () ,@body)
-	       ,@(when queue `(:queue ,queue))
-	       ,@(when delay `(:delay ,delay))))
+               ,@(when queue `(:queue ,queue))
+               ,@(when delay `(:delay ,delay))))
 
 (defmacro with-event-queue (queue &body body)
   `(let ((*event-queue* ,queue))
@@ -48,11 +49,11 @@ will still be 'fired' in the order they were added."))
 ;;;
 (defmessage execute-event (event)
   (:documentation
-"Takes care of executing a particular event."))
+   "Takes care of executing a particular event."))
 
 (defmessage cookedp (event)
   (:documentation
-"Is the event ready to fire?"))
+   "Is the event ready to fire?"))
 
 ;;; Messages
 (defreply execute-event ((event =event=))
@@ -113,7 +114,7 @@ will still be 'fired' in the order they were added."))
 (defreply event-available-p ((queue =event-queue=))
   "Simply peeks to see if there's an event in the queue, and if it's cooked."
   (when (and (peek-next-event queue)
-	     (cookedp (peek-next-event queue)))
+             (cookedp (peek-next-event queue)))
     t))
 
 (defreply clear-events ((queue =event-queue=))
@@ -127,4 +128,3 @@ will still be 'fired' in the order they were added."))
   (loop
      while (event-available-p queue)
      do (process-next-event queue)))
-

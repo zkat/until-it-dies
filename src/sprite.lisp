@@ -23,7 +23,6 @@
    "Not to be confused with =texture=; =textured= is a mixin that provides
 facilities for drawing textured onto components."))
 
-(defmessage calculate-tex-coords (obj))
 (defreply calculate-tex-coords ((textured =textured=))
   (declare (ignore textured))
   (vector 0 0 1 1))

@@ -27,8 +27,8 @@
        visiblep (x 255) (y 356))))
 
 (defreply draw :around ((thing *alien*) &key)
-  (with-properties (visible-p) thing
-    (when visible-p (call-next-reply))))
+  (with-properties (visiblep) thing
+    (when visiblep (call-next-reply))))
 
 (defvar *anim*
   (defobject =game-object=
@@ -64,9 +64,9 @@
     (draw *alien*)))
 
 (defreply mouse-down ((engine =uid-demo=) button click-x click-y)
-  (with-properties ((alien-x x) (alien-y y) visible-p) *alien*
+  (with-properties ((alien-x x) (alien-y y) visiblep) *alien*
     (case button
-      (1 (setf visible-p t
+      (1 (setf visiblep t
                alien-x click-x
                alien-y (- (window-height engine) click-y)))
-      (3 (setf visible-p (not visible-p))))))
+      (3 (setf visiblep (not visiblep))))))

@@ -73,12 +73,11 @@ texture they are drawn with."))
         (when rotation
           nil
           #+nil(gl:rotate rotation 0 0 1))
-        (gl:with-primitives :quads
-          (rectangle x y (* width (or x-scale 1)) (* height (or y-scale 1)) :z z
-                     :u1 (elt tex-coords 0)
-                     :v1 (elt tex-coords 1)
-                     :u2 (elt tex-coords 2)
-                     :v2 (elt tex-coords 3)))))))
+        (draw-rectangle x y (* width (or x-scale 1)) (* height (or y-scale 1)) :z z
+                        :u1 (elt tex-coords 0)
+                        :v1 (elt tex-coords 1)
+                        :u2 (elt tex-coords 2)
+                        :v2 (elt tex-coords 3))))))
 
 (defproto =animation= (=image=)
   ((texture (create-texture "/home/zkat/hackery/lisp/until-it-dies/res/explosion.png"))

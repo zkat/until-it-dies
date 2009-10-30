@@ -10,8 +10,7 @@
 ;;;
 ;;; Generic resources prototype
 ;;;
-(defproto =resource= ()
-  ()
+(defproto =resource= () ()
   (:documentation
    "A resource is an object with some aspect that needs to
 be (or should be) manually loaded and unloaded. Usually, this
@@ -20,22 +19,6 @@ from memory under some circumstances. A resource object should
 know everything necessary in order to load whatever it is
 managing into and out of memory (it should be ready to respond
 to LOAD-RESOURCE and UNLOAD-RESOURCE)."))
-
-(defmessage load-resource (resource)
-  (:documentation
-   "Loads the resource's data into memory, activating it."))
-(defmessage unload-resource (resource)
-  (:documentation
-"Unloads the resource's data from memory,
-handling any freeing that needs to happen"))
-(defmessage loadedp (resource)
-  (:documentation
-   "Is the resource currently correctly loaded and available for use?
-It's worth pointing out that a simple loadedp flag on the object may
-not be enough for all possible resource types. It's allowed, and even
-advisable, that this buzzword check other things to make sure it is
-correctly loaded (such as confirming that the texture ID is valid, in
-the case of =texture= objects.)"))
 
 (defproto =file-resource= (=resource=)
   ((filepath nil))
@@ -92,9 +75,6 @@ variable within its scope."))
 ;;; Standard textures
 ;;;
 ;;; - Textures manage opengl texture objects, and handle their binding.
-(defmessage bind-texture (texture))
-(defmessage unbind-texture (texture))
-
 (defproto =texture= (=resource=)
   ((tex-id nil)
    (target :texture-2d)

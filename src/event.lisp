@@ -44,24 +44,12 @@ will still be 'fired' in the order they were added."))
   `(let ((*event-queue* ,queue))
      ,@body))
 
-;;;
-;;; Event processing buzzwords
-;;;
-(defmessage execute-event (event)
-  (:documentation
-   "Takes care of executing a particular event."))
-
-(defmessage cookedp (event)
-  (:documentation
-   "Is the event ready to fire?"))
-
-;;; Messages
 (defreply execute-event ((event =event=))
   "Executes a standard event. Nothing fancy, just a funcall."
   (funcall (payload event)))
 
 (defreply cookedp ((event =event=))
-  "Simply checks that it doesn't shoot its load prematurely.."
+  "Simply checks that it doesn't shoot its load prematurely."
   (let  ((time-difference (- (exec-time event) (now))))
     (when (<= time-difference 0)
       t)))
@@ -71,34 +59,14 @@ will still be 'fired' in the order they were added."))
 ;;;
 (defproto =event-queue= ()
   ((queue (make-priority-queue :key #'exec-time)))
-  (:documentation "An event queue is a container for events. Events are inserted into it and
-                   automatically sorted according to the event's execution time. The queue
-                   works like a min-priority queue. The top event can be peeked at, or popped."))
+  (:documentation "An event queue is a container for events. Events are inserted
+into it and automatically sorted according to the event's execution time. The queue
+works like a min-priority queue. The top event can be peeked at, or popped."))
 
 (defreply init-object :after ((obj =event-queue=) &key)
   (setf (queue obj) (make-priority-queue :key #'exec-time)))
 
-;;; Buzzwords
-(defmessage push-event (event queue)
-  (:documentation "Adds EVENT to QUEUE"))
-(defmessage peek-next-event (queue)
-  (:documentation "Peeks at the next event in QUEUE without removing it.
-                   Returns NIL if there are no queued events."))
-(defmessage pop-next-event (queue)
-  (:documentation "Returns the next available event, and removes it from QUEUE.
-                   Returns NIL if there is nothing in the queue."))
-(defmessage event-available-p (queue)
-  (:documentation "Is there a cooked event available?"))
-(defmessage clear-events (queue)
-  (:documentation "Clears all events off the event queue"))
-(defmessage process-next-event (queue)
-  (:documentation "Grabs the next event from QUEUE and executes it."))
-(defmessage process-cooked-events (queue)
-  (:documentation "Processes all cooked events in QUEUE"))
-
-;;; Messages
-;;;
-;;; - Most of these messages wrap around the priority queue API in util/priority-queue.lisp
+;;; - Most of these replies wrap around the priority queue API in util/priority-queue.lisp
 ;;;   It is pretty much a standard by-the-book min-priority-queue, with items sorted by
 ;;;   #'exec-time.
 (defreply push-event ((event =event=) (queue =event-queue=))

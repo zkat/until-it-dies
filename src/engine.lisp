@@ -55,63 +55,6 @@ but it's not a mortal sin to just use it as a singleton."))
 (defreply init-object :after ((engine =engine=) &key)
   (setf (keys-held-down engine) (make-hash-table :test #'eq)))
 
-;;;
-;;; Buzzwords
-;;;
-(defmessage init (object)
-  (:documentation
-   "This buzzword takes care of any initialization that needs to be
-done before entering the engine loop."))
-
-(defmessage teardown (object)
-  (:documentation
-   "Takes care of all the teardown necessary to clean up ENGINE."))
-
-(defmessage run (engine)
-  (:documentation
-   "Runs the engine. ENGINE is initialized inside this buzzword,
-followed by the main engine loop."))
-
-(defmessage update (object dt &key)
-  (:documentation
-   "Updates the state of the object by DT (in seconds)"))
-
-(defmessage draw (object &key)
-  (:documentation
-   "Renders the object onto the screen in its current state."))
-
-;; Events
-(defmessage key-up (engine key mod-keys)
-  (:documentation
-   "Key event for a key being released."))
-
-(defmessage key-down (engine key mod-keys)
-  (:documentation
-   "Key event for a key being pressed."))
-
-(defmessage mouse-up (engine button x y)
-  (:documentation
-   "A mouse button has been released."))
-
-(defmessage mouse-down (engine button x y)
-  (:documentation
-   "A mouse button has been pressed."))
-
-(defmessage mouse-move (engine x y)
-  (:documentation
-   "Mouse has been moved to (X,Y)."))
-
-(defmessage window-resized (engine width height)
-  (:documentation
-   "Event called whenever the window is resized by the user"))
-
-(defmessage idle (engine)
-  (:documentation
-   "Run once per game loop."))
-
-;;;
-;;; Engine replies
-;;;
 (defreply update ((engine =engine=) dt &key)
   (declare (ignore dt))
   (values))

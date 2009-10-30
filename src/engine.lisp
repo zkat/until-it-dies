@@ -1,9 +1,11 @@
-;; This file is part of Until It Dies
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
 
-;; engine.lisp
-;;
-;; TODO - Wrap the sdl input stuff so that the key/modifier/mouseclick constants are
-;;        UID symbols instead of stuff like :sdl-key-escape and such.
+;;;; This file is part of Until It Dies
+
+;;;; engine.lisp
+;;;;
+;;;; TODO - Wrap the sdl input stuff so that the key/modifier/mouseclick constants are
+;;;;        UID symbols instead of stuff like :sdl-key-escape and such.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
@@ -35,7 +37,7 @@
    (last-fps-check-frame-count 0)
    (frame-count 0))
   (:documentation
-"Engines are objects that contain information about
+   "Engines are objects that contain information about
 -how- to run an application.
 
 The engine handles the following aspects of UID applications:
@@ -58,54 +60,54 @@ but it's not a mortal sin to just use it as a singleton."))
 ;;;
 (defmessage init (object)
   (:documentation
-"This buzzword takes care of any initialization that needs to be 
+   "This buzzword takes care of any initialization that needs to be
 done before entering the engine loop."))
 
 (defmessage teardown (object)
   (:documentation
-"Takes care of all the teardown necessary to clean up ENGINE."))
+   "Takes care of all the teardown necessary to clean up ENGINE."))
 
 (defmessage run (engine)
   (:documentation
-"Runs the engine. ENGINE is initialized inside this buzzword,
+   "Runs the engine. ENGINE is initialized inside this buzzword,
 followed by the main engine loop."))
 
 (defmessage update (object dt &key)
   (:documentation
-"Updates the state of the object by DT (in seconds)"))
+   "Updates the state of the object by DT (in seconds)"))
 
 (defmessage draw (object &key)
   (:documentation
-"Renders the object onto the screen in its current state."))
+   "Renders the object onto the screen in its current state."))
 
 ;; Events
 (defmessage key-up (engine key mod-keys)
   (:documentation
-"Key event for a key being released."))
+   "Key event for a key being released."))
 
 (defmessage key-down (engine key mod-keys)
   (:documentation
-"Key event for a key being pressed."))
+   "Key event for a key being pressed."))
 
 (defmessage mouse-up (engine button x y)
   (:documentation
-"A mouse button has been released."))
+   "A mouse button has been released."))
 
 (defmessage mouse-down (engine button x y)
   (:documentation
-"A mouse button has been pressed."))
+   "A mouse button has been pressed."))
 
 (defmessage mouse-move (engine x y)
   (:documentation
-"Mouse has been moved to (X,Y)."))
+   "Mouse has been moved to (X,Y)."))
 
 (defmessage window-resized (engine width height)
   (:documentation
-"Event called whenever the window is resized by the user"))
+   "Event called whenever the window is resized by the user"))
 
 (defmessage idle (engine)
   (:documentation
-"Run once per game loop."))
+   "Run once per game loop."))
 
 ;;;
 ;;; Engine replies
@@ -184,28 +186,28 @@ followed by the main engine loop."))
 (defun update-time (engine)
   (with-properties (frame-count last-frame-time) engine
     (incf frame-count)
-   (multiple-value-bind (dt now)
-       (time-difference last-frame-time)
-     (setf last-frame-time now)
-     (setf (dt engine) dt)
-     ;;    Update the current framerate for ENGINE
-     (with-properties (last-fps-check-time last-fps-check-frame-count fps-check-delay fps frame-count)
-	 engine
-      (when (>= now (+ last-fps-check-time dt))
-	(let ((frames (- frame-count last-fps-check-frame-count))
-	      (seconds dt))
-	  (setf fps (float (if (zerop dt)
-			       0 (/ frames seconds))))
-	  (setf last-fps-check-time now)
-	  (setf last-fps-check-frame-count frame-count))))
-     (process-cooked-events engine))))
+    (multiple-value-bind (dt now)
+        (time-difference last-frame-time)
+      (setf last-frame-time now)
+      (setf (dt engine) dt)
+      ;;    Update the current framerate for ENGINE
+      (with-properties (last-fps-check-time last-fps-check-frame-count fps-check-delay fps frame-count)
+          engine
+        (when (>= now (+ last-fps-check-time dt))
+          (let ((frames (- frame-count last-fps-check-frame-count))
+                (seconds dt))
+            (setf fps (float (if (zerop dt)
+                                 0 (/ frames seconds))))
+            (setf last-fps-check-time now)
+            (setf last-fps-check-frame-count frame-count))))
+      (process-cooked-events engine))))
 
 (defreply idle ((engine =engine=))
   (let ((color (clear-color engine)))
-   (gl:clear-color (elt color 0)
-                   (elt color 1)
-                   (elt color 2)
-                   (elt color 3)))
+    (gl:clear-color (elt color 0)
+                    (elt color 1)
+                    (elt color 2)
+                    (elt color 3)))
   (gl:clear :color-buffer-bit :depth-buffer-bit)
   (gl:enable :texture-2d :blend)
   (gl:blend-func :src-alpha :one-minus-src-alpha)
@@ -219,11 +221,11 @@ followed by the main engine loop."))
 
 ;;; Main loop
 (defreply init :before ((engine =engine=))
-  "By default, we take care of setting sdl window options, 
+  "By default, we take care of setting sdl window options,
 and doing some very initial OpenGL setup."
   (sdl:window (window-width engine) (window-height engine)
-	      :title-caption (title engine)
-	      :flags (logior sdl:sdl-opengl))
+              :title-caption (title engine)
+              :flags (logior sdl:sdl-opengl))
   (setf (sdl:frame-rate) 0)
   (setf (frame-count engine) 0)
   (setf (last-frame-time engine) 0)
@@ -262,37 +264,37 @@ we're done with it."
                (teardown ,engine-var))))))))
 
 (defreply run ((engine =engine=))
-  "Here's the main loop -- because of the way lb-sdl is set up, 
+  "Here's the main loop -- because of the way lb-sdl is set up,
 we handle all input right here. We also bind the engine parameter
 to *engine*, which might make things a little easier later on."
   (sdl:with-init ()
     (with-engine engine
-     (sdl:with-events ()
-       (:quit-event 
-        () 
-        (prog1 t
-          (setf (runningp engine) nil)))
-       (:video-resize-event
-        (:w width :h height)
-        (restartable (window-resized engine width height)))
-       (:key-down-event
-        (:key key :mod-key mod-keys)
-        (restartable (key-down engine (translate-key key) (translate-key-list mod-keys))))
-       (:key-up-event
-        (:key key :mod-key mod-keys)
-        (restartable (key-up engine (translate-key key) (translate-key-list mod-keys))))
-       (:mouse-button-up-event
-        (:button button :x x :y y)
-        (restartable (mouse-up engine (translate-key button) x y)))
-       (:mouse-button-down-event
-        (:button button :x x :y y)
-        (restartable (mouse-down engine (translate-key button) x y)))
-       (:mouse-motion-event
-        (:x x :y y)
-        (restartable (mouse-move engine x (- (window-height engine) y))))
-       (:idle
-        ()
-        (restartable (idle engine))))
-     ;; We return the engine after everything's done.
-     ;; It might be handy for inspection.
-     engine)))
+      (sdl:with-events ()
+        (:quit-event
+         ()
+         (prog1 t
+           (setf (runningp engine) nil)))
+        (:video-resize-event
+         (:w width :h height)
+         (restartable (window-resized engine width height)))
+        (:key-down-event
+         (:key key :mod-key mod-keys)
+         (restartable (key-down engine (translate-key key) (translate-key-list mod-keys))))
+        (:key-up-event
+         (:key key :mod-key mod-keys)
+         (restartable (key-up engine (translate-key key) (translate-key-list mod-keys))))
+        (:mouse-button-up-event
+         (:button button :x x :y y)
+         (restartable (mouse-up engine (translate-key button) x y)))
+        (:mouse-button-down-event
+         (:button button :x x :y y)
+         (restartable (mouse-down engine (translate-key button) x y)))
+        (:mouse-motion-event
+         (:x x :y y)
+         (restartable (mouse-move engine x (- (window-height engine) y))))
+        (:idle
+         ()
+         (restartable (idle engine))))
+      ;; We return the engine after everything's done.
+      ;; It might be handy for inspection.
+      engine)))

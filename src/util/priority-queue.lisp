@@ -1,17 +1,19 @@
-;; Copyright 2008 Zach Beane
-;; Copyright 2008-2009 Kat Marchan
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
 
-;; This file is part of yashmup
+;;;; Copyright 2008 Zach Beane
+;;;; Copyright 2008-2009 Kat Marchan
 
-;; priority-queue.lisp
-;;
-;; Implementation of a time-based event queue. It handles events depending on their execution
-;; time. It's a min-priority queue, so the event with the lowest time until execution (which
-;; can, and often will be, negative), is at the top of the queue.
-;;
-;; Note: This priority queue is directly converted from Xach's. Licensing stuff to come when
-;;       I find the file again. It's a BSD license.
-;;
+;;;; This file is part of yashmup
+
+;;;; priority-queue.lisp
+;;;;
+;;;; Implementation of a time-based event queue. It handles events depending on their execution
+;;;; time. It's a min-priority queue, so the event with the lowest time until execution (which
+;;;; can, and often will be, negative), is at the top of the queue.
+;;;;
+;;;; Note: This priority queue is directly converted from Xach's. Licensing stuff to come when
+;;;;       I find the file again. It's a BSD license.
+;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
@@ -118,11 +120,11 @@
     (loop for i = (heap-size heap) then parent-i
        for parent-i = (heap-parent i)
        while (and (> i 0)
-		  (not (ge (key (aref heap parent-i))
-			   (key new-item))))
+      (not (ge (key (aref heap parent-i))
+         (key new-item))))
        do (setf (aref heap i) (aref heap parent-i))
        finally (setf (aref heap i) new-item))
-    
+
     heap))
 
 (defun heap-minimum (heap)
@@ -140,4 +142,3 @@
 
 (defun heap-extract-minimum (heap &key (key #'identity) (test #'<=))
   (heap-extract heap 0 :key key :test test))
-

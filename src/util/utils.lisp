@@ -1,3 +1,5 @@
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
+
 (in-package :until-it-dies)
 
 ;;;
@@ -18,11 +20,11 @@
   "Checks the difference between the internal-time provided and the current time.
 Returns both the difference in time and the current-time used in the computation"
   (let* ((time-now (now))
-	 (difference (- time-now time-before)))
+         (difference (- time-now time-before)))
     (if (minusp difference)
-	0 ; just in case
-	(values (- time-now time-before)
-		time-now))))
+        0                               ; just in case
+        (values (- time-now time-before)
+                time-now))))
 
 ;;;
 ;;; Restarting and interactivity

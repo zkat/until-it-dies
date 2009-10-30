@@ -1,8 +1,10 @@
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
+
 (in-package :opengl)
 
 (export '(texturep
-	  delete-texture
-	  gen-texture))
+          delete-texture
+          gen-texture))
 
 (defun texturep (texture-id)
   (%gl:is-texture texture-id))

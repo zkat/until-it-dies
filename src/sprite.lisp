@@ -1,8 +1,10 @@
-;; This file is part of Until It Dies
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
 
-;; sprite.lisp
-;;
-;; A sprite is a graphical object, be it an animation or an image.
+;;;; This file is part of Until It Dies
+
+;;;; sprite.lisp
+;;;;
+;;;; A sprite is a graphical object, be it an animation or an image.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
@@ -12,14 +14,13 @@
 (defproto =sprite= ()
   ())
 
-
 ;;;
 ;;; Textured prototype
 ;;;
 (defproto =textured= (=sprite=)
   ((texture =texture=))
   (:documentation
-"Not to be confused with =texture=; =textured= is a mixin that provides
+   "Not to be confused with =texture=; =textured= is a mixin that provides
 facilities for drawing textured onto components."))
 
 (defmessage calculate-tex-coords (obj))
@@ -44,7 +45,7 @@ facilities for drawing textured onto components."))
 (defproto =image= (=textured=)
   ((texture (create-texture "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png")))
   (:documentation
-"Images are textured components that
+   "Images are textured components that
 are initialized to be the same size as the
 texture they are drawn with."))
 
@@ -91,7 +92,7 @@ texture they are drawn with."))
    (timer 0)
    (animation-type :loop))
   (:documentation
-"Animations are like images, but they use the provided texture
+   "Animations are like images, but they use the provided texture
 as a sprite sheet. Based on certain provided parameters, they
 figure out which frames to draw."))
 
@@ -103,12 +104,12 @@ figure out which frames to draw."))
 (defun create-animation (filepath frame-width frame-height frame-delay
                          num-frames &optional (type :loop))
   (defobject (=animation=)
-         ((texture (create-texture filepath))
-          (frame-width frame-width)
-          (frame-height frame-height)
-          (frame-delay frame-delay)
-          (num-frames num-frames)
-          (animation-type type))))
+      ((texture (create-texture filepath))
+       (frame-width frame-width)
+       (frame-height frame-height)
+       (frame-delay frame-delay)
+       (num-frames num-frames)
+       (animation-type type))))
 
 (defreply update ((animation =animation=) dt &key)
   (with-properties (timer num-frames current-frame frame-delay animation-type frame-step)
@@ -172,12 +173,11 @@ figure out which frames to draw."))
                 rotation (font *font*)
                 wrap (z 1))
   (draw (string-to-draw text) x y :z z
-               :x-scale x-scale
-               :y-scale y-scale
-               :rotation rotation
-               :font font
-               :wrap wrap))
+        :x-scale x-scale
+        :y-scale y-scale
+        :rotation rotation
+        :font font
+        :wrap wrap))
 
 (defun create-text (string)
   (defobject (=text=) ((string-to-draw string))))
-

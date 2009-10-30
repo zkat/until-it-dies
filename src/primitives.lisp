@@ -1,9 +1,11 @@
-;; This file is part of Until It Dies
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
 
-;; primitives.lisp
-;;
-;; Drawing of basic OGL primitives
-;;
+;;;; This file is part of Until It Dies
+
+;;;; primitives.lisp
+;;;;
+;;;; Drawing of basic OGL primitives
+;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
@@ -12,7 +14,7 @@
 ;;; Colors
 ;;;
 (defstruct (color (:type vector))
-  ;; A color is an object that represents a certain RGBA value. 
+  ;; A color is an object that represents a certain RGBA value.
   ;; The values are used directly by opengl, and should range between 0 and 1 (instead of 0-255)"
   (r 1)
   (g 1)
@@ -50,17 +52,17 @@
 (defvar *color* *white*)
 (defun mix-colors (color1 color2)
   (let* ((r1 (r color1))
-	 (g1 (g color1))
-	 (b1 (b color1))
-	 (a1 (a color1))
-	 (r2 (r color2))
-	 (g2 (g color2))
-	 (b2 (b color2))
-	 (a2 (a color2)))
-      (make-color :r (/ (+ r1 r2) 2)
-		  :g (/ (+ g1 g2) 2)
-		  :b (/ (+ b1 b2) 2)
-		  :a (/ (+ a1 a2) 2))))
+         (g1 (g color1))
+         (b1 (b color1))
+         (a1 (a color1))
+         (r2 (r color2))
+         (g2 (g color2))
+         (b2 (b color2))
+         (a2 (a color2)))
+    (make-color :r (/ (+ r1 r2) 2)
+                :g (/ (+ g1 g2) 2)
+                :b (/ (+ b1 b2) 2)
+                :a (/ (+ a1 a2) 2))))
 
 (defmacro with-color (color &body body)
   (let ((color-name (gensym "COLOR-")))
@@ -73,9 +75,9 @@
 
 (defun bind-color (color)
   (with-accessors ((r r)
-		   (g g)
-		   (b b)
-		   (a a))
+                   (g g)
+                   (b b)
+                   (a a))
       color
     (gl:color r g b a)))
 
@@ -109,26 +111,26 @@
   (when color
     (bind-color color))
   (gl:with-primitives :quads
-      (let* ((w/2 (/ width 2.0))
-         (h/2 (/ height 2.0))
-         (x1 (- x w/2))
-         (x2 (+ x w/2))
-         (y1 (+ y h/2))
-         (y2 (- y h/2)))
-    (gl:vertex x1 y1 z)
-    (gl:vertex x2 y1 z)
-    (gl:vertex x2 y2 z)
-    (gl:vertex x1 y2 z)))
+    (let* ((w/2 (/ width 2.0))
+           (h/2 (/ height 2.0))
+           (x1 (- x w/2))
+           (x2 (+ x w/2))
+           (y1 (+ y h/2))
+           (y2 (- y h/2)))
+      (gl:vertex x1 y1 z)
+      (gl:vertex x2 y1 z)
+      (gl:vertex x2 y2 z)
+      (gl:vertex x1 y2 z)))
   (when color
     (bind-color *color*)))
 
 (defun draw-triangle (p1 p2 p3 &key color)
   (when color
-   (bind-color color))
+    (bind-color color))
   (gl:with-primitives :triangles
     (mapc (lambda (point)
             (set-point point))
-	  (list p1 p2 p3)))
+          (list p1 p2 p3)))
   (when color
     (bind-color *color*)))
 
@@ -138,7 +140,7 @@
   (gl:with-primitives :quads
     (mapc (lambda (point)
             (set-point point))
-	  (list p1 p2 p3 p4)))
+          (list p1 p2 p3 p4)))
   (when color
     (bind-color *color*)))
 
@@ -152,20 +154,20 @@
 
 (defun draw-line (p1 p2 &key color)
   (when color
-   (bind-color color))
+    (bind-color color))
   (gl:with-primitives :lines
     (mapc (lambda (point)
             (set-point point))
-      (list p1 p2)))
+          (list p1 p2)))
   (when color
     (bind-color *color*)))
 
 (defun draw-polygon (points-list &key color)
   (when color
-   (bind-color color))
+    (bind-color color))
   (gl:with-primitives :polygon
     (mapc (lambda (point)
             (set-point point))
-	  points-list))
+          points-list))
   (when color
     (bind-color *color*)))

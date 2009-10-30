@@ -8,9 +8,9 @@
    (window-height 600)))
 
 (defparameter *test-image*
-  (create-image "/home/adlai/src/until-it-dies/res/lisplogo_alien_256.png"))
+  (create-image "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))
 (defparameter *test-anim*
-  (create-animation "/home/adlai/src/until-it-dies/res/explosion.png"
+  (create-animation "/home/zkat/hackery/lisp/until-it-dies/res/explosion.png"
                     15 14 0.05 14))
 
 (defparameter *x* 50)

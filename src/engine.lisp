@@ -31,7 +31,7 @@
    ;; fps calculation
    (fps 0)
    fps-limit                            ; only used during init time
-   (fps-check-delay 2000)
+   (fps-check-delay 100)
    (last-fps-check-time 0)
    (last-fps-check-frame-count 0)
    (frame-count 0))

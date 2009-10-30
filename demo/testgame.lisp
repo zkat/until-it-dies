@@ -53,12 +53,13 @@
       (decf y (* speed dt)))))
 
 (defreply draw ((engine =uid-demo=) &key)
-  (let ((scale-factor 5))
+  (let ((scale-factor 4))
     (with-color *green*
-      (dotimes (i 1000)
+      (dotimes (i 10000)
         (draw-point (make-point :x (random 600)
                                 :y (random 600)
                                 :z 0))))
+    (draw (format nil "~A" (fps engine)) :x 10 :y 10)
     (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor)
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (draw *alien*)))

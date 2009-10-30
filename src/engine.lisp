@@ -145,10 +145,8 @@ but it's not a mortal sin to just use it as a singleton."))
 
 (defreply idle ((engine =engine=))
   (let ((color (clear-color engine)))
-    (gl:clear-color (elt color 0)
-                    (elt color 1)
-                    (elt color 2)
-                    (elt color 3)))
+    (with-properties (r g b a) color
+      (gl:clear-color r g b a)))
   (gl:clear :color-buffer-bit :depth-buffer-bit)
   (gl:enable :texture-2d :blend)
   (gl:blend-func :src-alpha :one-minus-src-alpha)

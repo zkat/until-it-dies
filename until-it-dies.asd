@@ -23,6 +23,7 @@
                        (:file "priority-queue")
                        (:file "utils")))
              (:file "messages")
+             (:file "colors")
              (:file "primitives")
              (:file "config")
              (:file "event")

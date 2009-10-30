@@ -28,4 +28,5 @@
              (:file "event")
              (:file "resources")
              (:file "sprite")
-             (:file "engine")))))
+             (:file "engine")
+             (:file "resources-late")))))

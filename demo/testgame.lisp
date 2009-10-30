@@ -10,8 +10,8 @@
    (window-height 600)))
 
 (defproto =game-object= ()
-  ((x 0 :accessor nil)
-   (y 0 :accessor nil)
+  ((x 0)
+   (y 0)
    content))
 
 (defreply draw ((thing =game-object=) &rest args &key)

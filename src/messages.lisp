@@ -44,7 +44,7 @@
   (:documentation "Processes all cooked events in QUEUE"))
 
 ;;;
-;;; Resource messages
+;;; Resource loading messages
 ;;;
 (defmessage load-resource (resource)
   (:documentation
@@ -61,6 +61,16 @@ not be enough for all possible resource types. It's allowed, and even
 advisable, that this buzzword check other things to make sure it is
 correctly loaded (such as confirming that the texture ID is valid, in
 the case of =texture= objects.)"))
+
+;;;
+;;; Resource management messages
+;;;
+(defmessage attach (resource manager)
+  (:documentation "Sets up RESOURCE to be managed by MANAGER."))
+(defmessage detach (resource manager)
+  (:documentation "Ends the management of RESOURCE by MANAGER."))
+(defmessage detach-all (manager)
+  (:documentation "Removes all resources from MANAGER."))
 
 ;;;
 ;;; Texture messages

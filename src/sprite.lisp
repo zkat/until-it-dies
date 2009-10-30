@@ -110,6 +110,8 @@ figure out which frames to draw."))
        (animation-type type))))
 
 (defreply update ((animation =animation=) dt &key)
+  ;; TODO - this needs to update an animation properly regardless of framerate.
+  ;;        That probably means that frames should sometimes be skipped.
   (with-properties (timer num-frames current-frame frame-delay animation-type frame-step)
       animation
     (incf timer dt)

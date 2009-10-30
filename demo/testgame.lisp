@@ -2,6 +2,8 @@
   (:use :cl :sheeple :until-it-dies))
 (in-package :uid-demo)
 
+(defparameter *path-to-uid* "/home/zkat/hackery/lisp/until-it-dies/")
+
 (defproto =uid-demo= (=engine=)
   ((title "UID Demo")
    (window-width 600)
@@ -21,8 +23,8 @@
 
 (defvar *alien*
   (defobject =game-object=
-      ((content (create-image "/home/zkat/hackery/lisp/until-it-dies/res/lisplogo_alien_256.png"))
-       visible-p (x 255) (y 356))))
+      ((content (create-image (merge-pathnames "res/lisplogo_alien_256.png" *path-to-uid*)))
+       visiblep (x 255) (y 356))))
 
 (defreply draw :around ((thing *alien*) &key)
   (with-properties (visible-p) thing
@@ -30,7 +32,7 @@
 
 (defvar *anim*
   (defobject =game-object=
-      ((content (create-animation "/home/zkat/hackery/lisp/until-it-dies/res/explosion.png"
+      ((content (create-animation (merge-pathnames "res/explosion.png" *path-to-uid*)
                                   15 14 0.05 14))
        (speed 300) (x 50) (y 50))))
 

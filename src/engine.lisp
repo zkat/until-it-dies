@@ -12,7 +12,6 @@
 ;;;
 ;;; Engine Prototype
 ;;;
-(defvar *engine*)
 (defproto =engine= ()
   ((runningp t)
    initializedp

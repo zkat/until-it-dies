@@ -13,7 +13,11 @@
 ;; TODO - check for errors when loading/unloading/playing
 (defproto =sound= =resource=
   ((buffer-id nil)
-   (source-id nil)))
+   (source-id nil)
+   (position '(0 0 0))
+   (velocity '(0 0 0))
+   (direction '(0 0 0))
+   (source-relative-p t)))
 
 (defreply load-resource :before ((sound =sound=))
   (when (or (buffer-id sound)
@@ -28,7 +32,7 @@
 
 (defreply loadedp ((sound =sound=))
   (with-properties (buffer-id source-id) texture
-    (when (and buffer-id (al:bufferp buffer-id) 
+    (when (and buffer-id (al:bufferp buffer-id)
                source-id (al:sourcep source-id))
       t)))
 
@@ -37,10 +41,15 @@
   ((filepath "res/sample.wav")))
 
 (defreply load-resource ((sound =file-sound=))
-  (with-properties (buffer-id source-id filepath) sound
+  (with-properties (buffer-id source-id position velocity direction source-relative-p filepath)
+      sound
     (setf buffer-id (alut:create-buffer-from-file (namestring (truename filepath))))
     (setf source-id (al:gen-source))
-    (al:source source-id :buffer buffer-id))
+    (al:source source-id :buffer buffer-id)
+    (al:source source-id :position position)
+    (al:source source-id :velocity velocity)
+    (al:source source-id :direction direction)
+    (al:source source-id :source-relative source-relative-p))
   sound)
 
 (defmessage play (sound)

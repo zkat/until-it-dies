@@ -225,6 +225,7 @@ we're done with it."
         (glfw:set-mouse-button-callback (cffi:callback mouse-button-fun))
         (glfw:set-window-size-callback (cffi:callback window-size-fun))
         (glfw:set-window-close-callback (cffi:callback window-close-fun))
+        (setf (runningp engine) t)
         (loop while (= glfw:+true+ (glfw:get-window-param glfw:+opened+))
            do (restartable (idle engine))))))
   engine)

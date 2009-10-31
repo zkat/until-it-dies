@@ -67,6 +67,8 @@
 
 (defmessage sound-state (sound))
 (defreply sound-state ((sound =sound=))
+  "Returns one of: '(:PLAYING :PAUSED :STOPPED :INITIAL). If sound resource is not loaded yet,
+returns NIL."
   (when (loadedp sound)
     (al:get-source (source-id sound) :source-state)))
 

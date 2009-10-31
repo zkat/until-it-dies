@@ -36,6 +36,18 @@
                source-id (al:sourcep source-id))
       t)))
 
+(defreply source-position :after ((sound =sound=))
+  (when (loadedp sound)
+    (al:source (source-id sound) :position (source-position sound))))
+
+(defreply source-velocity :after ((sound =sound=))
+  (when (loadedp sound)
+    (al:source (source-id sound) :velocity (source-velocity sound))))
+
+(defreply source-direction :after ((sound =sound=))
+  (when (loadedp sound)
+    (al:source (source-id sound) :direction (source-direction sound))))
+
 ;;; File sounds
 (defproto =file-sound= (=file-resource= =sound=)
   ((filepath "res/sample.wav")))

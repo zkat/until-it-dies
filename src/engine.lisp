@@ -117,11 +117,11 @@ but it's not a mortal sin to just use it as a singleton."))
   (values))
 
 (defun update-time (engine)
-  (with-properties (last-frame-time) engine
-    (multiple-value-bind (dt now)
+  (with-properties (dt last-frame-time) engine
+    (multiple-value-bind (new-dt now)
         (time-difference last-frame-time)
       (setf last-frame-time now)
-      (setf (dt engine) dt))))
+      (setf dt new-dt))))
 
 (defreply idle ((engine =engine=))
   (let ((color (clear-color engine)))

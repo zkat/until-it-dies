@@ -62,7 +62,7 @@
     (draw *alien*)))
 
 (defreply mouse-move :after ((engine =uid-demo=) x y)
-  (with-properties (alien-x alien-y) *alien*
+  (with-properties ((alien-x x) (alien-y y)) *alien*
     (setf alien-x x alien-y y)))
 
 (defreply mouse-down ((engine =uid-demo=) button)

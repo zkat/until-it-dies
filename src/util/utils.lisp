@@ -52,17 +52,18 @@ Returns both the difference in time and the current-time used in the computation
   (princ (apply #'build-string objects)))
 
 (defun build-string (&rest objects)
+  (declare (list objects))
   (apply #'concatenate 'string
-         (mapcar (lambda (obj)
-                   (cond ((eq :% obj)
-                          (format nil "~%"))
-                         ((and (symbolp obj)
-                               (numberp (read-from-string (symbol-name obj))))
-                          (apply #'concatenate 'string
-                                 (loop for i below (read-from-string (symbol-name obj))
-                                    collect " ")))
-                         (t (format nil "~A" obj))))
-                 objects)))
+         (map 'list (lambda (obj)
+                      (cond ((eq :% obj)
+                             (format nil "~%"))
+                            ((and (symbolp obj)
+                                  (numberp (read-from-string (symbol-name obj))))
+                             (apply #'concatenate 'string
+                                    (loop repeat (read-from-string (symbol-name obj))
+                                       collect " ")))
+                            (t (format nil "~A" obj))))
+              objects)))
 
 ;;;
 ;;; OpengGL utils
@@ -116,7 +117,7 @@ Returns both the difference in time and the current-time used in the computation
 
 (defun translate-key (key)
   (let ((translation (gethash key *key-table*)))
-    (if translation translation key)))
+    (or translation key)))
 
 (defun translate-key-list (keylist)
   (mapcar #'translate-key

@@ -191,24 +191,6 @@ we're done with it."
                   ,@body
                (teardown ,engine-var))))))))
 
-;;; This is used for non-printable characters
-(cffi:defcallback key-hook :void ((key :int) (action :int))
-  (format t "~[~;~&KEY: ~S ~S~%~]" action key (code-char key))
-  (case action
-    (#.glfw:+press+
-     (restartable (key-down *engine* (translate-key key))))
-    (#.glfw:+release+
-     (restartable (key-up *engine* (translate-key key))))))
-
-;;; This is used for printable characters
-(cffi:defcallback char-hook :void ((key :int) (action :int))
-  (format t "~[~;~&UTF: ~S ~S~%~]" action key (code-char key))
-  (case action
-    (#.glfw:+press+
-     (restartable (key-down *engine* (translate-key key))))
-    (#.glfw:+release+
-     (restartable (key-up *engine* (translate-key key))))))
-
 (cffi:defcallback mouse-moved :void ((x :int) (y :int))
   (restartable (mouse-move *engine* x (- (window-height *engine*) y))))
 

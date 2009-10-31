@@ -111,7 +111,7 @@ variable within its scope."))
 ;;; File textures
 ;;;
 (defproto =file-texture= (=file-resource= =texture=)
-  ((filepath "res/lisplogo_alien_256.png"))
+  ((filepath (truename "res/lisplogo_alien_256.png")))
   (:documentation "A file texture is loaded from an image file."))
 
 (defreply load-resource :before ((texture =texture=))
@@ -152,7 +152,7 @@ variable within its scope."))
    (size 12)
    (res 100)
    (loadedp nil)
-   (filepath "/home/zkat/hackery/lisp/until-it-dies/res/example.otf"))
+   (filepath (truename "res/example.otf")))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
 
 (defun create-font (filepath &key (size 12) (res 20))

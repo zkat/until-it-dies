@@ -31,10 +31,10 @@
              (:module resources
                       :serial t
                       :components
-                      (:file "resources")
-                      (:file "textures")
-                      (:file "fonts")
-                      (:file "sounds"))
+                      ((:file "resources")
+                       (:file "textures")
+                       (:file "fonts")
+                       (:file "sounds")))
              (:file "sprite")
              (:file "engine")))))
 

@@ -19,7 +19,7 @@
 (defreply update ((thing =game-object=) dt &rest args &key)
   (apply 'update (content thing) dt args))
 
-;; We use defproto here for conveniance, but keep our *earmuffs*
+;; We use defproto here for convenience, but keep our *earmuffs*
 (defproto *alien* =game-object=
   ((content (create-image (truename "res/lisplogo_alien_256.png")))
    visiblep (x 255) (y 356)))

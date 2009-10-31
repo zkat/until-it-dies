@@ -8,6 +8,26 @@
 (in-package :until-it-dies)
 
 ;;;
+;;; Callbacks for GLFW events
+;;;
+(cffi:defcallback key-hook :void ((key :int) (action :int))
+  "Invokes KEY-DOWN or KEY-UP on the active engine, for control keys."
+  (unless (<= key 255)
+    (restartable
+      (funcall (case action
+                 (#.glfw:+press+ 'key-down)
+                 (#.glfw:+release+ 'key-up))
+               *engine* (translate-control-key key))))) ; TODO: Write this
+
+(cffi:defcallback char-hook :void ((key :int) (action :int))
+  "Invokes KEY-DOWN or KEY-UP on the active engine, for character input."
+  (restartable
+    (funcall (case action
+               (#.glfw:+press+ 'key-down)
+               (#.glfw:+release+ 'key-up))
+             *engine* (code-char key))))
+
+;;;
 ;;; SDL key/mouse constant translation
 ;;;
 (defparameter *all-keys*

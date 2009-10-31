@@ -14,7 +14,7 @@
 ;;; Time
 ;;;
 (defun now ()
-  (/ (get-internal-run-time) internal-time-units-per-second))
+  (/ (get-internal-real-time) internal-time-units-per-second))
 
 (defun time-difference (time-before)
   "Checks the difference between the internal-time provided and the current time.

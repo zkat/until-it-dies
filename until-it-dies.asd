@@ -22,6 +22,7 @@
                        (:file "opengl-hacks")
                        (:file "priority-queue")
                        (:file "utils")))
+             (:file "input")
              (:file "messages")
              (:file "colors")
              (:file "primitives")

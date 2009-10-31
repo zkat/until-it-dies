@@ -32,7 +32,8 @@
                       :serial t
                       :components
                       (:file "resources")
-                      (:file "textures"))
+                      (:file "textures")
+                      (:file "fonts"))
              (:file "sprite")
              (:file "engine")))))
 

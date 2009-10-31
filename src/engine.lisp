@@ -191,6 +191,7 @@ we're done with it."
                   ,@body
                (teardown ,engine-var))))))))
 
+;;; This is used for non-printable characters
 (cffi:defcallback key-hook :void ((key :int) (action :int))
   (case action
     (#.glfw:+press+
@@ -198,6 +199,7 @@ we're done with it."
     (#.glfw:+release+
      (restartable (key-up *engine* (translate-key key))))))
 
+;;; This is used for printable characters
 (cffi:defcallback char-hook :void ((key :int) (action :int))
   (case action
     (#.glfw:+press+

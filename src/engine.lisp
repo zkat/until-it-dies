@@ -15,7 +15,7 @@
    initializedp
    (last-frame-time 0)
    (dt 0)
-   (keys-held-down (make-hash-table :test #'eq))
+   (keys-held-down (make-hash-table))
    (event-queue (object :parents =event-queue=))
    (resource-manager (object :parents =resource-manager=))
    (default-font (object :parents =font=))
@@ -43,7 +43,7 @@ It's a good idea to create a delegate of =engine= for each application being cre
 but it's not a mortal sin to just use it as a singleton."))
 
 (defreply init-object :after ((engine =engine=) &key)
-  (setf (keys-held-down engine) (make-hash-table :test #'eq)))
+  (setf (keys-held-down engine) (make-hash-table)))
 
 (defreply (setf title) :after (new-value (engine =engine=))
   (when (initializedp engine)

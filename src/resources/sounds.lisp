@@ -53,18 +53,30 @@
   sound)
 
 (defmessage play (sound)
+  (:reply :before ((sound =sound=))
+    (unless (loadedp sound)
+      (load-resource sound)))
   (:reply ((sound =sound=))
     (al:source-play (source-id sound))))
 
 (defmessage stop (sound)
+  (:reply :before ((sound =sound=))
+    (unless (loadedp sound)
+      (load-resource sound)))
   (:reply ((sound =sound=))
     (al:source-stop (source-id sound))))
 
 (defmessage pause (sound)
+  (:reply :before ((sound =sound=))
+    (unless (loadedp sound)
+      (load-resource sound)))
   (:reply ((sound =sound=))
     (al:source-pause (source-id sound))))
 
 (defmessage rewind (sound)
+  (:reply :before ((sound =sound=))
+    (unless (loadedp sound)
+      (load-resource sound)))
   (:reply ((sound =sound=))
     (al:source-rewind (source-id sound))))
 

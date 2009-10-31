@@ -74,6 +74,31 @@
    :=resource=
    :=resource-manager=
    :*resource-manager*
+   :=file-resource=
+   :load-resource
+   :unload-resource
+   :loadedp
+
+   ;; textures
+   :=texture=
+   :=file-texture=
+   :bind-texture
+   :unbind-texture
+   :create-texture
+
+   ;; sounds
+   :=sound=
+   :=file-sound=
+   :source-position
+   :source-velocity
+   :source-direction
+   :play
+   :stop
+   :pause
+   :rewind
+
+   ;; fonts
+   :=font=
    :create-font
    :*font*
    :with-font

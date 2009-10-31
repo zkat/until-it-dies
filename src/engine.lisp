@@ -94,7 +94,7 @@ but it's not a mortal sin to just use it as a singleton."))
 
 (defreply key-down ((engine =engine=) key)
   "The 'real' key-down is blank by default."
-  (when (eq key glfw:+key-esc+)
+  (when (eq key :escape)
     (quit))
   (values))
 
@@ -193,7 +193,7 @@ we're done with it."
 
 ;;; This is used for non-printable characters
 (cffi:defcallback key-hook :void ((key :int) (action :int))
-  (format t "~[~;~&KEY: ~S ~S~%~]" action key (code-char key))
+  (format t "~[~;~&KEY: ~S ~S~%~]" action key (translate-key key))
   (case action
     (#.glfw:+press+
      (restartable (key-down *engine* (translate-key key))))

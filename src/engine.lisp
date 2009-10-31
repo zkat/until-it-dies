@@ -4,8 +4,6 @@
 
 ;;;; engine.lisp
 ;;;;
-;;;; TODO - Wrap the sdl input stuff so that the key/modifier/mouseclick constants are
-;;;;        UID symbols instead of stuff like :sdl-key-escape and such.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 

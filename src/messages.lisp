@@ -111,16 +111,16 @@ followed by the main engine loop."))
 ;;;
 ;;; Event messages
 ;;;
-(defmessage key-up (engine key mod-keys)
+(defmessage key-up (engine key)
   (:documentation "Key event for a key being released."))
 
-(defmessage key-down (engine key mod-keys)
+(defmessage key-down (engine key)
   (:documentation "Key event for a key being pressed."))
 
-(defmessage mouse-up (engine button x y)
+(defmessage mouse-up (engine button)
   (:documentation "A mouse button has been released."))
 
-(defmessage mouse-down (engine button x y)
+(defmessage mouse-down (engine button)
   (:documentation "A mouse button has been pressed."))
 
 (defmessage mouse-move (engine x y)

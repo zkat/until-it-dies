@@ -45,6 +45,22 @@ but it's not a mortal sin to just use it as a singleton."))
 (defreply init-object :after ((engine =engine=) &key)
   (setf (keys-held-down engine) (make-hash-table :test #'eq)))
 
+(defreply (setf title) :after (new-value (engine =engine=))
+  (when (initializedp engine)
+    (glfw:set-window-title new-value)))
+
+(defreply (setf window-width) :after (new-value (engine =engine=))
+  (declare (ignore new-value))
+  (when (initializedp engine)
+    (with-properties (window-width window-height) engine
+      (glfw:set-window-size window-width window-height))))
+
+(defreply (setf window-height) :after (new-value (engine =engine=))
+  (declare (ignore new-value))
+  (when (initializedp engine)
+    (with-properties (window-width window-height) engine
+      (glfw:set-window-size window-width window-height))))
+
 (defreply update ((engine =engine=) dt &key)
   (declare (ignore dt))
   (values))
@@ -61,29 +77,29 @@ but it's not a mortal sin to just use it as a singleton."))
 ;;; Key event handling
 
 ;;; TODO - should these also pass input events to all attached screens? Maybe not?
-(defreply key-up :before ((engine =engine=) key mod-keys)
+(defreply key-up :before ((engine =engine=) key)
   "If the key was released, it's no longer pressed!"
-  (declare (ignore mod-keys))
   (with-properties (keys-held-down) engine
     (setf (gethash key keys-held-down) nil)))
 
-(defreply key-up ((engine =engine=) key mod-keys)
+(defreply key-up ((engine =engine=) key)
   "This is the 'real' KEY-UP. Blank by default."
-  (declare (ignore engine key mod-keys))
+  (declare (ignore key))
   (values))
 
-(defreply key-down :before ((engine =engine=) key mod-keys)
+(defreply key-down :before ((engine =engine=) key)
   "If the key was pressed, then it's being held! :D"
-  (declare (ignore mod-keys))
   (with-properties (keys-held-down) engine
     (setf (gethash key keys-held-down) t)))
 
-(defreply key-down ((engine =engine=) key mod-keys)
+(defreply key-down ((engine =engine=) key)
   "The 'real' key-down is blank by default."
-  (declare (ignore engine mod-keys))
   (when (eq key :escape)
-    (sdl:push-quit-event))
+    (quit))
   (values))
+
+(defun quit ()
+  (glfw:close-window))
 
 (defun key-down-p (key)
   "Is KEY being held down?"
@@ -113,7 +129,8 @@ but it's not a mortal sin to just use it as a singleton."))
 ;;; Other events
 (defreply window-resized (engine width height)
   "We don't really care about resize events right now."
-  (declare (ignore engine width height))
+  (setf (window-width engine) width)
+  (setf (window-height engine) height)
   (values))
 
 (defun update-time (engine)
@@ -133,22 +150,13 @@ but it's not a mortal sin to just use it as a singleton."))
   (update-time engine)
   (process-cooked-events engine)
   (update engine (dt engine))
-  (draw engine))
-
-(defreply idle :after ((engine =engine=))
-  (declare (ignore engine))
-  (sdl:update-display))
+  (draw engine)
+  (glfw:swap-buffers))
 
 ;;; Main loop
 (defreply init :before ((engine =engine=))
-  "By default, we take care of setting sdl window options,
-and doing some very initial OpenGL setup."
-  (sdl:window (window-width engine) (window-height engine)
-              :title-caption (title engine)
-              :flags (logior sdl:sdl-opengl))
-  (setf (sdl:frame-rate) 0)
   (setf (last-frame-time engine) 0)
-  (setf cl-opengl-bindings:*gl-get-proc-address* #'sdl-cffi::sdl-gl-get-proc-address)
+  (setf cl-opengl-bindings:*gl-get-proc-address* #'cl-glfw:get-proc-address)
   (setup-ortho-projection (window-width engine) (window-height engine))
   (il:init)
   (ilut:init)
@@ -166,6 +174,7 @@ and doing some very initial OpenGL setup."
   "Once the real teardown stuff is done, we shut down our libs."
   (il:shutdown)
   (alut:exit)
+  (glfw:terminate)
   (setf (initializedp engine) nil))
 
 (defmacro with-engine (engine &body body)
@@ -182,38 +191,40 @@ we're done with it."
                   ,@body
                (teardown ,engine-var))))))))
 
+(cffi:defcallback keyfun :void ((key :int) (action :int))
+  (case action
+    (glfw:+press+
+     (restartable (key-down *engine* (translate-key key))))
+    (glfw:+release+
+     (restartable (key-up *engine* (translate-key key))))))
+
+(cffi:defcallback mouse-pos-fun :void ((x :int) (y :int))
+  (restartable (mouse-move *engine* x (- (window-height *engine*) y))))
+
+(cffi:defcallback mouse-button-fun :void ((button :int) (action :int))
+  (case action
+    (glfw:+press+
+     (restartable (mouse-down *engine* (translate-key button))))
+    (glfw:+release+
+     (restartable (mouse-up *engine* (translate-key button))))))
+
+(cffi:defcallback window-size-fun :void ((width :int) (height :int))
+  (restartable (window-resized *engine* width height)))
+
+(cffi:defcallback window-close-fun :void ()
+  (setf (runningp *engine*) nil))
+
 (defreply run ((engine =engine=))
-  "Here's the main loop -- because of the way lb-sdl is set up,
-we handle all input right here. We also bind the engine parameter
-to *engine*, which might make things a little easier later on."
-  (sdl:with-init ()
-    (with-engine engine
-      (sdl:with-events ()
-        (:quit-event
-         ()
-         (prog1 t
-           (setf (runningp engine) nil)))
-        (:video-resize-event
-         (:w width :h height)
-         (restartable (window-resized engine width height)))
-        (:key-down-event
-         (:key key :mod-key mod-keys)
-         (restartable (key-down engine (translate-key key) (translate-key-list mod-keys))))
-        (:key-up-event
-         (:key key :mod-key mod-keys)
-         (restartable (key-up engine (translate-key key) (translate-key-list mod-keys))))
-        (:mouse-button-up-event
-         (:button button :x x :y y)
-         (restartable (mouse-up engine (translate-key button) x y)))
-        (:mouse-button-down-event
-         (:button button :x x :y y)
-         (restartable (mouse-down engine (translate-key button) x y)))
-        (:mouse-motion-event
-         (:x x :y y)
-         (restartable (mouse-move engine x (- (window-height engine) y))))
-        (:idle
-         ()
-         (restartable (idle engine))))
-      ;; We return the engine after everything's done.
-      ;; It might be handy for inspection.
-      engine)))
+  (glfw:with-init
+    (glfw:open-window-hint glfw:+window-no-resize+ glfw:+true+)
+    (glfw:with-open-window ((title engine) (window-width engine) (window-height engine))
+      (with-engine engine
+        (glfw:set-key-callback (cffi:callback keyfun))
+        (glfw:set-char-callback (cffi:callback keyfun))
+        (glfw:set-mouse-pos-callback (cffi:callback mouse-pos-fun))
+        (glfw:set-mouse-button-callback (cffi:callback mouse-button-fun))
+        (glfw:set-window-size-callback (cffi:callback window-size-fun))
+        (glfw:set-window-close-callback (cffi:callback window-close-fun))
+        (loop while (= glfw:+true+ (glfw:get-window-param glfw:+opened+))
+           do (restartable (idle engine))))))
+  engine)

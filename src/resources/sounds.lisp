@@ -65,6 +65,11 @@
     (al:source source-id :source-relative source-relative-p))
   sound)
 
+(defmessage sound-state (sound))
+(defreply sound-state ((sound =sound=))
+  (when (loadedp sound)
+    (al:get-source (source-id sound) :source-state)))
+
 (defmessage play (sound))
 (defreply play :before ((sound =sound=))
   (unless (loadedp sound)

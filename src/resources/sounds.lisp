@@ -11,7 +11,7 @@
 ;;; Sound
 ;;;
 ;; TODO - check for errors when loading/unloading/playing
-(defproto =sound= =resource=
+(defproto =sound= (=resource=)
   ((buffer-id nil)
    (source-id nil)
    (source-position '(0 0 0))
@@ -28,10 +28,10 @@
   (al:delete-source (source-id sound))
   (al:delete-buffer (buffer-id sound))
   (setf (buffer-id sound) nil
-        (source-id sound nil)))
+        (source-id sound) nil))
 
 (defreply loadedp ((sound =sound=))
-  (with-properties (buffer-id source-id) texture
+  (with-properties (buffer-id source-id) sound
     (when (and buffer-id (al:bufferp buffer-id)
                source-id (al:sourcep source-id))
       t)))

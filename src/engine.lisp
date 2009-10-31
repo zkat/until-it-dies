@@ -192,21 +192,21 @@ we're done with it."
                (teardown ,engine-var))))))))
 
 (cffi:defcallback keyfun :void ((key :int) (action :int))
-  (cond ((= action glfw:+press+)
-         (restartable (key-down *engine* (translate-key key))))
-        ((= action glfw:+release+)
-         (restartable (key-up *engine* (translate-key key))))
-        (t (error "keyfun failed"))))
+  (case action
+    (#.glfw:+press+
+     (restartable (key-down *engine* (translate-key key))))
+    (#.glfw:+release+
+     (restartable (key-up *engine* (translate-key key))))))
 
 (cffi:defcallback mouse-pos-fun :void ((x :int) (y :int))
   (restartable (mouse-move *engine* x (- (window-height *engine*) y))))
 
 (cffi:defcallback mouse-button-fun :void ((button :int) (action :int))
-  (cond ((= action glfw:+press+)
-         (restartable (mouse-down *engine* (translate-key button))))
-        ((= action glfw:+release+)
-         (restartable (mouse-up *engine* (translate-key button))))
-        (t (error "mouse-button-fun failed"))))
+  (case action
+    (#.glfw:+press+
+     (restartable (mouse-down *engine* (translate-key button))))
+    (#.glfw:+release+
+     (restartable (mouse-up *engine* (translate-key button))))))
 
 (cffi:defcallback window-size-fun :void ((width :int) (height :int))
   (restartable (window-resized *engine* width height)))

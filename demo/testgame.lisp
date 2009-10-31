@@ -24,6 +24,9 @@
   ((content (create-image (truename "res/lisplogo_alien_256.png")))
    visiblep (x 255) (y 356)))
 
+(defproto *nay* =file-sound=
+  ((filepath "res/sample.wav")))
+
 (defreply draw :around ((thing *alien*) &key)
   (with-properties (visiblep) thing
     (when visiblep (call-next-reply))))
@@ -66,4 +69,5 @@
 (defreply mouse-down ((engine =uid-demo=) button)
   (with-properties ((alien-x x) (alien-y y) visiblep) *alien*
     (case button
-      (0 (setf visiblep (not visiblep))))))
+      (0 (setf visiblep (not visiblep)))
+      (1 (play *nay*)))))

@@ -14,9 +14,9 @@
 (defproto =sound= =resource=
   ((buffer-id nil)
    (source-id nil)
-   (position '(0 0 0))
-   (velocity '(0 0 0))
-   (direction '(0 0 0))
+   (source-position '(0 0 0))
+   (source-velocity '(0 0 0))
+   (source-direction '(0 0 0))
    (source-relative-p t)))
 
 (defreply load-resource :before ((sound =sound=))
@@ -41,14 +41,15 @@
   ((filepath "res/sample.wav")))
 
 (defreply load-resource ((sound =file-sound=))
-  (with-properties (buffer-id source-id position velocity direction source-relative-p filepath)
+  (with-properties (buffer-id source-id source-position source-velocity
+                    source-direction source-relative-p filepath)
       sound
     (setf buffer-id (alut:create-buffer-from-file (namestring (truename filepath))))
     (setf source-id (al:gen-source))
     (al:source source-id :buffer buffer-id)
-    (al:source source-id :position position)
-    (al:source source-id :velocity velocity)
-    (al:source source-id :direction direction)
+    (al:source source-id :position source-position)
+    (al:source source-id :velocity source-velocity)
+    (al:source source-id :direction source-direction)
     (al:source source-id :source-relative source-relative-p))
   sound)
 

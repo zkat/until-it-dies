@@ -92,6 +92,7 @@
    :source-position
    :source-velocity
    :source-direction
+   :sound-state
    :play
    :stop
    :pause

@@ -61,11 +61,14 @@
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (draw *alien*)))
 
+(defreply mouse-move :after ((engine =uid-demo=) x y)
+  (with-properties (alien-x alien-y) *alien*
+    (setf alien-x x alien-y y)))
+
 (defreply mouse-down ((engine =uid-demo=) button)
-  (format t "Mouse pressed: ~A~%" button)
   (with-properties ((alien-x x) (alien-y y) visiblep) *alien*
     (case button
-      (1 (setf visiblep t
+      (0 (setf visiblep t
                alien-x (mouse-x engine)
-               alien-y (- (window-height engine) (mouse-y engine))))
-      (3 (setf visiblep (not visiblep))))))
+               alien-y (mouse-y engine)))
+      (1 (setf visiblep (not visiblep))))))

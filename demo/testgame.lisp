@@ -53,7 +53,7 @@
 (defreply draw ((engine =uid-demo=) &key)
   (let ((scale-factor 4))
     (with-color *green*
-      (dotimes (i 10000)
+      (dotimes (i 1000)
         (draw-point (make-point :x (random 600)
                                 :y (random 600)
                                 :z 0))))
@@ -68,7 +68,4 @@
 (defreply mouse-down ((engine =uid-demo=) button)
   (with-properties ((alien-x x) (alien-y y) visiblep) *alien*
     (case button
-      (0 (setf visiblep t
-               alien-x (mouse-x engine)
-               alien-y (mouse-y engine)))
-      (1 (setf visiblep (not visiblep))))))
+      (0 (setf visiblep (not visiblep))))))

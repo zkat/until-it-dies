@@ -28,7 +28,10 @@
              (:file "primitives")
              (:file "config")
              (:file "event")
-             (:file "resources")
+             (:module resources
+                      :serial t
+                      :components
+                      (:file "resources"))
              (:file "sprite")
              (:file "engine")))))
 

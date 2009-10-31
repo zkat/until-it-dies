@@ -31,7 +31,8 @@
              (:module resources
                       :serial t
                       :components
-                      (:file "resources"))
+                      (:file "resources")
+                      (:file "textures"))
              (:file "sprite")
              (:file "engine")))))
 

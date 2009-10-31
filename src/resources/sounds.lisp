@@ -17,7 +17,7 @@
    (source-position '(0 0 0))
    (source-velocity '(0 0 0))
    (source-direction '(0 0 0))
-   (source-relative-p t)))
+   (source-relative-p nil)))
 
 (defreply load-resource :before ((sound =sound=))
   (when (or (buffer-id sound)

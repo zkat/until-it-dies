@@ -4,6 +4,14 @@
   (:nicknames #:uid)
   (:use #:cl #:sheeple #:trivial-garbage)
   (:export
+
+   ;; time
+   :now
+   :time-difference
+   ;; text
+   :out
+   :build-string
+
    ;; core
    :init
    :teardown

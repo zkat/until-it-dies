@@ -191,27 +191,34 @@ we're done with it."
                   ,@body
                (teardown ,engine-var))))))))
 
-(cffi:defcallback keyfun :void ((key :int) (action :int))
+(cffi:defcallback key-hook :void ((key :int) (action :int))
   (case action
     (#.glfw:+press+
      (restartable (key-down *engine* (translate-key key))))
     (#.glfw:+release+
      (restartable (key-up *engine* (translate-key key))))))
 
-(cffi:defcallback mouse-pos-fun :void ((x :int) (y :int))
+(cffi:defcallback char-hook :void ((key :int) (action :int))
+  (case action
+    (#.glfw:+press+
+     (restartable (key-down *engine* (translate-key key))))
+    (#.glfw:+release+
+     (restartable (key-up *engine* (translate-key key))))))
+
+(cffi:defcallback mouse-moved :void ((x :int) (y :int))
   (restartable (mouse-move *engine* x (- (window-height *engine*) y))))
 
-(cffi:defcallback mouse-button-fun :void ((button :int) (action :int))
+(cffi:defcallback mouse-button-hook :void ((button :int) (action :int))
   (case action
     (#.glfw:+press+
      (restartable (mouse-down *engine* (translate-key button))))
     (#.glfw:+release+
      (restartable (mouse-up *engine* (translate-key button))))))
 
-(cffi:defcallback window-size-fun :void ((width :int) (height :int))
+(cffi:defcallback window-resized :void ((width :int) (height :int))
   (restartable (window-resized *engine* width height)))
 
-(cffi:defcallback window-close-fun :void ()
+(cffi:defcallback window-closed :void ()
   (setf (runningp *engine*) nil))
 
 (defreply run ((engine =engine=))
@@ -219,12 +226,12 @@ we're done with it."
     (glfw:open-window-hint glfw:+window-no-resize+ glfw:+true+)
     (glfw:with-open-window ((title engine) (window-width engine) (window-height engine))
       (with-engine engine
-        (glfw:set-key-callback (cffi:callback keyfun))
-        (glfw:set-char-callback (cffi:callback keyfun))
-        (glfw:set-mouse-pos-callback (cffi:callback mouse-pos-fun))
-        (glfw:set-mouse-button-callback (cffi:callback mouse-button-fun))
-        (glfw:set-window-size-callback (cffi:callback window-size-fun))
-        (glfw:set-window-close-callback (cffi:callback window-close-fun))
+        (glfw:set-key-callback (cffi:callback key-hook))
+        (glfw:set-char-callback (cffi:callback char-hook))
+        (glfw:set-mouse-pos-callback (cffi:callback mouse-moved))
+        (glfw:set-mouse-button-callback (cffi:callback mouse-button-hook))
+        (glfw:set-window-size-callback (cffi:callback window-resized))
+        (glfw:set-window-close-callback (cffi:callback window-closed))
         (setf (runningp engine) t)
         (loop while (= glfw:+true+ (glfw:get-window-param glfw:+opened+))
            do (restartable (idle engine))))))

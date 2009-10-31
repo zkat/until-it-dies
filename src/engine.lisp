@@ -25,14 +25,7 @@
    (mouse-y 0)
    (window-width 400)
    (window-height 400)
-   (title "Until It Dies application")
-   ;; fps calculation
-   (fps 0)
-   fps-limit                            ; only used during init time
-   (fps-check-delay 100)
-   (last-fps-check-time 0)
-   (last-fps-check-frame-count 0)
-   (frame-count 0))
+   (title "Until It Dies application"))
   (:documentation
    "Engines are objects that contain information about
 -how- to run an application.
@@ -124,22 +117,11 @@ but it's not a mortal sin to just use it as a singleton."))
   (values))
 
 (defun update-time (engine)
-  (with-properties (frame-count last-frame-time) engine
-    (incf frame-count)
+  (with-properties (last-frame-time) engine
     (multiple-value-bind (dt now)
         (time-difference last-frame-time)
       (setf last-frame-time now)
-      (setf (dt engine) dt)
-      ;;    Update the current framerate for ENGINE
-      (with-properties (last-fps-check-time last-fps-check-frame-count fps-check-delay fps frame-count)
-          engine
-        (when (>= now (+ last-fps-check-time dt))
-          (let ((frames (- frame-count last-fps-check-frame-count))
-                (seconds dt))
-            (setf fps (float (if (zerop dt)
-                                 0 (/ frames seconds))))
-            (setf last-fps-check-time now)
-            (setf last-fps-check-frame-count frame-count)))))))
+      (setf (dt engine) dt))))
 
 (defreply idle ((engine =engine=))
   (let ((color (clear-color engine)))
@@ -165,7 +147,6 @@ and doing some very initial OpenGL setup."
               :title-caption (title engine)
               :flags (logior sdl:sdl-opengl))
   (setf (sdl:frame-rate) 0)
-  (setf (frame-count engine) 0)
   (setf (last-frame-time engine) 0)
   (setf cl-opengl-bindings:*gl-get-proc-address* #'sdl-cffi::sdl-gl-get-proc-address)
   (setup-ortho-projection (window-width engine) (window-height engine))

@@ -59,7 +59,6 @@
         (draw-point (make-point :x (random 600)
                                 :y (random 600)
                                 :z 0))))
-    (draw (format nil "~A" (fps engine)) :x 10 :y 10)
     (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor)
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (draw *alien*)))

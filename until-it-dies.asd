@@ -33,7 +33,8 @@
                       :components
                       (:file "resources")
                       (:file "textures")
-                      (:file "fonts"))
+                      (:file "fonts")
+                      (:file "sounds"))
              (:file "sprite")
              (:file "engine")))))
 

@@ -19,20 +19,18 @@
 (defreply update ((thing =game-object=) dt &rest args &key)
   (apply 'update (content thing) dt args))
 
-(defvar *alien*
-  (defobject =game-object=
-      ((content (create-image (truename "res/lisplogo_alien_256.png")))
-       visiblep (x 255) (y 356))))
+;; We use defproto here for conveniance, but keep our *earmuffs*
+(defproto *alien* =game-object=
+  ((content (create-image (truename "res/lisplogo_alien_256.png")))
+   visiblep (x 255) (y 356)))
 
 (defreply draw :around ((thing *alien*) &key)
   (with-properties (visiblep) thing
     (when visiblep (call-next-reply))))
 
-(defvar *anim*
-  (defobject =game-object=
-      ((content (create-animation (truename "res/explosion.png")
-                                  15 14 0.05 14))
-       (speed 300) (x 50) (y 50))))
+(defproto *anim* =game-object=
+  ((content (create-animation (truename "res/explosion.png") 15 14 0.05 14))
+   (speed 300) (x 50) (y 50)))
 
 (defreply update ((engine =uid-demo=) dt &key)
   (update *anim* dt)

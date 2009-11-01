@@ -2,6 +2,12 @@
 
 (in-package :until-it-dies)
 
+(defmacro fun (&body body)
+  "This macro puts the FUN back in LAMBDA"
+  `(lambda (&optional _)
+     (declare (ignorable _))
+     ,@body))
+
 ;;;
 ;;; Pathnames
 ;;;

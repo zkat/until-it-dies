@@ -94,7 +94,7 @@ but it's not a mortal sin to just use it as a singleton."))
 
 (defreply key-down ((engine =engine=) key)
   "The 'real' key-down is blank by default."
-  (when (eq key glfw:+key-esc+)
+  (when (eq key :escape)
     (quit))
   (values))
 

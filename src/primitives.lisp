@@ -9,14 +9,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
-(defun make-point (&key (x 0) (y 0) (z 0))
-  "For efficiency, points are vectors using the format #(x y z)"
-  (vector x y z))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+ (deftype point ()
+   '(vector real 3))
+
+ (defun make-point (x y &optional (z 0))
+   (vector x y z))
+
+ (defun point-x (point)
+   (svref point 0))
+ (defun point-y (point)
+   (svref point 1))
+ (defun point-z (point)
+   (svref point 2)))
 
 (defun set-point (point)
-  (gl:vertex (aref point 0)
-             (aref point 1)
-             (aref point 2)))
+  (gl:vertex (point-x point) (point-y point) (point-z point)))
 
 (defun draw-rectangle (x y width height &key (z 0) (u1 0) (v1 0) (u2 1) (v2 1) color)
   (when color
@@ -43,9 +51,9 @@
   (when color
     (bind-color color))
   (gl:with-primitives :triangles
-    (mapc (lambda (point)
-            (set-point point))
-          (list p1 p2 p3)))
+    (set-point p1)
+    (set-point p2)
+    (set-point p3))
   (when color
     (bind-color *color*)))
 
@@ -53,9 +61,10 @@
   (when color
     (bind-color color))
   (gl:with-primitives :quads
-    (mapc (lambda (point)
-            (set-point point))
-          (list p1 p2 p3 p4)))
+    (set-point p1)
+    (set-point p2)
+    (set-point p3)
+    (set-point p4))
   (when color
     (bind-color *color*)))
 
@@ -71,18 +80,15 @@
   (when color
     (bind-color color))
   (gl:with-primitives :lines
-    (mapc (lambda (point)
-            (set-point point))
-          (list p1 p2)))
+    (set-point p1)
+    (set-point p2))
   (when color
     (bind-color *color*)))
 
-(defun draw-polygon (points-list &key color)
+(defun draw-polygon (points &key color)
   (when color
     (bind-color color))
   (gl:with-primitives :polygon
-    (mapc (lambda (point)
-            (set-point point))
-          points-list))
+    (map nil 'set-point points))
   (when color
     (bind-color *color*)))

@@ -64,6 +64,7 @@
    :*brown*
    :make-point
    :draw-rectangle
+   :draw-circle
    :draw-triangle
    :draw-quad
    :draw-point

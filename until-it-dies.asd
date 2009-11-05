@@ -1,5 +1,11 @@
 ;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
 
+(cl:defpackage until-it-dies.resource-info
+  (:export :*resource-directory*))
+
+(cl:defvar until-it-dies.resource-info:*resource-directory*
+  (print (merge-pathnames "res/" *load-truename*)))
+
 (asdf:defsystem until-it-dies
   :version "0.1 (unreleased)"
   :description "Until It Dies -- A 2D Game Engine."

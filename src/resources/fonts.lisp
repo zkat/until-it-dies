@@ -15,7 +15,7 @@
    (size 12)
    (res 100)
    (loadedp nil)
-   (filepath (truename "res/example.otf")))
+   (filepath (merge-pathnames "example.otf" *resource-directory*)))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
 
 (defun create-font (filepath &key (size 12) (res 20))

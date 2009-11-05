@@ -50,7 +50,7 @@
 
 ;;; File sounds
 (defproto =file-sound= (=file-resource= =sound=)
-  ((filepath "res/sample.wav")))
+  ((filepath (merge-pathnames "sample.wav" *resource-directory*))))
 
 (defreply load-resource ((sound =file-sound=))
   (with-properties (buffer-id source-id source-position source-velocity

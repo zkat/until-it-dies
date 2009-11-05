@@ -42,7 +42,7 @@ facilities for drawing textured onto components."))
 ;;; Image prototype
 ;;;
 (defproto =image= (=textured=)
-  ((texture (create-texture (truename "res/lisplogo_alien_256.png"))))
+  ((texture (create-texture (merge-pathnames "lisplogo_alien_256.png" *resource-directory*))))
   (:documentation
    "Images are textured components that
 are initialized to be the same size as the
@@ -80,7 +80,7 @@ texture they are drawn with."))
                         :v2 (elt tex-coords 3))))))
 
 (defproto =animation= (=image=)
-  ((texture (create-texture (truename "res/explosion.png")))
+  ((texture (create-texture (merge-pathnames "explosion.png" *resource-directory*)))
    (current-frame 0)
    (num-frames 14)
    (frame-delay 50)

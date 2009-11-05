@@ -50,13 +50,11 @@
 (defun draw-circle (center radius &key (resolution 100) color (filledp t))
   (when color
     (bind-color color))
-  (gl:disable :texture-2d)
   (gl:with-primitives (if filledp :triangle-fan :line-loop)
     (loop for i below resolution
        for angle = (* i 2 pi 1/100)
        do (gl:vertex (+ (point-x center) (* radius (cos angle)))
-                     (+ (point-y center) (* radius (sin angle))))))
-  (gl:enable :texture-2d))
+                     (+ (point-y center) (* radius (sin angle)))))))
 
 (defun draw-triangle (p1 p2 p3 &key color)
   (when color

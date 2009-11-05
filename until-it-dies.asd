@@ -18,8 +18,7 @@
              (:module util
                       :serial t
                       :components
-                      ((:file "trivial-garbage")
-                       (:file "opengl-hacks")
+                      ((:file "opengl-hacks")
                        (:file "priority-queue")
                        (:file "utils")))
              (:file "input")

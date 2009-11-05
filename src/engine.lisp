@@ -197,9 +197,9 @@ we're done with it."
 (cffi:defcallback mouse-button-hook :void ((button :int) (action :int))
   (case action
     (#.glfw:+press+
-     (restartable (mouse-down *engine* (translate-key button))))
+     (restartable (mouse-down *engine* button)))
     (#.glfw:+release+
-     (restartable (mouse-up *engine* (translate-key button))))))
+     (restartable (mouse-up *engine* button)))))
 
 (cffi:defcallback window-resized :void ((width :int) (height :int))
   (restartable (window-resized *engine* width height)))

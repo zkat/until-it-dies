@@ -63,6 +63,9 @@
    :*orange*
    :*brown*
    :make-point
+   :point-x
+   :point-y
+   :point-z
    :draw-rectangle
    :draw-circle
    :draw-triangle

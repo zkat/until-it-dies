@@ -47,13 +47,14 @@
   (when color
     (bind-color *color*)))
 
-(defun draw-circle (center radius &key color (filledp t))
+(defun draw-circle (center radius &key (resolution 20) color (filledp t))
   (when color
     (bind-color color))
   (gl:with-primitives (if filledp :triangle-fan :line-loop)
-    (loop for angle from 0 to 360 by 5
-       do (gl:vertex (+ (point-x center) (* radius (cos angle)))
-                     (+ (point-y center) (* radius (sin angle)))))))
+    (loop for angle from 0 to 360 by resolution
+       for radian = (degrees->radians angle)
+       do (gl:vertex (+ (point-x center) (* radius (cos radian)))
+                     (+ (point-y center) (* radius (sin radian)))))))
 
 (defun draw-triangle (p1 p2 p3 &key color)
   (when color

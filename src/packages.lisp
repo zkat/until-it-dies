@@ -2,7 +2,7 @@
 
 (defpackage #:until-it-dies
   (:nicknames #:uid)
-  (:use #:cl #:sheeple #:trivial-garbage #:until-it-dies.resource-info)
+  (:use #:cl #:sheeple #:until-it-dies.resource-info)
   (:export
 
    ;; time

@@ -1,5 +1,6 @@
 (defpackage uid-ftgl
-  (:use :cl :cffi))
+  (:use :cl :cffi)
+  (:export :destroy-font :set-font-face-size :render-font :create-texture-font))
 (in-package :uid-ftgl)
 
 (define-foreign-library ftgl

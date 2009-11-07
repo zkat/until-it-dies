@@ -17,7 +17,7 @@
                      including opengl-graphics, and Sheeple as an object system."
   :serial t
   :components
-  ((:module src
+  ((:module "src"
             :components
             ((:file "packages")
              (:module "util" :depends-on ("packages")
@@ -30,7 +30,6 @@
              (:file "messages" :depends-on ("util"))
              (:file "colors" :depends-on ("util"))
              (:file "primitives" :depends-on ("util"))
-             (:file "config") ; This will probably go soon
              (:file "event" :depends-on ("messages"))
              (:module "resources" :depends-on ("util" "messages")
                       :components

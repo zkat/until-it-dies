@@ -21,6 +21,7 @@
    (default-font (object :parents =font=))
    (clear-color (make-color :r 0 :g 0 :b 0 :a 0))
    pausedp
+   resizablep
    (mouse-x 0)
    (mouse-y 0)
    (window-width 400)
@@ -215,7 +216,8 @@ we're done with it."
 ;;;
 (defreply run ((engine =engine=))
   (uid-glfw:with-init
-    (uid-glfw:open-window-hint uid-glfw:+window-no-resize+ uid-glfw:+true+)
+    (unless (resizablep engine)
+      (uid-glfw:open-window-hint uid-glfw:+window-no-resize+ uid-glfw:+true+))
     (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine))
       (with-engine engine
         (uid-glfw:set-key-callback (cffi:callback key-hook))

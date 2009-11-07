@@ -71,3 +71,6 @@
     (case button
       (0 (setf visiblep (not visiblep)))
       (1 (play *nay*)))))
+
+(defun run-demo ()
+  (run =uid-demo=))

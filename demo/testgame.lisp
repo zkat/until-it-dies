@@ -1,5 +1,6 @@
 (defpackage #:uid-demo
-  (:use :cl :sheeple :until-it-dies))
+  (:use :cl :sheeple :until-it-dies)
+  (:shadow :speed))
 (in-package :uid-demo)
 
 (defproto =uid-demo= (=engine=)

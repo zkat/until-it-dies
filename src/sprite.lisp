@@ -14,6 +14,9 @@
 (defproto =sprite= ()
   ())
 
+(defun draw-at (x y obj &rest all-keys)
+  (apply #'draw obj :x x :y y all-keys))
+
 ;;;
 ;;; Textured prototype
 ;;;

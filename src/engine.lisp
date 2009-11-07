@@ -47,19 +47,19 @@ but it's not a mortal sin to just use it as a singleton."))
 
 (defreply (setf title) :after (new-value (engine =engine=))
   (when (initializedp engine)
-    (glfw:set-window-title new-value)))
+    (uid-glfw:set-window-title new-value)))
 
 (defreply (setf window-width) :after (new-value (engine =engine=))
   (declare (ignore new-value))
   (when (initializedp engine)
     (with-properties (window-width window-height) engine
-      (glfw:set-window-size window-width window-height))))
+      (uid-glfw:set-window-size window-width window-height))))
 
 (defreply (setf window-height) :after (new-value (engine =engine=))
   (declare (ignore new-value))
   (when (initializedp engine)
     (with-properties (window-width window-height) engine
-      (glfw:set-window-size window-width window-height))))
+      (uid-glfw:set-window-size window-width window-height))))
 
 (defreply update ((engine =engine=) dt &key)
   (declare (ignore dt))
@@ -99,7 +99,7 @@ but it's not a mortal sin to just use it as a singleton."))
   (values))
 
 (defun quit ()
-  (glfw:close-window))
+  (uid-glfw:close-window))
 
 (defun key-down-p (key)
   "Is KEY being held down?"
@@ -151,12 +151,12 @@ but it's not a mortal sin to just use it as a singleton."))
   (process-cooked-events engine)
   (update engine (dt engine))
   (draw engine)
-  (glfw:swap-buffers))
+  (uid-glfw:swap-buffers))
 
 ;;; Main loop
 (defreply init :before ((engine =engine=))
   (setf (last-frame-time engine) 0)
-  (setf cl-opengl-bindings:*gl-get-proc-address* #'cl-glfw:get-proc-address)
+  (setf cl-opengl-bindings:*gl-get-proc-address* #'uid-glfw:get-proc-address)
   (setup-ortho-projection (window-width engine) (window-height engine))
   (uid-il:init)
   (uid-ilut:init)
@@ -174,7 +174,7 @@ but it's not a mortal sin to just use it as a singleton."))
   "Once the real teardown stuff is done, we shut down our libs."
   (uid-il:shutdown)
   (alut:exit)
-  (glfw:terminate)
+  (uid-glfw:terminate)
   (setf (initializedp engine) nil))
 
 (defmacro with-engine (engine &body body)
@@ -199,16 +199,16 @@ we're done with it."
   (unless (<= key 255)
     (continuable
       (funcall (case action
-                 (#.glfw:+press+ 'key-down)
-                 (#.glfw:+release+ 'key-up))
+                 (#.uid-glfw:+press+ 'key-down)
+                 (#.uid-glfw:+release+ 'key-up))
                *engine* (translate-glfw-control-key key)))))
 
 (cffi:defcallback char-hook :void ((key :int) (action :int))
   "Invokes KEY-DOWN or KEY-UP on the active engine, for character input."
   (continuable
     (funcall (case action
-               (#.glfw:+press+ 'key-down)
-               (#.glfw:+release+ 'key-up))
+               (#.uid-glfw:+press+ 'key-down)
+               (#.uid-glfw:+release+ 'key-up))
              *engine* (code-char key))))
 
 (cffi:defcallback mouse-moved :void ((x :int) (y :int))
@@ -216,9 +216,9 @@ we're done with it."
 
 (cffi:defcallback mouse-button-hook :void ((button :int) (action :int))
   (case action
-    (#.glfw:+press+
+    (#.uid-glfw:+press+
      (continuable (mouse-down *engine* button)))
-    (#.glfw:+release+
+    (#.uid-glfw:+release+
      (continuable (mouse-up *engine* button)))))
 
 (cffi:defcallback window-resized :void ((width :int) (height :int))
@@ -228,17 +228,17 @@ we're done with it."
   (setf (runningp *engine*) nil))
 
 (defreply run ((engine =engine=))
-  (glfw:with-init
-    (glfw:open-window-hint glfw:+window-no-resize+ glfw:+true+)
-    (glfw:with-open-window ((title engine) (window-width engine) (window-height engine))
+  (uid-glfw:with-init
+    (uid-glfw:open-window-hint uid-glfw:+window-no-resize+ uid-glfw:+true+)
+    (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine))
       (with-engine engine
-        (glfw:set-key-callback (cffi:callback key-hook))
-        (glfw:set-char-callback (cffi:callback char-hook))
-        (glfw:set-mouse-pos-callback (cffi:callback mouse-moved))
-        (glfw:set-mouse-button-callback (cffi:callback mouse-button-hook))
-        (glfw:set-window-size-callback (cffi:callback window-resized))
-        (glfw:set-window-close-callback (cffi:callback window-closed))
+        (uid-glfw:set-key-callback (cffi:callback key-hook))
+        (uid-glfw:set-char-callback (cffi:callback char-hook))
+        (uid-glfw:set-mouse-pos-callback (cffi:callback mouse-moved))
+        (uid-glfw:set-mouse-button-callback (cffi:callback mouse-button-hook))
+        (uid-glfw:set-window-size-callback (cffi:callback window-resized))
+        (uid-glfw:set-window-close-callback (cffi:callback window-closed))
         (setf (runningp engine) t)
-        (loop while (= glfw:+true+ (glfw:get-window-param glfw:+opened+))
+        (loop while (= uid-glfw:+true+ (uid-glfw:get-window-param uid-glfw:+opened+))
            do (continuable (idle engine))))))
   engine)

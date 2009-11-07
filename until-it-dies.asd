@@ -12,16 +12,19 @@
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "BSD-style"
-  :depends-on (sheeple cl-opengl cl-openal cl-glfw)
+  :depends-on (sheeple cl-opengl cl-openal)
   :long-description "Until It Dies is based on the code developed in Yashmup, with some improvements,
                      including opengl-graphics, and Sheeple as an object system."
   :serial t
   :components
-  ((:module src :components
+  ((:module src
+            :components
             ((:file "packages")
-             (:module "util" :depends-on ("packages") :components
+             (:module "util" :depends-on ("packages")
+                      :components
                       ((:file "opengl-hacks")
                        (:file "priority-queue")
+                       (:file "glfw")
                        (:file "utils")))
              (:file "input" :depends-on ("util"))
              (:file "messages" :depends-on ("util"))
@@ -29,7 +32,8 @@
              (:file "primitives" :depends-on ("util"))
              (:file "config") ; This will probably go soon
              (:file "event" :depends-on ("messages"))
-             (:module "resources" :depends-on ("util" "messages") :components
+             (:module "resources" :depends-on ("util" "messages")
+                      :components
                       ((:file "finalizers")
                        (:file "resources" :depends-on ("finalizers"))
                        (:file "devil")
@@ -38,7 +42,7 @@
                        (:file "fonts" :depends-on ("ftgl" "resources"))
                        (:file "sounds" :depends-on ("resources"))))
              (:file "sprite" :depends-on ("messages" "resources"))
-             (:file "engine" :depends-on ("event" "sprite"))))))
+             (:file "engine" :depends-on ("event" "sprite" "util"))))))
 
 (asdf:defsystem until-it-dies.examples
   :version "0.1 (unreleased)"

@@ -7,6 +7,7 @@
 
 (defproto =uid-demo= (=engine=)
   ((title "UID Demo")
+   (resizablep nil)
    (window-width 600)
    (window-height 600)))
 
@@ -58,11 +59,11 @@
 
 (defreply draw ((engine =uid-demo=) &key)
   (let ((scale-factor 4))
-    (with-color *green*
+    (with-color (mix-colors *white* *black* *blue* *green*)
       (dotimes (i 1000)
         (draw-point (make-point (random 600) (random 600)))))
     (with-font *our-font*
-      (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor))
+      (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor :rotation 0))
     (draw-circle (make-point 100 100) 50)
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (draw *alien*)))

@@ -57,6 +57,7 @@
       (dotimes (i 1000)
         (draw-point (make-point (random 600) (random 600)))))
     (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor)
+    (draw-circle (make-point 100 100) 50)
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (draw *alien*)))
 

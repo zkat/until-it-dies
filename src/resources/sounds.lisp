@@ -65,6 +65,9 @@
     (al:source source-id :source-relative source-relative-p))
   sound)
 
+(defun create-sound (filepath)
+  (defobject =file-sound= ((filepath filepath))))
+
 (defmessage sound-state (sound))
 (defreply sound-state ((sound =sound=))
   "Returns one of: '(:PLAYING :PAUSED :STOPPED :INITIAL). If sound resource is not loaded yet,

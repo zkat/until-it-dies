@@ -26,8 +26,7 @@
   ((content (create-image (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
    visiblep (x 255) (y 356)))
 
-(defproto *nay* =file-sound=
-  ((filepath (merge-pathnames "sample.wav" *resource-directory*))))
+(defparameter *nay* (create-sound (merge-pathnames "sample.wav" *resource-directory*)))
 
 (defreply draw :around ((thing *alien*) &key)
   (with-properties (visiblep) thing

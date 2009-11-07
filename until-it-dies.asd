@@ -26,9 +26,6 @@
                       :components
                       ((:file "opengl-hacks")
                        (:file "priority-queue")
-                       (:file "devil")
-                       (:file "ftgl")
-                       (:file "finalizer")
                        (:file "utils")))
              (:file "input")
              (:file "messages")
@@ -39,8 +36,11 @@
              (:module resources
                       :serial t
                       :components
-                      ((:file "resources")
+                      ((:file "finalizers")
+                       (:file "resources")
+                       (:file "devil")
                        (:file "textures")
+                       (:file "ftgl")
                        (:file "fonts")
                        (:file "sounds")))
              (:file "sprite")

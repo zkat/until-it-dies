@@ -191,6 +191,26 @@ we're done with it."
                   ,@body
                (teardown ,engine-var))))))))
 
+;;;
+;;; Callbacks for GLFW events
+;;;
+(cffi:defcallback key-hook :void ((key :int) (action :int))
+  "Invokes KEY-DOWN or KEY-UP on the active engine, for control keys."
+  (unless (<= key 255)
+    (restartable
+      (funcall (case action
+                 (#.glfw:+press+ 'key-down)
+                 (#.glfw:+release+ 'key-up))
+               *engine* (translate-glfw-control-key key)))))
+
+(cffi:defcallback char-hook :void ((key :int) (action :int))
+  "Invokes KEY-DOWN or KEY-UP on the active engine, for character input."
+  (restartable
+    (funcall (case action
+               (#.glfw:+press+ 'key-down)
+               (#.glfw:+release+ 'key-up))
+             *engine* (code-char key))))
+
 (cffi:defcallback mouse-moved :void ((x :int) (y :int))
   (restartable (mouse-move *engine* x (- (window-height *engine*) y))))
 

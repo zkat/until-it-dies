@@ -1,8 +1,9 @@
 ;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10; indent-tabs-mode: nil -*-
 
-(defpackage #:until-it-dies
-  (:nicknames #:uid)
-  (:use #:cl #:sheeple)
+(defpackage until-it-dies
+  (:nicknames :uid)
+  (:use :cl :sheeple)
+  (:shadow :step)
   (:export
 
    ;; time
@@ -27,7 +28,7 @@
    :mouse-down
    :mouse-move
    :window-resized
-   :idle
+   :step
 
    ;; Engine
    :=engine=

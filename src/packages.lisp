@@ -113,7 +113,8 @@
    :res
 
    ;; sprites
-   :draw-sprite
+   :draw
+   :draw-at
    :create-image
    :width
    :height

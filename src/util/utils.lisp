@@ -9,14 +9,6 @@
      ,@body))
 
 ;;;
-;;; Pathnames
-;;;
-(defun current-working-directory ()
-  #+ccl(ccl:current-directory)
-  #+sbcl(merge-pathnames "")
-  #+clisp(ext:default-directory))
-
-;;;
 ;;; Time
 ;;;
 (defun now ()

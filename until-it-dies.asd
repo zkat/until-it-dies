@@ -17,34 +17,28 @@
                      including opengl-graphics, and Sheeple as an object system."
   :serial t
   :components
-  ((:module src
-            :serial t
-            :components
+  ((:module src :components
             ((:file "packages")
-             (:module util
-                      :serial t
-                      :components
+             (:module "util" :depends-on ("packages") :components
                       ((:file "opengl-hacks")
                        (:file "priority-queue")
                        (:file "utils")))
-             (:file "input")
-             (:file "messages")
-             (:file "colors")
-             (:file "primitives")
-             (:file "config")
-             (:file "event")
-             (:module resources
-                      :serial t
-                      :components
+             (:file "input" :depends-on ("util"))
+             (:file "messages" :depends-on ("util"))
+             (:file "colors" :depends-on ("util"))
+             (:file "primitives" :depends-on ("util"))
+             (:file "config") ; This will probably go soon
+             (:file "event" :depends-on ("messages"))
+             (:module "resources" :depends-on ("util" "messages") :components
                       ((:file "finalizers")
-                       (:file "resources")
+                       (:file "resources" :depends-on ("finalizers"))
                        (:file "devil")
-                       (:file "textures")
+                       (:file "textures" :depends-on ("devil" "resources"))
                        (:file "ftgl")
-                       (:file "fonts")
-                       (:file "sounds")))
-             (:file "sprite")
-             (:file "engine")))))
+                       (:file "fonts" :depends-on ("ftgl" "resources"))
+                       (:file "sounds" :depends-on ("resources"))))
+             (:file "sprite" :depends-on ("messages" "resources"))
+             (:file "engine" :depends-on ("event" "sprite"))))))
 
 (asdf:defsystem until-it-dies.examples
   :version "0.1 (unreleased)"
@@ -54,6 +48,5 @@
   :licence "BSD-style"
   :depends-on (until-it-dies)
   :components
-  ((:module demo
-            :components
+  ((:module "demo" :components
             ((:file "testgame")))))

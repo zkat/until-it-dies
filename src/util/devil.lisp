@@ -85,9 +85,18 @@
   (:d3d-alpha-key-color #x0707)
   (:d3d-alpha-key-colour #x0707))
 
+(define-foreign-type pathname-string-type ()
+  ()
+  (:actual-type :string)
+  (:simple-parser pathname-string))
+(eval-when (:compile-toplevel :load-toplevel)
+  (defmethod expand-to-foreign-dyn (value var body (type pathname-string-type))
+    `(with-foreign-string (,var (if (pathnamep ,value) (namestring ,value) ,value))
+       ,@body)))
+
 (defcfun ("ilutInit" init) :boolean)
 (defcfun ("ilutRenderer" renderer) :boolean (renderer renderer))
 (defcfun ("ilutEnable" enable) :boolean (state state-definition))
 (defcfun ("ilutDisable" disable) :boolean (state state-definition))
-(defcfun ("ilutGLLoadImage" gl-load-image) :uint (file-name :string))
+(defcfun ("ilutGLLoadImage" gl-load-image) :uint (file-name pathname-string))
 

@@ -11,6 +11,9 @@
 
 (defvar *engine*)
 
+(defmessage initializedp (engine)
+  (:documentation "Tests whether ENGINE has been initialized"))
+
 ;;;
 ;;; Event processing messages
 ;;;

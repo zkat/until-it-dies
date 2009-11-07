@@ -155,27 +155,27 @@ but it's not a mortal sin to just use it as a singleton."))
   (uid-glfw:swap-buffers))
 
 ;;; Main loop
-(defreply init :before ((engine =engine=))
+(defreply init ((engine =engine=))
   (setf (last-frame-time engine) 0)
   (setf cl-opengl-bindings:*gl-get-proc-address* #'uid-glfw:get-proc-address)
   (setup-ortho-projection (window-width engine) (window-height engine))
   (uid-il:init)
   (uid-ilut:init)
   (alut:init)
-  (setf (initializedp engine) t))
+  engine)
 
-(defreply init ((engine =engine=))
-  "Do nothing by default."
-  (values))
+(defreply init :after ((engine =engine=))
+  (setf (initializedp engine) t))
 
 (defreply teardown ((engine =engine=))
   "Do nothing by default."
-  (values))
-(defreply teardown :after ((engine =engine=))
-  "Once the real teardown stuff is done, we shut down our libs."
   (uid-il:shutdown)
   (alut:exit)
   (uid-glfw:terminate)
+  engine)
+
+(defreply teardown :after ((engine =engine=))
+  "Once the real teardown stuff is done, we shut down our libs."
   (setf (initializedp engine) nil))
 
 (defmacro with-engine (engine &body body)

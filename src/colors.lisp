@@ -41,7 +41,15 @@ The values are used directly by opengl, and should range between 0 and 1 (instea
   ((r 0.34) (g 0.165) (b 0.165)))
 
 (defvar *color* *white*)
-(defun mix-colors (color1 color2)
+(defun mix-colors (&rest colors)
+  (declare (dynamic-extent colors))
+  (cond ((null colors)
+         nil)
+        ((= 1 (length colors))
+         (car colors))
+        (t (reduce #'%mix-colors colors))))
+
+(defun %mix-colors (color1 color2)
   (let* ((r1 (r color1))
          (g1 (g color1))
          (b1 (b color1))

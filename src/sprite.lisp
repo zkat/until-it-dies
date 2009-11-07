@@ -166,7 +166,7 @@ figure out which frames to draw."))
       nil
       #+nil(gl:rotate rotation 0 0 1))
     (gl:scale (or x-scale 1) (or y-scale 1) 1)
-    (ftgl:render-font (font-pointer font) string :all)))
+    (uid-ftgl:render-font (font-pointer font) string :all)))
 
 (defreply draw ((text =text=)
                 &key x y x-scale y-scale

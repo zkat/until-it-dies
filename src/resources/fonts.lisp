@@ -34,8 +34,8 @@
 
 (defreply load-resource ((font =font=))
   (setf (font-pointer font)
-        (ftgl:create-texture-font (namestring (filepath font))))
-  (ftgl:set-font-face-size (font-pointer font)
+        (uid-ftgl:create-texture-font (namestring (filepath font))))
+  (uid-ftgl:set-font-face-size (font-pointer font)
                            (size font)
                            (res font))
   (setf (loadedp font) t)
@@ -44,10 +44,10 @@
 (defreply load-resource :after ((font =font=))
   (let ((ptr (font-pointer font)))
     (finalize font (lambda ()
-                     (ftgl:destroy-font ptr)))))
+                     (uid-ftgl:destroy-font ptr)))))
 
 (defreply unload-resource ((font =font=))
-  (ftgl:destroy-font (font-pointer font))
+  (uid-ftgl:destroy-font (font-pointer font))
   (setf (font-pointer font) nil)
   (setf (loadedp font) nil)
   font)

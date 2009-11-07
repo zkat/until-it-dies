@@ -194,23 +194,6 @@ we're done with it."
 ;;;
 ;;; Callbacks for GLFW events
 ;;;
-(cffi:defcallback key-hook :void ((key :int) (action :int))
-  "Invokes KEY-DOWN or KEY-UP on the active engine, for control keys."
-  (unless (<= key 255)
-    (continuable
-      (funcall (case action
-                 (#.uid-glfw:+press+ 'key-down)
-                 (#.uid-glfw:+release+ 'key-up))
-               *engine* (translate-glfw-control-key key)))))
-
-(cffi:defcallback char-hook :void ((key :int) (action :int))
-  "Invokes KEY-DOWN or KEY-UP on the active engine, for character input."
-  (continuable
-    (funcall (case action
-               (#.uid-glfw:+press+ 'key-down)
-               (#.uid-glfw:+release+ 'key-up))
-             *engine* (code-char key))))
-
 (cffi:defcallback mouse-moved :void ((x :int) (y :int))
   (continuable (mouse-move *engine* x (- (window-height *engine*) y))))
 
@@ -227,6 +210,9 @@ we're done with it."
 (cffi:defcallback window-closed :void ()
   (setf (runningp *engine*) nil))
 
+;;;
+;;; Main Function Extraordinaire
+;;;
 (defreply run ((engine =engine=))
   (uid-glfw:with-init
     (uid-glfw:open-window-hint uid-glfw:+window-no-resize+ uid-glfw:+true+)

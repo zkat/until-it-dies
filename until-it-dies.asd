@@ -20,10 +20,10 @@
                        (:file "priority-queue")
                        (:file "glfw")
                        (:file "utils")))
-             (:file "input" :depends-on ("util"))
              (:file "messages" :depends-on ("util"))
+             (:file "input" :depends-on ("messages"))
              (:file "colors" :depends-on ("util"))
-             (:file "primitives" :depends-on ("util"))
+             (:file "primitives" :depends-on ("colors"))
              (:file "event" :depends-on ("messages"))
              (:module "resources" :depends-on ("util" "messages")
                       :components

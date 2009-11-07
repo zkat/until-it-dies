@@ -12,20 +12,20 @@
 ;;;
 (defun glfw-vector-index (keycode)
   ;; This, like some of the following, assumes the input is valid
-  (- keycode glfw:+key-special+ 1))
+  (- keycode uid-glfw:+key-special+ 1))
 
 (defvar *glfw-control-keys*
-  (make-array (1+ (glfw-vector-index glfw:+key-last+)) :element-type 'keyword)
+  (make-array (1+ (glfw-vector-index uid-glfw:+key-last+)) :element-type 'keyword)
   "A vector translating the GLFW control key constants to CL keywords")
 
 (defun glfw-keysym-p (symbol)
   (with-accessors ((name symbol-name) (value symbol-value)) symbol
     (and (constantp symbol)             ; <- CLHS that. I love lisp.
          (= 5 (mismatch "+KEY-" name)) ; Is it key-related?
-         (or (< glfw:+key-special+ value glfw:+key-last+)
+         (or (< uid-glfw:+key-special+ value uid-glfw:+key-last+)
              ;; These bounds aren't too tight... :(
-             (and (= value glfw:+key-last+)
-                  (not (eq symbol 'glfw:+key-last+)))))))
+             (and (= value uid-glfw:+key-last+)
+                  (not (eq symbol 'uid-glfw:+key-last+)))))))
 
 (defun translate-glfw-keysym-name (symbol)
   (let ((name (subseq (string-trim "+" (symbol-name symbol)) 4)))
@@ -46,7 +46,7 @@
       ;; If it doesn't match any special case, just return the name as-is
       (t name))))
 
-(do-external-symbols (symbol :glfw)
+(do-external-symbols (symbol :uid-glfw)
   (with-accessors ((name symbol-name) (value symbol-value)) symbol
     (when (glfw-keysym-p symbol)
       (setf (svref *glfw-control-keys* (glfw-vector-index value))

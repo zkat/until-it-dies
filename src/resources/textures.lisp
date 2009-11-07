@@ -46,8 +46,7 @@
 ;;;
 ;;; File textures
 ;;;
-(defproto =file-texture= (=file-resource= =texture=)
-  ((filepath (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
+(defproto =file-texture= (=file-resource= =texture=) ()
   (:documentation "A file texture is loaded from an image file."))
 
 (defreply load-resource :before ((texture =texture=))

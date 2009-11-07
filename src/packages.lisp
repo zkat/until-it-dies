@@ -2,7 +2,7 @@
 
 (defpackage #:until-it-dies
   (:nicknames #:uid)
-  (:use #:cl #:sheeple #:until-it-dies.resource-info)
+  (:use #:cl #:sheeple)
   (:export
 
    ;; time
@@ -78,7 +78,6 @@
    :=resource=
    :=resource-manager=
    :*resource-manager*
-   :*resource-directory*
    :=file-resource=
    :load-resource
    :unload-resource

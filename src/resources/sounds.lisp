@@ -49,8 +49,7 @@
     (al:source (source-id sound) :direction (source-direction sound))))
 
 ;;; File sounds
-(defproto =file-sound= (=file-resource= =sound=)
-  ((filepath (merge-pathnames "sample.wav" *resource-directory*))))
+(defproto =file-sound= (=file-resource= =sound=) ())
 
 (defreply load-resource ((sound =file-sound=))
   (with-properties (buffer-id source-id source-position source-velocity

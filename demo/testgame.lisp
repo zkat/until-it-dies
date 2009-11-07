@@ -1,5 +1,5 @@
 (defpackage #:uid-demo
-  (:use :cl :sheeple :until-it-dies)
+  (:use :cl :sheeple :until-it-dies :until-it-dies.demo.resource-info)
   (:shadow :speed)
   (:export :run-demo))
 (in-package :uid-demo)
@@ -36,6 +36,9 @@
   ((content (create-animation (merge-pathnames "explosion.png" *resource-directory*) 15 14 0.05 14))
    (speed 300) (x 50) (y 50)))
 
+(defproto *our-font* =font=
+  ((filepath (merge-pathnames "example.otf" *resource-directory*))))
+
 (defreply update ((engine =uid-demo=) dt &key)
   (update *anim* dt)
   (with-properties (x y speed) *anim*
@@ -57,7 +60,8 @@
     (with-color *green*
       (dotimes (i 1000)
         (draw-point (make-point (random 600) (random 600)))))
-    (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor)
+    (with-font *our-font*
+      (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor))
     (draw-circle (make-point 100 100) 50)
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (draw *alien*)))

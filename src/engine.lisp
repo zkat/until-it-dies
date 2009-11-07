@@ -197,7 +197,7 @@ we're done with it."
 (cffi:defcallback key-hook :void ((key :int) (action :int))
   "Invokes KEY-DOWN or KEY-UP on the active engine, for control keys."
   (unless (<= key 255)
-    (restartable
+    (continuable
       (funcall (case action
                  (#.glfw:+press+ 'key-down)
                  (#.glfw:+release+ 'key-up))
@@ -205,24 +205,24 @@ we're done with it."
 
 (cffi:defcallback char-hook :void ((key :int) (action :int))
   "Invokes KEY-DOWN or KEY-UP on the active engine, for character input."
-  (restartable
+  (continuable
     (funcall (case action
                (#.glfw:+press+ 'key-down)
                (#.glfw:+release+ 'key-up))
              *engine* (code-char key))))
 
 (cffi:defcallback mouse-moved :void ((x :int) (y :int))
-  (restartable (mouse-move *engine* x (- (window-height *engine*) y))))
+  (continuable (mouse-move *engine* x (- (window-height *engine*) y))))
 
 (cffi:defcallback mouse-button-hook :void ((button :int) (action :int))
   (case action
     (#.glfw:+press+
-     (restartable (mouse-down *engine* button)))
+     (continuable (mouse-down *engine* button)))
     (#.glfw:+release+
-     (restartable (mouse-up *engine* button)))))
+     (continuable (mouse-up *engine* button)))))
 
 (cffi:defcallback window-resized :void ((width :int) (height :int))
-  (restartable (window-resized *engine* width height)))
+  (continuable (window-resized *engine* width height)))
 
 (cffi:defcallback window-closed :void ()
   (setf (runningp *engine*) nil))
@@ -240,5 +240,5 @@ we're done with it."
         (glfw:set-window-close-callback (cffi:callback window-closed))
         (setf (runningp engine) t)
         (loop while (= glfw:+true+ (glfw:get-window-param glfw:+opened+))
-           do (restartable (idle engine))))))
+           do (continuable (idle engine))))))
   engine)

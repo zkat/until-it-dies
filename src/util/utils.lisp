@@ -27,12 +27,10 @@ Returns both the difference in time and the current-time used in the computation
 ;;;
 ;;; Restarting and interactivity
 ;;;
-(defmacro restartable (&body body)
+(defmacro continuable (&body body)
   "helper macro since we use continue restarts a lot
  (remember to hit C in slime or pick the restart so errors don't kill the app)"
-  `(restart-case
-      (progn ,@body)
-    (continue () :report "Continue")))
+  `(with-simple-restart (continue "Continue") ,@body))
 
 ;;;
 ;;; Maths

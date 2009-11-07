@@ -1,0 +1,38 @@
+About
+=====
+
+Until It Dies is a simple game and application engine designed to make it damn easy to get a window
+up to display all the shiny things you might want to do. It has support for image loading, sound,
+and fonts.
+
+UID uses OpenGL to draw graphics, and a prototype-based object system, Sheeple, for its API.
+
+UID itself is MIT licensed, and all its dependencies use permissive licenses. See below for specifics.
+
+Getting it to run
+=================
+
+UID has the following Lisp dependencies:
+
+* Sheeple
+* CL-OpenGL
+* CL-OpenAL
+
+Additionally, you must have the following C dependencies installed:
+
+* opengl (whatever provides the opengl library in your case, that is) (open standard)
+* openal - sound (LGPL)
+* freealut - more sound (LGPL)
+* devil - image loading (LGPL)
+* ftgl - text (MIT/LGPL)
+* glfw - windowing and events (BSD)
+
+How the hell do I use it?
+=========================
+
+You're on your own there for now. UID is still pretty new, so I haven't written up a manual. If you
+want to use it, I recommend checking out demo/testgame.lisp for a nice example of a simple
+application written with UID's API. You may also want to look at Sheeple and its API.
+
+If you're working on something and want help, feel free to e-mail me (kzm@sykosomatic.org), or
+show up it #sykosomatic@freenode on IRC, and I'll do my best to help you get going.

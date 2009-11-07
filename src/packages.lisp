@@ -94,6 +94,7 @@
    ;; sounds
    :=sound=
    :=file-sound=
+   :create-sound
    :source-position
    :source-velocity
    :source-direction

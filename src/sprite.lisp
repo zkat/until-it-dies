@@ -77,7 +77,7 @@ texture they are drawn with. Their TEXTURE property should contain a texture."))
       (gl:with-pushed-matrix
         (gl:translate x y z)
         (when rotation
-          (gl:rotate rotation 0 0 1))
+          (gl:rotate (- rotation) 0 0 1))
         (draw-rectangle 0 0 (* width (or x-scale 1)) (* height (or y-scale 1)) :z z
                         :u1 (elt tex-coords 0)
                         :v1 (elt tex-coords 1)
@@ -167,7 +167,7 @@ figure out which frames to draw."))
   (gl:with-pushed-matrix
     (gl:translate x y z)
     (when rotation
-      (gl:rotate rotation 0 0 1))
+      (gl:rotate (- rotation) 0 0 1))
     (gl:scale (or x-scale 1) (or y-scale 1) 1)
     (uid-ftgl:render-font (font-pointer font) string :all)))
 

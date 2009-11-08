@@ -48,6 +48,7 @@
    :window-width
    :window-height
    :title
+   :key-repeat-p
    :fps
 
    ;; primitives

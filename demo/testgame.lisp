@@ -93,7 +93,8 @@
       (dotimes (i 1000)
         (draw-point (make-point (random 600) (random 600)))))
     (with-font *our-font*
-      (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor :rotation 0))
+      (draw-at 60 20 "Try left-clicking, right-clicking, and pressing the arrow keys!"
+               :x-scale 1.5 :y-scale 1.5))
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (draw *circle*)
     (draw *alien*)))

@@ -64,8 +64,9 @@
         (draw-point (make-point (random 600) (random 600)))))
     (with-font *our-font*
       (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor :rotation 0))
-    (draw-circle (make-point 100 100) 50)
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
+    (with-color (make-color :r 0.5 :g 0.1 :b 0.1)
+      (draw-circle (make-point 100 100) 15 :filledp nil))
     (draw *alien*)))
 
 (defreply mouse-move :after ((engine =uid-demo=) x y)

@@ -5,11 +5,10 @@
   (:export :run-demo))
 (in-package :uid-demo)
 
-(defproto =uid-demo= (=engine=)
-  ((title "UID Demo")
-   (resizablep nil)
-   (window-width 600)
-   (window-height 600)))
+(defparameter *uid-demo* (create-engine :title "UID Demo"
+                                        :resizablep nil
+                                        :window-width 600
+                                        :window-height 600))
 
 (defproto =game-object= ()
   ((x 0)
@@ -53,16 +52,16 @@
 
 (defreply update ((thing *circle*) dt &key)
   (declare (ignore dt))
-  (with-properties ((x mouse-x) (y mouse-y)) =uid-demo=
+  (with-properties ((x mouse-x) (y mouse-y)) *uid-demo*
     (with-properties (dx/dt dy/dt (cx x) (cy y)) *circle*
       (when (> (abs dx/dt) 5)
         (setf dx/dt (* 0.9 dx/dt)))
       (when (> (abs dy/dt) 5)
         (setf dy/dt (* 0.9 dx/dt)))
-      (unless (< 0 cx (window-width =uid-demo=))
+      (unless (< 0 cx (window-width *uid-demo*))
         (setf dx/dt (- dx/dt)))
       (incf cx dx/dt)
-      (unless (< 0 cy (window-height =uid-demo=))
+      (unless (< 0 cy (window-height *uid-demo*))
         (setf dy/dt (- dy/dt)))
       (incf cy dy/dt)
       (let* ((x-gap (- x cx))
@@ -71,7 +70,7 @@
         (incf dx/dt (* accel x-gap))
         (incf dy/dt (* accel y-gap))))))
 
-(defreply update ((engine =uid-demo=) dt &key)
+(defreply update ((engine *uid-demo*) dt &key)
   (update *anim* dt)
   (update *circle* dt)
   (with-properties (x y speed) *anim*
@@ -88,7 +87,7 @@
                (< 0 y))
       (decf y (* speed dt)))))
 
-(defreply draw ((engine =uid-demo=) &key)
+(defreply draw ((engine *uid-demo*) &key)
   (let ((scale-factor 4))
     (with-color (mix-colors *white* *black* *blue* *green*)
       (dotimes (i 1000)
@@ -99,15 +98,15 @@
     (draw *circle*)
     (draw *alien*)))
 
-(defreply mouse-move :after ((engine =uid-demo=) x y)
+(defreply mouse-move :after ((engine *uid-demo*) x y)
   (with-properties ((alien-x x) (alien-y y)) *alien*
     (setf alien-x x alien-y y)))
 
-(defreply mouse-down ((engine =uid-demo=) button)
+(defreply mouse-down ((engine *uid-demo*) button)
   (with-properties ((alien-x x) (alien-y y) visiblep) *alien*
     (case button
       (0 (setf visiblep (not visiblep)))
       (1 (play *nay*)))))
 
 (defun run-demo ()
-  (run =uid-demo=))
+  (run *uid-demo*))

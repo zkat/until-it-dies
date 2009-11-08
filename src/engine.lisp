@@ -246,8 +246,8 @@ we're done with it."
   (uid-glfw:with-init
     (unless (resizablep engine)
       (uid-glfw:open-window-hint uid-glfw:+window-no-resize+ uid-glfw:+true+))
-    (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine)
-                                (mode (if (windowedp engine) uid-glfw:+window+ uid-glfw:+fullscreen+)))
+    (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine) 0 0 0 0
+                                0 0 (if (windowedp engine) uid-glfw:+window+ uid-glfw:+fullscreen+))
       (with-engine engine
         (uid-glfw:set-key-callback (cffi:callback key-hook))
         (uid-glfw:set-char-callback (cffi:callback char-hook))

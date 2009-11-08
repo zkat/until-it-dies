@@ -56,6 +56,10 @@
    ;; primitives
    :make-color
    :mix-colors
+   :red
+   :green
+   :blue
+   :alpha
    :*color*
    :with-color
    :*black*

@@ -171,8 +171,8 @@ but it's not a mortal sin to just use it as a singleton."))
 
 (defreply step-engine ((engine =engine=))
   (let ((color (clear-color engine)))
-    (with-properties (r g b a) color
-      (gl:clear-color r g b a)))
+    (with-properties (red green blue alpha) color
+      (gl:clear-color red green blue alpha)))
   (gl:clear :color-buffer-bit :depth-buffer-bit)
   (update-time engine)
   (process-cooked-events engine)

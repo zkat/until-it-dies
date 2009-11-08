@@ -49,6 +49,7 @@
    :window-height
    :title
    :key-repeat-p
+   :mouse-visible-p
    :fps
 
    ;; primitives

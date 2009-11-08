@@ -122,7 +122,7 @@
     (setf alien-x x alien-y y)))
 
 (defreply mouse-down ((engine *uid-demo*) button)
-  (with-properties ((alien-x x) (alien-y y) visiblep) *alien*
+  (with-properties (visiblep) *alien*
     (case button
       (0 (setf visiblep (not visiblep)))
       (1 (play *nay*)))))

@@ -33,13 +33,16 @@ facilities for drawing textured onto components."))
 (defreply draw :before ((textured =textured=) &key x y )
   "Before we a draw textured sprite, we should bind its texture."
   (declare (ignore x y))
+  (gl:enable :texture-2d :blend)
+  (gl:blend-func :src-alpha :one-minus-src-alpha)
   (when (texture textured)
     (bind-texture (texture textured))))
 
 (defreply draw :after ((textured =textured=) &key x y)
   "Once we're done drawing it, we should unbind the texture."
   (declare (ignore x y))
-  (unbind-texture (texture textured)))
+  (unbind-texture (texture textured))
+  (gl:disable :texture-2d))
 
 ;;;
 ;;; Image prototype

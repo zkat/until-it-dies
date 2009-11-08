@@ -33,6 +33,7 @@
    ;; Engine
    :=engine=
    :*engine*
+   :create-engine
    :with-engine
    :runningp
    :initializedp

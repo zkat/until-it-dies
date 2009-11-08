@@ -28,7 +28,7 @@
    :mouse-down
    :mouse-move
    :window-resized
-   :step
+   :step-engine
 
    ;; Engine
    :=engine=

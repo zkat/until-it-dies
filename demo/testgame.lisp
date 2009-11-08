@@ -1,7 +1,6 @@
 (defpackage uid-demo
   (:use :cl :sheeple :until-it-dies :until-it-dies.demo.resource-info)
   (:shadow :speed)
-  (:shadowing-import-from :uid :step)
   (:export :run-demo))
 (in-package :uid-demo)
 

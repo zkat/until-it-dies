@@ -132,5 +132,5 @@ followed by the main engine loop."))
 (defmessage window-resized (engine width height)
   (:documentation "The window is resized by the user"))
 
-(defmessage step (engine)
+(defmessage step-engine (engine)
   (:documentation "Runs once per game loop."))

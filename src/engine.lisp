@@ -169,7 +169,7 @@ but it's not a mortal sin to just use it as a singleton."))
       (setf last-frame-time now)
       (setf dt new-dt))))
 
-(defreply step ((engine =engine=))
+(defreply step-engine ((engine =engine=))
   (let ((color (clear-color engine)))
     (with-properties (r g b a) color
       (gl:clear-color r g b a)))
@@ -257,5 +257,5 @@ we're done with it."
         (uid-glfw:set-window-close-callback (cffi:callback window-closed))
         (setf (runningp engine) t)
         (loop while (= uid-glfw:+true+ (uid-glfw:get-window-param uid-glfw:+opened+))
-           do (continuable (step engine))))))
+           do (continuable (step-engine engine))))))
   engine)

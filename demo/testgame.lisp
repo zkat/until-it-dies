@@ -55,6 +55,10 @@
   (declare (ignore dt))
   (with-properties ((x mouse-x) (y mouse-y)) =uid-demo=
     (with-properties (dx/dt dy/dt (cx x) (cy y)) *circle*
+      (when (> (abs dx/dt) 5)
+        (setf dx/dt (* 0.9 dx/dt)))
+      (when (> (abs dy/dt) 5)
+        (setf dy/dt (* 0.9 dx/dt)))
       (unless (< 0 cx (window-width =uid-demo=))
         (setf dx/dt (- dx/dt)))
       (incf cx dx/dt)

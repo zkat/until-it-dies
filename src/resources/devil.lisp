@@ -1,6 +1,6 @@
 (defpackage uid-il
   (:use :cl :cffi)
-  (:export :init :shutdown :get-integer :bind-image))
+  (:export :init :shutdown :get-integer :bind-image :get-error))
 (in-package :uid-il)
 
 (define-foreign-library il
@@ -45,10 +45,39 @@
   (:image-origin #x0DFE)
   (:image-channels #x0DFF))
 
+(defcenum error
+  (:no-error #x0000)
+  (:invalid-enum #x0501)
+  (:out-of-memory #x0502)
+  (:format-not-supported #x0503)
+  (:internal-error #x0504)
+  (:invalid-value #x0505)
+  (:illegal-operation #x0506)
+  (:illegal-file-value #x0507)
+  (:invalid-file-header #x0508)
+  (:invalid-param #x0509)
+  (:could-not-open-file #x050A)
+  (:invalid-extension #x050B)
+  (:file-already-exists #x050C)
+  (:out-format-same #x050D)
+  (:stack-overflow #x050E)
+  (:stack-underflow #x050F)
+  (:invalid-conversion #x0510)
+  (:bad-dimensions #x0511)
+  (:file-read-error #x0512)
+  (:file-write-error #x0512)
+  (:lib-gif-error #x05E1)
+  (:lib-jpeg-error #x05E2)
+  (:lib-png-error #x05E3)
+  (:lib-tiff-error #x05E4)
+  (:lib-mng-error #x05E5)
+  (:unknown-error #x05FF))
+
 (defcfun ("ilInit" init) :void)
 (defcfun ("ilShutDown" shutdown) :void)
 (defcfun ("ilGetInteger" get-integer) :uint (mode mode))
 (defcfun ("ilBindImage" bind-image) :void (image :int))
+(defcfun ("ilGetError" get-error) error)
 
 (defpackage uid-ilut
   (:use :cl :cffi)

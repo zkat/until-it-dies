@@ -68,7 +68,7 @@ but it's not a mortal sin to just use it as a singleton."))
         (uid-glfw:enable uid-glfw:+key-repeat+)
         (uid-glfw:disable uid-glfw:+key-repeat+))))
 
-(defreply (setf key-repeat-p) :after (new-value (engine =engine=))
+(defreply (setf mouse-visible-p) :after (new-value (engine =engine=))
   (when (initializedp engine)
     (if new-value
         (uid-glfw:enable uid-glfw:+mouse-cursor+)

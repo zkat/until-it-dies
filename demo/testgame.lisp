@@ -43,19 +43,30 @@
   ((x 100) (y 100) (dx/dt 0.0) (dy/dt 0.0)
    (radius 15)))
 
+(defun angle->color (angle)
+  "Turns an angle, in radians, into a color, using the following algorithm:
+  0° => 100% red
+120° => 100% green
+240° => 100% blue
+  Angles in between are blended smoothly; for example, 90° is #x3FBF00"
+  ;; The following assumes that angle has been produced by `cl:atan', and
+  ;; depends heavily upon that and the gory details of the function.
+  (flet ((ndist (a b) (abs (- a b))))
+    (make-color :r (- 1 (/ (ndist angle 0) pi 2/3))
+                :g (- 1 (/ (ndist (mod angle (* 2 pi)) (* pi 2/3)) pi 2/3))
+                :b (- 1 (/ (ndist (mod angle (* 2 pi)) (* pi 4/3)) pi 2/3)))))
+
 (defreply draw ((thing *circle*) &key)
   (with-properties (x y radius dx/dt dy/dt) thing
     (flet ((ndist (a b) (abs (- a b))))
       (let* ((speed (sqrt (+ (* dx/dt dx/dt) (* dy/dt dy/dt))))
              (brightness (max (/ speed 4) 0.3))
-             (theta (atan dy/dt dx/dt))
-             ;; The following depends heavily upon the gory details of CL:ATAN
-             ;; The net effect is that 0° = red, 120° = green, 240° = blue,
-             ;; and headings in between are blended smoothly.
-             (r (* (- 1 (/ (ndist theta 0) pi 2/3)) brightness))
-             (g (* (- 1 (/ (ndist (mod theta (* 2 pi)) (* pi 2/3)) pi 2/3)) brightness))
-             (b (* (- 1 (/ (ndist (mod theta (* 2 pi)) (* pi 4/3)) pi 2/3)) brightness)))
-        (with-color (make-color :r r :b b :g g)
+             (color (angle->color (atan dy/dt dx/dt))))
+        (with-properties (red green blue) color
+          (setf red (* red brightness)
+                green (* green brightness)
+                blue (* blue brightness)))
+        (with-color color
           (draw-circle (make-point x y) radius :filledp t))))))
 
 (defreply update ((thing *circle*) dt &key)

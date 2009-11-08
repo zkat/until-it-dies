@@ -63,16 +63,25 @@ The values are used directly by opengl, and should range between 0 and 1 (instea
                 :b (/ (+ b1 b2) 2)
                 :a (/ (+ a1 a2) 2))))
 
+(defun color-equal (color1 color2)
+  (with-properties ((r1 r) (g1 g) (b1 b) (a1 a)) color1
+    (with-properties ((r2 r) (g2 g) (b2 b) (a2 a)) color2
+      (when (and (= r1 r2) (= g1 g2) (= b1 b2) (= a1 a2)) t))))
+
 (defmacro with-color (color &body body)
-  (let ((color-name (gensym "COLOR-")))
-    `(progn
-       (let* ((,color-name ,color)
-              (*color* ,color-name))
-         (bind-color *color*)
-         ,@body)
-       (bind-color *color*))))
+  (let ((color-name (gensym "COLOR-"))
+        (rebindp (gensym "REBINDP-")))
+    `(let* ((,color-name ,color)
+            (,rebindp (not (or (null ,color-name)
+                               (eq *color* ,color-name)
+                               (color-equal *color* ,color-name)))))
+       (unwind-protect
+            (let ((*color* ,color))
+              (when ,rebindp
+                (bind-color *color*))
+              ,@body)
+         (when ,rebindp (bind-color *color*))))))
 
 (defun bind-color (color)
   (with-properties (r g b a) color
     (gl:color r g b a)))
-

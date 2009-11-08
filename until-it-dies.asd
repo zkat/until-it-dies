@@ -35,7 +35,7 @@
                        (:file "fonts" :depends-on ("ftgl" "resources"))
                        (:file "sounds" :depends-on ("resources"))))
              (:file "sprite" :depends-on ("messages" "resources"))
-             (:file "engine" :depends-on ("event" "sprite" "util"))))))
+             (:file "engine" :depends-on ("event" "sprite" "util" "colors"))))))
 
 (cl:defpackage until-it-dies.demo.resource-info
   (:export :*resource-directory*))

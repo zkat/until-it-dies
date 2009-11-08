@@ -41,14 +41,14 @@
   ((filepath (merge-pathnames "example.otf" *resource-directory*))))
 
 (defproto *circle* =game-object=
-  ((color (make-color :r 0.5 :g 0.2 :b 0.1))
+  ((color (mix-colors *red* *white*))
    (x 100) (y 100) (dx/dt 0.0) (dy/dt 0.0)
    (radius 15)))
 
 (defreply draw ((thing *circle*) &key)
   (with-properties (color x y radius) thing
     (with-color color
-      (draw-circle (make-point x y) radius :filledp nil))))
+      (draw-circle (make-point x y) radius :filledp t))))
 
 (defreply update ((thing *circle*) dt &key)
   (declare (ignore dt))

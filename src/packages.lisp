@@ -51,6 +51,7 @@
    :key-repeat-p
    :mouse-visible-p
    :fps
+   :quit
 
    ;; primitives
    :make-color

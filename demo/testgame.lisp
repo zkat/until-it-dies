@@ -26,7 +26,7 @@
   ((content (create-image (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
    visiblep (x 255) (y 356)))
 
-(defparameter *nay* (create-sound (merge-pathnames "sample.wav" *resource-directory*)))
+(defparameter *bah* (create-sound (merge-pathnames "sample.wav" *resource-directory*)))
 
 (defreply draw :around ((thing *alien*) &key)
   (with-properties (visiblep) thing
@@ -125,7 +125,7 @@
   (with-properties (visiblep) *alien*
     (case button
       (0 (setf visiblep (not visiblep)))
-      (1 (play *nay*)))))
+      (1 (play *bah*)))))
 
 (defun run-demo ()
   (run *uid-demo*))

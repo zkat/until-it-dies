@@ -146,8 +146,6 @@ but it's not a mortal sin to just use it as a singleton."))
     (with-properties (r g b a) color
       (gl:clear-color r g b a)))
   (gl:clear :color-buffer-bit :depth-buffer-bit)
-  (gl:enable :texture-2d :blend)
-  (gl:blend-func :src-alpha :one-minus-src-alpha)
   (update-time engine)
   (process-cooked-events engine)
   (update engine (dt engine))

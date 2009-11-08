@@ -22,6 +22,7 @@
    (clear-color (make-color :r 0 :g 0 :b 0 :a 0))
    pausedp
    resizablep
+   windowedp
    key-repeat-p
    (mouse-visible-p t)
    (mouse-x 0)
@@ -51,11 +52,12 @@ but it's not a mortal sin to just use it as a singleton."))
 (defun create-engine (&key (default-font (object :parents =font=))
                       (clear-color *black*) resizablep (title "UID Application")
                       (window-width 500) (window-height 500) key-repeat-p
-                      (mouse-visible-p t))
+                      (mouse-visible-p t) (windowedp t))
   (defobject =engine= ((default-font default-font)
                        (clear-color clear-color)
                        (resizablep resizablep)
                        (title title) (key-repeat-p key-repeat-p)
+                       (windowedp windowedp)
                        (window-width window-width)
                        (window-height window-height)
                        (mouse-visible-p mouse-visible-p))))
@@ -244,7 +246,8 @@ we're done with it."
   (uid-glfw:with-init
     (unless (resizablep engine)
       (uid-glfw:open-window-hint uid-glfw:+window-no-resize+ uid-glfw:+true+))
-    (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine))
+    (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine)
+                                (mode (if (windowedp engine) uid-glfw:+window+ uid-glfw:+fullscreen+)))
       (with-engine engine
         (uid-glfw:set-key-callback (cffi:callback key-hook))
         (uid-glfw:set-char-callback (cffi:callback char-hook))

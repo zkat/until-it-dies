@@ -115,7 +115,7 @@
                :x-scale 1.5 :y-scale 1.5))
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (draw *circle*)
-    (draw *alien*)))
+    (draw *alien* :rotation 45)))
 
 (defreply mouse-move :after ((engine *uid-demo*) x y)
   (with-properties ((alien-x x) (alien-y y)) *alien*

@@ -41,14 +41,23 @@
   ((filepath (merge-pathnames "example.otf" *resource-directory*))))
 
 (defproto *circle* =game-object=
-  ((color (mix-colors *red* *white*))
-   (x 100) (y 100) (dx/dt 0.0) (dy/dt 0.0)
+  ((x 100) (y 100) (dx/dt 0.0) (dy/dt 0.0)
    (radius 15)))
 
 (defreply draw ((thing *circle*) &key)
-  (with-properties (color x y radius) thing
-    (with-color color
-      (draw-circle (make-point x y) radius :filledp t))))
+  (with-properties (x y radius dx/dt dy/dt) thing
+    (flet ((ndist (a b) (abs (- a b))))
+      (let* ((speed (sqrt (+ (* dx/dt dx/dt) (* dy/dt dy/dt))))
+             (brightness (max (/ speed 4) 0.3))
+             (theta (atan dy/dt dx/dt))
+             ;; The following depends heavily upon the gory details of CL:ATAN
+             ;; The net effect is that 0° = red, 120° = green, 240° = blue,
+             ;; and headings in between are blended smoothly.
+             (r (* (- 1 (/ (ndist theta 0) pi 2/3)) brightness))
+             (g (* (- 1 (/ (ndist (mod theta (* 2 pi)) (* pi 2/3)) pi 2/3)) brightness))
+             (b (* (- 1 (/ (ndist (mod theta (* 2 pi)) (* pi 4/3)) pi 2/3)) brightness)))
+        (with-color (make-color :r r :b b :g g)
+          (draw-circle (make-point x y) radius :filledp t))))))
 
 (defreply update ((thing *circle*) dt &key)
   (declare (ignore dt))

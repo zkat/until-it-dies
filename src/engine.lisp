@@ -22,6 +22,7 @@
    (clear-color (make-color :r 0 :g 0 :b 0 :a 0))
    pausedp
    resizablep
+   key-repeat-p
    (mouse-x 0)
    (mouse-y 0)
    (window-width 400)
@@ -48,13 +49,19 @@ but it's not a mortal sin to just use it as a singleton."))
 
 (defun create-engine (&key (default-font (object :parents =font=))
                       (clear-color *black*) resizablep (title "UID Application")
-                      (window-width 500) (window-height 500))
+                      (window-width 500) (window-height 500) key-repeat-p)
   (defobject =engine= ((default-font default-font)
                        (clear-color clear-color)
                        (resizablep resizablep)
-                       (title title)
+                       (title title) (key-repeat-p key-repeat-p)
                        (window-width window-width)
                        (window-height window-height))))
+
+(defreply (setf key-repeat-p) :after (new-value (engine =engine=))
+  (when (initializedp engine)
+    (if new-value
+        (uid-glfw:enable uid-glfw:+key-repeat+)
+        (uid-glfw:disable uid-glfw:+key-repeat+))))
 
 (defreply (setf title) :after (new-value (engine =engine=))
   (when (initializedp engine)
@@ -173,6 +180,8 @@ but it's not a mortal sin to just use it as a singleton."))
   engine)
 
 (defreply init :after ((engine =engine=))
+  (when (key-repeat-p engine)
+    (uid-glfw:enable uid-glfw:+key-repeat+))
   (setf (initializedp engine) t))
 
 (defreply teardown ((engine =engine=))

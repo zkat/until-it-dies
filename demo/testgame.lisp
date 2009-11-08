@@ -41,8 +41,35 @@
 (defproto *our-font* =font=
   ((filepath (merge-pathnames "example.otf" *resource-directory*))))
 
+(defproto *circle* =game-object=
+  ((color (make-color :r 0.5 :g 0.2 :b 0.1))
+   (x 100) (y 100) (dx/dt 0.0) (dy/dt 0.0)
+   (radius 15)))
+
+(defreply draw ((thing *circle*) &key)
+  (with-properties (color x y radius) thing
+    (with-color color
+      (draw-circle (make-point x y) radius :filledp nil))))
+
+(defreply update ((thing *circle*) dt &key)
+  (declare (ignore dt))
+  (with-properties ((x mouse-x) (y mouse-y)) =uid-demo=
+    (with-properties (dx/dt dy/dt (cx x) (cy y)) *circle*
+      (unless (< 0 cx (window-width =uid-demo=))
+        (setf dx/dt (- dx/dt)))
+      (incf cx dx/dt)
+      (unless (< 0 cy (window-height =uid-demo=))
+        (setf dy/dt (- dy/dt)))
+      (incf cy dy/dt)
+      (let* ((x-gap (- x cx))
+             (y-gap (- y cy))
+             (accel (/ (+ (expt x-gap 2) (expt y-gap 2)))))
+        (incf dx/dt (* accel x-gap))
+        (incf dy/dt (* accel y-gap))))))
+
 (defreply update ((engine =uid-demo=) dt &key)
   (update *anim* dt)
+  (update *circle* dt)
   (with-properties (x y speed) *anim*
     (when (and (key-down-p :right)
                (< x (window-width engine)))
@@ -65,7 +92,7 @@
     (with-font *our-font*
       (draw "HURR DURR HURR!" :x 60 :y 50 :x-scale scale-factor :y-scale scale-factor :rotation 0))
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
-    (draw-circle (make-point 300 300) 50 :filledp nil :resolution 3 :color (mix-colors *red* *blue*))
+    (draw *circle*)
     (draw *alien*)))
 
 (defreply mouse-move :after ((engine =uid-demo=) x y)

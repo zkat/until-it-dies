@@ -18,7 +18,7 @@
 
 (defreply draw ((thing =game-object=) &rest args &key)
   (with-properties (x y content) thing
-    (apply 'draw content :x x :y y args)))
+    (apply 'draw-at x y content args)))
 
 (defreply update ((thing =game-object=) dt &rest args &key)
   (apply 'update (content thing) dt args))

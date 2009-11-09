@@ -22,7 +22,7 @@
    (clear-color (make-color :r 0 :g 0 :b 0 :a 0))
    pausedp
    resizablep
-   windowedp
+   (windowedp t)
    key-repeat-p
    (mouse-visible-p t)
    (mouse-x 0)

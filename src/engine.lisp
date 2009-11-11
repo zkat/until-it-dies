@@ -189,7 +189,6 @@ but it's not a mortal sin to just use it as a singleton."))
 (defreply init :after ((engine =engine=))
   (setf (mouse-visible-p engine) (mouse-visible-p engine)
         (key-repeat-p engine) (key-repeat-p engine))
-  (mapc #'funcall (init-functions engine))
   (setf (initializedp engine) t))
 
 (defreply teardown ((engine =engine=))
@@ -198,7 +197,6 @@ but it's not a mortal sin to just use it as a singleton."))
 
 (defreply teardown :after ((engine =engine=))
   "Once the real teardown stuff is done, we shut down our libs."
-  (mapc #'funcall (teardown-functions engine))
   (setf (initializedp engine) nil))
 
 (defmacro with-engine (engine &body body)

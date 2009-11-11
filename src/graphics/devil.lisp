@@ -129,3 +129,16 @@
 (defcfun ("ilutDisable" disable) :boolean (state state-definition))
 (defcfun ("ilutGLLoadImage" gl-load-image) :uint (file-name pathname-string))
 
+(defun init-devil ()
+  (uid-il:init)
+  (uid-ilut:init))
+
+(defun shutdown-devil ()
+  (uid-il:shutdown))
+
+(defun reinit-devil ()
+  (shutdown-devil)
+  (init-devil))
+
+(eval-when (:load-toplevel :execute)
+  (init-devil))

@@ -27,7 +27,7 @@
                       :components
                       ((:file "finalizers")
                        (:file "resources" :depends-on ("finalizers"))))
-             (:file "engine" :depends-on ("event" "util" "colors"))))))
+             (:file "engine" :depends-on ("event" "util" "colors" "resources"))))))
 
 (cl:defpackage until-it-dies.demo.resource-info
   (:export :*resource-directory*))

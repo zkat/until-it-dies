@@ -5,37 +5,9 @@
   :description "Until It Dies -- A 2D Game Engine."
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
-  :licence "BSD-style"
-  :depends-on (sheeple cl-opengl cl-openal)
-  :long-description "Until It Dies is based on the code developed in Yashmup, with some improvements,
-                     including opengl-graphics, and Sheeple as an object system."
-  :serial t
-  :components
-  ((:module "src"
-            :components
-            ((:file "packages")
-             (:module "util" :depends-on ("packages")
-                      :components
-                      ((:file "opengl-hacks")
-                       (:file "priority-queue")
-                       (:file "glfw")
-                       (:file "utils")))
-             (:file "messages" :depends-on ("util"))
-             (:file "input" :depends-on ("messages"))
-             (:file "colors" :depends-on ("util"))
-             (:file "primitives" :depends-on ("colors"))
-             (:file "event" :depends-on ("messages"))
-             (:module "resources" :depends-on ("util" "messages")
-                      :components
-                      ((:file "finalizers")
-                       (:file "resources" :depends-on ("finalizers"))
-                       (:file "devil")
-                       (:file "textures" :depends-on ("devil" "resources"))
-                       (:file "ftgl")
-                       (:file "fonts" :depends-on ("ftgl" "resources"))
-                       (:file "sounds" :depends-on ("resources"))))
-             (:file "sprite" :depends-on ("messages" "resources"))
-             (:file "engine" :depends-on ("event" "sprite" "util" "colors"))))))
+  :licence "MIT"
+  :depends-on (until-it-dies.base until-it-dies.graphics until-it-dies.sound))
+
 
 (cl:defpackage until-it-dies.demo.resource-info
   (:export :*resource-directory*))

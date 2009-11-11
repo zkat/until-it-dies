@@ -47,7 +47,9 @@ It's a good idea to create a delegate of =engine= for each application being cre
 but it's not a mortal sin to just use it as a singleton."))
 
 (defreply init-object :after ((engine =engine=) &key)
-  (setf (keys-held-down engine) (make-hash-table)))
+  (setf (keys-held-down engine) (make-hash-table)
+        (resource-manager engine) (object :parents =resource-manager=)
+        (event-queue engine) (object :parents =event-queue=)))
 
 (defun create-engine (&key (default-font (object :parents =font=))
                       (clear-color *black*) resizablep (title "UID Application")

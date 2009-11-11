@@ -18,7 +18,6 @@
    (keys-held-down (make-hash-table))
    (event-queue (object :parents =event-queue=))
    (resource-manager (object :parents =resource-manager=))
-   (default-font (object :parents =font=))
    (clear-color (make-color :r 0 :g 0 :b 0 :a 0))
    pausedp
    resizablep
@@ -51,12 +50,10 @@ but it's not a mortal sin to just use it as a singleton."))
         (resource-manager engine) (object :parents =resource-manager=)
         (event-queue engine) (object :parents =event-queue=)))
 
-(defun create-engine (&key (default-font (object :parents =font=))
-                      (clear-color *black*) resizablep (title "UID Application")
+(defun create-engine (&key (clear-color *black*) resizablep (title "UID Application")
                       (window-width 500) (window-height 500) key-repeat-p
                       (mouse-visible-p t) (windowedp t))
-  (defobject =engine= ((default-font default-font)
-                       (clear-color clear-color)
+  (defobject =engine= ((clear-color clear-color)
                        (resizablep resizablep)
                        (title title) (key-repeat-p key-repeat-p)
                        (windowedp windowedp)
@@ -187,24 +184,21 @@ but it's not a mortal sin to just use it as a singleton."))
   (setf (last-frame-time engine) 0)
   (setf cl-opengl-bindings:*gl-get-proc-address* #'uid-glfw:get-proc-address)
   (setup-ortho-projection (window-width engine) (window-height engine))
-  (uid-il:init)
-  (uid-ilut:init)
-  (alut:init)
   engine)
 
 (defreply init :after ((engine =engine=))
   (setf (mouse-visible-p engine) (mouse-visible-p engine)
         (key-repeat-p engine) (key-repeat-p engine))
+  (mapc #'funcall (init-functions engine))
   (setf (initializedp engine) t))
 
 (defreply teardown ((engine =engine=))
   "Do nothing by default."
-  (uid-il:shutdown)
-  (alut:exit)
   engine)
 
 (defreply teardown :after ((engine =engine=))
   "Once the real teardown stuff is done, we shut down our libs."
+  (mapc #'funcall (teardown-functions engine))
   (setf (initializedp engine) nil))
 
 (defmacro with-engine (engine &body body)
@@ -215,11 +209,10 @@ we're done with it."
             (*engine* ,engine-var))
        (with-event-queue (event-queue ,engine-var)
          (with-resource-manager (resource-manager ,engine-var)
-           (with-font (default-font ,engine-var)
-             (init ,engine-var)
-             (unwind-protect
-                  ,@body
-               (teardown ,engine-var))))))))
+           (init ,engine-var)
+           (unwind-protect
+                ,@body
+             (teardown ,engine-var)))))))
 
 ;;;
 ;;; Callbacks for GLFW events

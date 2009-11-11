@@ -184,3 +184,4 @@ figure out which frames to draw."))
 
 (defun create-text (string)
   (defobject (=text=) ((string-to-draw string))))
+

@@ -11,7 +11,7 @@
             ((:module "graphics"
                       :components
                       ((:file "devil")
-                       (:file "textures" :depends-on ("devil" "resources"))
+                       (:file "textures" :depends-on ("devil"))
                        (:file "ftgl")
-                       (:file "fonts" :depends-on ("ftgl" "resources"))
-                       (:file "sprite" :depends-on ("messages" "resources"))))))))
+                       (:file "fonts" :depends-on ("ftgl"))
+                       (:file "sprite" :depends-on ("fonts" "textures"))))))))

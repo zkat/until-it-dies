@@ -26,14 +26,8 @@
              (:module "resources" :depends-on ("util" "messages")
                       :components
                       ((:file "finalizers")
-                       (:file "resources" :depends-on ("finalizers"))
-                       (:file "devil")
-                       (:file "textures" :depends-on ("devil" "resources"))
-                       (:file "ftgl")
-                       (:file "fonts" :depends-on ("ftgl" "resources"))
-                       (:file "sounds" :depends-on ("resources"))))
-             (:file "sprite" :depends-on ("messages" "resources"))
-             (:file "engine" :depends-on ("event" "sprite" "util" "colors"))))))
+                       (:file "resources" :depends-on ("finalizers"))))
+             (:file "engine" :depends-on ("event" "util" "colors"))))))
 
 (cl:defpackage until-it-dies.demo.resource-info
   (:export :*resource-directory*))

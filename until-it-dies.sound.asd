@@ -10,4 +10,4 @@
             :components
             ((:module "sound"
                       :components
-                      ((:file "sound")))))))
+                      ((:file "sounds")))))))

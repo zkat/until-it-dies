@@ -201,7 +201,6 @@ but it's not a mortal sin to just use it as a singleton."))
   "Do nothing by default."
   (uid-il:shutdown)
   (alut:exit)
-  (uid-glfw:terminate)
   engine)
 
 (defreply teardown :after ((engine =engine=))

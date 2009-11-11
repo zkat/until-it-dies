@@ -101,3 +101,6 @@ returns NIL."
     (load-resource sound)))
 (defreply rewind ((sound =sound=))
   (al:source-rewind (source-id sound)))
+
+(eval-when (:load-toplevel :execute)
+  (alut:init))

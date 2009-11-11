@@ -87,6 +87,3 @@
   (defobject (=file-texture=)
       ((filepath filepath))))
 
-(defun init-textures ()
-  (uid-il:init)
-  (uid-ilut:init))

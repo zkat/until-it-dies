@@ -12,20 +12,23 @@ UID itself is MIT licensed, and all its dependencies use permissive licenses. Se
 Getting it to run
 =================
 
-UID has the following Lisp dependencies:
+UID is split into several modules. The base system, `until-it-dies.base`, includes the basics for
+the engine, such as windowing, the resource manager, the event queue, primitive drawing, and
+colors. If this is all you need, you can simply asdf-load until-it-dies.base. The only dependencies
+for this base system are Sheeple and CL-OpenGL. You must also have glfw installed in your system.
 
-* Sheeple
-* CL-OpenGL
-* CL-OpenAL
+Besides the base system, UID currently includes systems that provide fancier features, which can
+optionally be loaded:
 
-Additionally, you must have the following C dependencies installed:
+* `until-it-dies.graphics` provides image loading, textures, animations, text rendering, and
+  sprites. It requires that ftgl and devil be installed.
 
-* opengl (whatever provides the opengl library in your case, that is) (open standard)
-* openal - sound (LGPL)
-* freealut - more sound (LGPL)
-* devil - image loading (LGPL)
-* ftgl - text (MIT/LGPL)
-* glfw - windowing and events (BSD)
+* `until-it-dies.sound` provides positional audio. You must have openal and freealut installed in
+  order to use this module. This module also depends on cl-openal for bindings.
+
+If you want the whole thing, the `until-it-dies.asd` system will load everything.
+
+As of right now, all of the modules dump their symbols into the base until-it-dies package.
 
 How the hell do I use it?
 =========================

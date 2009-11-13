@@ -18,6 +18,10 @@
                        (:file "priority-queue")
                        (:file "glfw")
                        (:file "utils")))
+             (:module "resources" :depends-on ("util" "messages")
+                      :components
+                      ((:file "finalizers")
+                       (:file "resources" :depends-on ("finalizers"))))
              (:file "messages" :depends-on ("util"))
              (:file "input" :depends-on ("messages"))
              (:file "colors" :depends-on ("util"))
@@ -27,7 +31,8 @@
                       :components
                       ((:file "finalizers")
                        (:file "resources" :depends-on ("finalizers"))))
-             (:file "engine" :depends-on ("event" "input" "util" "colors" "resources"))))))
+             (:file "view")
+             (:file "engine" :depends-on ("event" "view" "input" "util" "colors" "resources"))))))
 
 (cl:defpackage until-it-dies.demo.resource-info
   (:export :*resource-directory*))

@@ -63,4 +63,3 @@ Returns both the difference in time and the current-time used in the computation
 
 (defun string-join (joiner &rest strings)
   (format nil (format nil "~~{~~A~~^~A~~}" joiner) strings))
-

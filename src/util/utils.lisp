@@ -61,12 +61,3 @@ Returns both the difference in time and the current-time used in the computation
                             (t (format nil "~A" obj))))
               objects)))
 
-;;;
-;;; OpengGL utils
-;;;
-(defun setup-ortho-projection (width height)
-  (gl:matrix-mode :projection)
-  (gl:load-identity)
-  (gl:viewport 0 0 width height)
-  (gl:ortho 0 width 0 height 10 0) ;0,0 is at bottom left of screen. Much nicer for maths.
-  (gl:matrix-mode :modelview))

@@ -30,6 +30,7 @@
    joysticks
    (window-width 400)
    (window-height 400)
+   (current-view (object :parents =view=))
    (title "Until It Dies application"))
   (:documentation
    "Engines are objects that contain information about
@@ -54,14 +55,15 @@ but it's not a mortal sin to just use it as a singleton."))
 
 (defun create-engine (&key (clear-color *black*) resizablep (title "UID Application")
                       (window-width 500) (window-height 500) key-repeat-p
-                      (mouse-visible-p t) (windowedp t))
+                      (mouse-visible-p t) (windowedp t) current-view)
   (defobject =engine= ((clear-color clear-color)
                        (resizablep resizablep)
                        (title title) (key-repeat-p key-repeat-p)
                        (windowedp windowedp)
                        (window-width window-width)
                        (window-height window-height)
-                       (mouse-visible-p mouse-visible-p))))
+                       (mouse-visible-p mouse-visible-p)
+                       (current-view (or current-view (object :parents =view=))))))
 
 (defreply (setf key-repeat-p) :after (new-value (engine =engine=))
   (when (initializedp engine)
@@ -232,7 +234,7 @@ but it's not a mortal sin to just use it as a singleton."))
   (setf (last-frame-time engine) 0)
   (setf (joysticks engine) (available-joysticks))
   (setf cl-opengl-bindings:*gl-get-proc-address* #'uid-glfw:get-proc-address)
-  (setup-ortho-projection (window-width engine) (window-height engine))
+  (set-view (current-view engine))
   engine)
 
 (defreply init :after ((engine =engine=))
@@ -265,7 +267,12 @@ we're done with it."
 ;;; Callbacks for GLFW events
 ;;;
 (cffi:defcallback mouse-moved :void ((x :int) (y :int))
-  (continuable (mouse-move *engine* x (- (window-height *engine*) y))))
+  (continuable
+    (let* ((view (current-view engine))
+           (width-factor (/ (view-width view) (window-width engine)))
+           (height-factor (/ (view-height view) (window-height engine))))
+      (mouse-move *engine* (+ (view-left view) (* x width-factor))
+                  (+ (view-bottom view) (* (- (window-height *engine*) y) height-factor))))))
 
 (cffi:defcallback mouse-button-hook :void ((button :int) (action :int))
   (case action

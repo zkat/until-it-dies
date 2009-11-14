@@ -129,9 +129,6 @@ followed by the main engine loop."))
 (defmessage mouse-move (engine x y)
   (:documentation "Mouse has been moved to (X,Y)."))
 
-(defmessage mouse-wheel (engine delta)
-  (:documentation "Mouse wheel has been scrolled by `DELTA' units"))
-
 (defmessage joystick-button-down (engine joystick button)
   (:documentation "JOYSTICK's button #`BUTTON' has been pressed."))
 

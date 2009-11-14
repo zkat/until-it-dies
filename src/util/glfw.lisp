@@ -139,6 +139,8 @@
 ;; Keyboard key definitions: 8-bit ISO-8859-1 (Latin 1) encoding is used
 ;; for printable keys (such as A-Z, 0-9 etc), and values above 256
 ;; represent special (non-printable) keys (e.g. F1, Page Up etc).
+(defconstant +key-special+ 256)
+(defconstant +key-last+ (+ 256 62))
 (cffi:defcenum key
 
   (:unknown -1) (:space 32) (:special 256) :escape
@@ -163,6 +165,7 @@
 
 ;; Mouse button definitions
 (defcenum mouse-button
+<<<<<<< HEAD
   :mouse-button-1
   :mouse-button-2
   :mouse-button-3
@@ -172,6 +175,17 @@
   :mouse-button-7
   :mouse-button-8
   :mouse-button-last
+=======
+  (:mouse-button-1 0)
+  (:mouse-button-2 1)
+  (:mouse-button-3 2)
+  (:mouse-button-4 3)
+  (:mouse-button-5 4)
+  (:mouse-button-6 5)
+  (:mouse-button-7 6)
+  (:mouse-button-8 7)
+  (:mouse-button-last 7)
+>>>>>>> MORE PORTING
   ;; Mouse button aliases
   (:mouse-button-left 0)
   :mouse-button-right
@@ -369,7 +383,8 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 (defcfun ("glfwSetMousePosCallback" set-mouse-pos-callback) :void (cbfun :pointer))
 (defcfun ("glfwSetMouseWheelCallback" set-mouse-wheel-callback) :void (cbfun :pointer))
 
-(defcfun ("glfwGetJoystickParam" %get-joystick-param) :int (joy :int) (param joystick-param))
+(defcfun ("glfwGetJoystickParam" %get-joystick-param) key/button-state
+  (joy :int) (param joystick-param))
 (defun get-joystick-param (joystick param)
   (if (eq :present param)
       (cffi:translate-from-foreign (%get-joystick-param joystick param) 'boolean)
@@ -382,7 +397,11 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
     (let ((numaxes (%get-joystick-pos joy pos numaxes)))
       (loop for i below numaxes collecting (mem-aref pos :float i)))))
 
+<<<<<<< HEAD
 (defcfun ("glfwGetJoystickButtons" %get-joystick-buttons) :int (joy :int) (buttons :pointer) (numbuttons :int))
+=======
+(defcfun ("glfwGetJoystickButtons" %get-joystick-buttons)  (joy :int) (buttons :pointer) (numbuttons :int))
+>>>>>>> MORE PORTING
 (defun get-joystick-buttons (joy numbuttons)
   (with-foreign-object (buttons :unsigned-char numbuttons)
     (let ((numbuttons (%get-joystick-buttons joy buttons numbuttons)))

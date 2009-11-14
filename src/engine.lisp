@@ -276,7 +276,12 @@ we're done with it."
 
 (cffi:defcallback mouse-wheel-moved :void ((new-pos :int))
   (continuable (let ((delta (- new-pos (last-mouse-wheel-position *engine*))))
-                 (mouse-wheel *engine* delta))))
+                 (if (> delta 0)
+                     (progn (mouse-down *engine* 4)
+                            (mouse-up *engine* 4))
+                     (progn (mouse-down *engine* 5)
+                            (mouse-up *engine* 5)))))
+  (setf (last-mouse-wheel-position *engine*) new-pos))
 
 (cffi:defcallback window-resized :void ((width :int) (height :int))
   (continuable (window-resized *engine* width height)))

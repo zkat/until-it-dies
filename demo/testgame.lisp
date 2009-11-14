@@ -127,5 +127,13 @@
       (0 (setf visiblep (not visiblep)))
       (1 (play *bah*)))))
 
+(defreply joystick-button-down ((engine *uid-demo*) joystick button)
+  (when (= 0 (joystick-number joystick))
+    (case button
+      (0 (play *bah*)))))
+
+(defreply joystick-move ((engine *uid-demo*) joystick axis state)
+  (format t "Joystick: ~A Axis: ~A Position: ~A~%" joystick axis state))
+
 (defun run-demo ()
   (run *uid-demo*))

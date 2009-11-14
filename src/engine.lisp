@@ -61,7 +61,6 @@
   (mapc #'teardown (windows engine))
   (setf (initializedp engine) nil))
 
-
 ;;;
 ;;; Main Function Extraordinaire
 ;;;

@@ -27,9 +27,20 @@
    :mouse-up
    :mouse-down
    :mouse-move
+   :joystick-button-down
+   :joystick-button-up
+   :joystick-move
    :window-resized
    :step-engine
 
+   ;; joysticks
+   :=joystick=
+   :joystick-number
+   :num-axes
+   :num-buttons
+   :axis-positions
+   :button-states
+   
    ;; Engine
    :=engine=
    :*engine*
@@ -43,6 +54,7 @@
    :default-font
    :clear-color
    :pausedp
+   :joysticks
    :mouse-x
    :mouse-y
    :window-width

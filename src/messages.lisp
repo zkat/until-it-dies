@@ -129,6 +129,16 @@ followed by the main engine loop."))
 (defmessage mouse-move (engine x y)
   (:documentation "Mouse has been moved to (X,Y)."))
 
+(defmessage joystick-button-down (engine joystick button)
+  (:documentation "JOYSTICK's button #`BUTTON' has been pressed."))
+
+(defmessage joystick-button-up (engine joystick button)
+  (:documentation "JOYSTICK's button #`BUTTON' has been released."))
+
+(defmessage joystick-move (engine joystick axis state)
+  (:documentation "JOYSTICK's axis #`AXIS' has been moved.
+                   Its current state is a number in range [-1, 1]"))
+
 (defmessage window-resized (engine width height)
   (:documentation "The window is resized by the user"))
 

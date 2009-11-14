@@ -29,43 +29,35 @@
 (defreply (setf height) (new-value (view =view))
   (setf (view-top view) (+ (view-bottom view) new-value)))
 
-(defmessage zoom-view (view zoom-factor)
-  (:reply ((view =view=) zoom-factor)
-    (let ((width-diff (* zoom-factor (width view)))
-          (height-diff (* zoom-factor (height view))))
-      (with-properties (view-left view-right view-bottom view-top view-zoom)
-          view
-        (decf view-left width-diff)
-        (incf view-right width-diff)
-        (decf view-bottom height-diff)
-        (incf view-top height-diff)
-        (incf view-zoom zoom-factor)))))
-
-(defmessage move-view (view dx dy)
-  (:reply ((view =view=) dx dy)
-    (with-properties (view-left view-right view-bottom view-top) 
+(defreply zoom-view ((view =view=) zoom-factor)
+  (let ((width-diff (* zoom-factor (view-width view)))
+        (height-diff (* zoom-factor (view-height view))))
+    (with-properties (view-left view-right view-bottom view-top view-zoom)
         view
       (incf view-left dx) (incf view-right dx)
       (incf view-bottom dy) (incf view-top dy))))
 
-(defmessage update-view (view x y width height &key far near)
-  (:reply ((view =view=) x y width height)
-    (with-properties (view-left view-right view-bottom view-top view-far view-near)
-        view
-      (setf view-left x
-            view-right (+ x width)
-            view-bottom y
-            view-top (+ y height))
-      (when far (setf view-far far))
-      (when near (setf view-near near)))))
+(defreply move-view ((view =view=) dx dy)
+  (with-properties (view-left view-right view-bottom view-top)
+      view
+    (incf view-left dx) (incf view-right dx)
+    (incf view-bottom dy) (incf view-top dy)))
 
-(defmessage set-view (view)
-  (:reply ((view =view=))
-    (with-properties (view-left view-right view-top view-bottom view-far view-near)
-        view
-      (gl:matrix-mode :projection)
-      (gl:load-identity)
-      (gl:ortho view-left view-right view-bottom view-top view-near view-far)
-      (gl:matrix-mode :modelview)
-      (gl:load-identity))))
+(defreply update-view ((view =view=) x y width height &key far near)
+  (with-properties (view-left view-right view-bottom view-top view-far view-near)
+      view
+    (setf view-left x
+          view-right (+ x width)
+          view-bottom y
+          view-top (+ y height))
+    (when far (setf view-far far))
+    (when near (setf view-near near))))
 
+(defreply set-view ((view =view=))
+  (with-properties (view-left view-right view-top view-bottom view-far view-near)
+      view
+    (gl:matrix-mode :projection)
+    (gl:load-identity)
+    (gl:ortho view-left view-right view-bottom view-top view-near view-far)
+    (gl:matrix-mode :modelview)
+    (gl:load-identity)))

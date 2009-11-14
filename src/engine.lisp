@@ -26,6 +26,7 @@
    (mouse-visible-p t)
    (mouse-x 0)
    (mouse-y 0)
+   (last-mouse-wheel-position 0)
    joysticks
    (window-width 400)
    (window-height 400)
@@ -273,6 +274,10 @@ we're done with it."
     (#.uid-glfw:+release+
      (continuable (mouse-up *engine* button)))))
 
+(cffi:defcallback mouse-wheel-moved :void ((new-pos :int))
+  (continuable (let ((delta (- new-pos (last-mouse-wheel-position *engine*))))
+                 (mouse-wheel *engine* delta))))
+
 (cffi:defcallback window-resized :void ((width :int) (height :int))
   (continuable (window-resized *engine* width height)))
 
@@ -293,6 +298,7 @@ we're done with it."
         (uid-glfw:set-char-callback (cffi:callback char-hook))
         (uid-glfw:set-mouse-pos-callback (cffi:callback mouse-moved))
         (uid-glfw:set-mouse-button-callback (cffi:callback mouse-button-hook))
+        (uid-glfw:set-mouse-wheel-callback (cffi:callback mouse-wheel-moved))
         (uid-glfw:set-window-size-callback (cffi:callback window-resized))
         (uid-glfw:set-window-close-callback (cffi:callback window-closed))
         (setf (runningp engine) t)

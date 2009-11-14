@@ -144,3 +144,15 @@ followed by the main engine loop."))
 
 (defmessage step-engine (engine)
   (:documentation "Runs once per game loop."))
+
+;;;
+;;; Views
+;;;
+(defmessage zoom-view (view zoom-factor))
+
+(defmessage move-view (view dx dy))
+
+(defmessage update-view (view x y width height &key far near))
+
+(defmessage set-view (view))
+

@@ -27,11 +27,7 @@
              (:file "colors" :depends-on ("util"))
              (:file "primitives" :depends-on ("colors"))
              (:file "event" :depends-on ("messages"))
-             (:module "resources" :depends-on ("util" "messages")
-                      :components
-                      ((:file "finalizers")
-                       (:file "resources" :depends-on ("finalizers"))))
-             (:file "view")
+             (:file "view" :depends-on ("messages"))
              (:file "engine" :depends-on ("event" "view" "input" "util" "colors" "resources"))))))
 
 (cl:defpackage until-it-dies.demo.resource-info

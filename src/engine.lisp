@@ -156,14 +156,17 @@ but it's not a mortal sin to just use it as a singleton."))
   (values))
 
 ;;; joystick events
-(defmessage joystick-button-down (engine joystick button)
-  (:reply ((engine =engine=) (joystick =joystick=) button) (declare (ignore button)) nil))
+(defreply joystick-button-down ((engine =engine=) (joystick =joystick=) button)
+  (declare (ignore button))
+  (values))
 
-(defmessage joystick-button-up (engine joystick button)
-  (:reply ((engine =engine=) (joystick =joystick=) button) (declare (ignore button)) nil))
+(defreply joystick-button-up ((engine =engine=) (joystick =joystick=) button)
+  (declare (ignore button))
+  (values))
 
-(defmessage joystick-move (engine joystick axis state)
-  (:reply ((engine =engine=) (joystick =joystick=) axis state) (declare (ignore axis state)) nil))
+(defreply joystick-move((engine =engine=) (joystick =joystick=) axis state)
+  (declare (ignore axis state))
+  (values))
 
 (defreply update ((joystick =joystick=) dt &key)
   (declare (ignore dt))

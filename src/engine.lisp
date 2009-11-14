@@ -183,7 +183,7 @@ but it's not a mortal sin to just use it as a singleton."))
 
 (defun maybe-fire-joystick-axis-events (engine joystick old-axes new-axes)
   (loop for old-axis in old-axes
-     for new-axis in old-axes
+     for new-axis in new-axes
      for axis-id from 0
      unless (= old-axis new-axis)
      do (joystick-move engine joystick axis-id new-axis)))
@@ -191,8 +191,9 @@ but it's not a mortal sin to just use it as a singleton."))
 (defun maybe-fire-joystick-button-events (engine joystick old-buttons new-buttons)
   (loop for old-button in old-buttons
      for new-button in new-buttons
+     for button-id from 0
      unless (= old-button new-button)
-     do (if (eq new-button :released)
+     do (if (eq old-button :pressed)
             (joystick-button-up engine joystick button-id)
             (joystick-button-down engine joystick button-id))))
 

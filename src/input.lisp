@@ -97,17 +97,17 @@
 
 (defun glfw-joystick-button-states (joystick-number num-buttons)
   (loop for state in (uid-glfw:get-joystick-buttons joystick-number num-buttons)
-     collect (if (= uid-glfw:+press+) :pressed :released)))
+     collect (if (= state uid-glfw:+press+) :pressed :released)))
 
 ;;; Interface
 (defproto =joystick= ()
-  (joystick-number 0)
-  (num-axes 0) (num-buttons 0)
-  (axis-positions nil) (button-states nil))
+  ((joystick-number 0)
+   (num-axes 0) (num-buttons 0)
+   (axis-positions nil) (button-states nil)))
 
 (defun build-joystick (joynum)
-  (let ((num-axes (glfw-joystick-num-axes))
-        (num-buttons (glfw-joystick-num-buttons)))
+  (let ((num-axes (glfw-joystick-num-axes joynum))
+        (num-buttons (glfw-joystick-num-buttons joynum)))
     (defobject =joystick=
         ((joystick-number joynum)
          (num-axes num-axes)

@@ -63,7 +63,7 @@ but it's not a mortal sin to just use it as a singleton."))
                        (window-width window-width)
                        (window-height window-height)
                        (mouse-visible-p mouse-visible-p)
-                       (current-view (or current-view (object :parents =view=))))))
+                       (current-view (or current-view (create-view 0 0 window-width window-height))))))
 
 (defreply (setf key-repeat-p) :after (new-value (engine =engine=))
   (when (initializedp engine)

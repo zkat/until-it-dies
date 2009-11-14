@@ -192,8 +192,8 @@ but it's not a mortal sin to just use it as a singleton."))
   (loop for old-button in old-buttons
      for new-button in new-buttons
      for button-id from 0
-     unless (= old-button new-button)
-     do (if (eq old-button :pressed)
+     unless (eq old-button new-button)
+     do (if (eq new-button :released)
             (joystick-button-up engine joystick button-id)
             (joystick-button-down engine joystick button-id))))
 

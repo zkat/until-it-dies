@@ -57,6 +57,7 @@
 (defmethod teardown ((engine engine))
   engine)
 
+
 (defmethod teardown :after ((engine engine))
   (mapc #'teardown (windows engine))
   (setf (initializedp engine) nil))

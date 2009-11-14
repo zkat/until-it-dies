@@ -68,14 +68,14 @@ but it's not a mortal sin to just use it as a singleton."))
 (defreply (setf key-repeat-p) :after (new-value (engine =engine=))
   (when (initializedp engine)
     (if new-value
-        (uid-glfw:enable uid-glfw:+key-repeat+)
-        (uid-glfw:disable uid-glfw:+key-repeat+))))
+        (uid-glfw:enable :key-repeat)
+        (uid-glfw:disable :key-repeat))))
 
 (defreply (setf mouse-visible-p) :after (new-value (engine =engine=))
   (when (initializedp engine)
     (if new-value
-        (uid-glfw:enable uid-glfw:+mouse-cursor+)
-        (uid-glfw:disable uid-glfw:+mouse-cursor+))))
+        (uid-glfw:enable :mouse-cursor)
+        (uid-glfw:disable :mouse-cursor))))
 
 (defreply (setf title) :after (new-value (engine =engine=))
   (when (initializedp engine)
@@ -274,11 +274,11 @@ we're done with it."
       (mouse-move *engine* (+ (view-left view) (* x width-factor))
                   (+ (view-bottom view) (* (- (window-height *engine*) y) height-factor))))))
 
-(cffi:defcallback mouse-button-hook :void ((button :int) (action :int))
+(cffi:defcallback mouse-button-hook :void ((button :int) (action uid-glfw:key/button-state))
   (case action
-    (#.uid-glfw:+press+
+    (:press
      (continuable (mouse-down *engine* button)))
-    (#.uid-glfw:+release+
+    (:release
      (continuable (mouse-up *engine* button)))))
 
 (cffi:defcallback mouse-wheel-moved :void ((new-pos :int))
@@ -301,10 +301,9 @@ we're done with it."
 ;;;
 (defreply run ((engine =engine=))
   (uid-glfw:with-init
-    (unless (resizablep engine)
-      (uid-glfw:open-window-hint uid-glfw:+window-no-resize+ uid-glfw:+true+))
+    (uid-glfw:open-window-hint :window-no-resize (resizable engine))
     (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine) 0 0 0 0
-                                0 0 (if (windowedp engine) uid-glfw:+window+ uid-glfw:+fullscreen+))
+                                0 0 (if (windowedp engine) :window :fullscreen))
       (with-engine engine
         (uid-glfw:set-key-callback (cffi:callback key-hook))
         (uid-glfw:set-char-callback (cffi:callback char-hook))
@@ -314,6 +313,6 @@ we're done with it."
         (uid-glfw:set-window-size-callback (cffi:callback window-resized))
         (uid-glfw:set-window-close-callback (cffi:callback window-closed))
         (setf (runningp engine) t)
-        (loop while (= uid-glfw:+true+ (uid-glfw:get-window-param uid-glfw:+opened+))
+        (loop while (uid-glfw:get-window-param :opened)
            do (continuable (step-engine engine))))))
   engine)

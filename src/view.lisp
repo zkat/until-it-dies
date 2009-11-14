@@ -13,20 +13,25 @@
    (view-far 0) (view-near 10) (view-zoom 1.0)))
 
 (defun create-view (x y width height &key (far 0) (near 10))
-  (defobject =view= ((view-left x) (view-right (+ x view-width))
+  (defobject =view= ((view-left x) (view-right (+ x width))
                      (view-bottom y) (view-top (+ y height))
                      (view-far far) (view-near near))))
 
-(defreply width ((view =view=))
+(defmessage view-width (view))
+(defmessage (setf view-width) (new-value view))
+(defmessage view-height (view))
+(defmessage (setf view-height) (new-value view))
+
+(defreply view-width ((view =view=))
   (- (view-right view) (view-left view)))
 
-(defreply (setf width) (new-value (view =view=))
+(defreply (setf view-width) (new-value (view =view=))
   (setf (view-right view) (+ (view-left view) new-value)))
 
-(defreply height ((view =view=))
+(defreply view-height ((view =view=))
   (- (view-top view) (view-bottom view)))
 
-(defreply (setf height) (new-value (view =view))
+(defreply (setf view-height) (new-value (view =view=))
   (setf (view-top view) (+ (view-bottom view) new-value)))
 
 (defreply zoom-view ((view =view=) zoom-factor)
@@ -34,8 +39,11 @@
         (height-diff (* zoom-factor (view-height view))))
     (with-properties (view-left view-right view-bottom view-top view-zoom)
         view
-      (incf view-left dx) (incf view-right dx)
-      (incf view-bottom dy) (incf view-top dy))))
+      (decf view-left width-diff)
+      (incf view-right width-diff)
+      (decf view-bottom height-diff)
+      (incf view-top height-diff)
+      (incf view-zoom zoom-factor))))
 
 (defreply move-view ((view =view=) dx dy)
   (with-properties (view-left view-right view-bottom view-top)

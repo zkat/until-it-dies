@@ -155,8 +155,9 @@
                              (:default "libglfw")))
 
 ;; Key and button state/action definitions
-(defconstant +release+ 0)
-(defconstant +press+ 1)
+(defcenum key/button-state
+  (:release 0)
+  (:press 1))
 
 ;; Keyboard key definitions: 8-bit ISO-8859-1 (Latin 1) encoding is used
 ;; for printable keys (such as A-Z, 0-9 etc), and values above 256
@@ -338,21 +339,27 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 (defcfun ("glfwOpenWindow" %open-window) boolean
   (width :int) (height :int)
   (redbits :int) (greenbits :int) (bluebits :int) (alphabits :int)
-  (depthbits :int) (stencilbits :int) (mode :int))
+  (depthbits :int) (stencilbits :int) (mode open-window-mode))
 
 (declaim (inline open-window))
 (defun open-window (&optional (width 0) (height 0)
                     (redbits 0) (greenbits 0) (bluebits 0) (alphabits 0)
-                    (depthbits 0) (stencilbits 0) (mode +window+))
+                    (depthbits 0) (stencilbits 0) (mode :window))
   (%open-window width height redbits greenbits bluebits alphabits depthbits stencilbits mode))
 
-(defcfun ("glfwOpenWindowHint" open-window-hint) :void (target :int) (hint :int))
+(defcfun ("glfwOpenWindowHint" %open-window-hint) :void (target window-param) (hint :int))
+(defun open-window-hint (target hint)
+  (case target
+    ((:window-no-resize :stereo)
+     (%open-window-hint target (if hint 1 0)))
+    (otherwise
+     (%open-window-hint target hint))))
 
 (defcfun ("glfwCloseWindow" close-window) :void)
 
 (defmacro with-open-window ((&optional (title "glfw window") (width 0) (height 0)
                                        (redbits 0) (greenbits 0) (bluebits 0) (alphabits 0)
-                                       (depthbits 0) (stencilbits 0) (mode +window+))
+                                       (depthbits 0) (stencilbits 0) (mode :window))
                             &body forms)
   `(if (%open-window ,width ,height ,redbits ,greenbits ,bluebits ,alphabits 
                      ,depthbits ,stencilbits ,mode)
@@ -360,7 +367,7 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
             (block with-open-window
               (uid-glfw:set-window-title ,title)
               ,@forms)
-         (when (= +true+ (uid-glfw:get-window-param uid-glfw:+opened+))
+         (when (uid-glfw:get-window-param :opened)
            (close-window)))
        (error "Error initializing glfw window.")))
 
@@ -386,7 +393,7 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 
 (defcfun ("glfwRestoreWindow" restore-window) :void)
 
-(defcfun ("glfwGetWindowParam" get-window-param) :int (param :int))
+(defcfun ("glfwGetWindowParam" get-window-param) :int (param window-param))
 
 (defcfun ("glfwSwapBuffers" swap-buffers) :void)
 
@@ -425,9 +432,9 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
           (foreign-slot-value mode 'vidmode 'greenbits)
           (foreign-slot-value mode 'vidmode 'bluebits))))
 
-(defcfun ("glfwGetKey" get-key) :int (key :int))
+(defcfun ("glfwGetKey" get-key) key/button-state (key key))
 
-(defcfun ("glfwGetMouseButton" get-mouse-button) :int (button :int))
+(defcfun ("glfwGetMouseButton" get-mouse-button) key/button-state (button mouse-button))
 
 (defcfun+out+doc ("glfwGetMousePos" get-mouse-pos) :void ((:out xpos :int) (:out ypos :int)))
 
@@ -437,14 +444,18 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 
 (defcfun ("glfwSetMouseWheel" set-mouse-wheel) :void (pos :int))
 
-
 (defcfun ("glfwSetKeyCallback" set-key-callback) :void (cbfun :pointer))
 (defcfun ("glfwSetCharCallback" set-char-callback) :void (cbfun :pointer))
 (defcfun ("glfwSetMouseButtonCallback" set-mouse-button-callback) :void (cbfun :pointer))
 (defcfun ("glfwSetMousePosCallback" set-mouse-pos-callback) :void (cbfun :pointer))
 (defcfun ("glfwSetMouseWheelCallback" set-mouse-wheel-callback) :void (cbfun :pointer))
 
-(defcfun ("glfwGetJoystickParam" get-joystick-param) :int (joy :int) (param :int))
+(defcfun ("glfwGetJoystickParam" %get-joystick-param) :int (joy :int) (param joystick-param))
+(defun get-joystick-param (joystick param)
+  (if (eq :present param)
+      (when (= 1 (%get-joystick-param joystick param))
+        t)
+      (%get-joystick-param joystick param)))
 
 (defcfun ("glfwGetJoystickPos" %get-joystick-pos) :int (joy :int) (pos :pointer) (numaxes :int))
 
@@ -468,6 +479,6 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
                                                             (:out minor :int)
                                                             (:out rev :int)))
 
-(defcfun ("glfwEnable" enable) :void (token :int))
-(defcfun ("glfwDisable" disable) :void (token :int))
+(defcfun ("glfwEnable" enable) :void (token enable/disable))
+(defcfun ("glfwDisable" disable) :void (token enable/disable))
 

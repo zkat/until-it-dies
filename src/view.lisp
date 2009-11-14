@@ -9,8 +9,8 @@
 
 ;;; View objects
 (defproto =view= ()
-  (view-left 0) (view-right 1) (view-bottom 0) (view-top 1) 
-  (view-far 0) (view-near 10) (view-zoom 1.0))
+  ((view-left 0) (view-right 400) (view-bottom 0) (view-top 400)
+   (view-far 0) (view-near 10) (view-zoom 1.0)))
 
 (defun create-view (x y width height &key (far 0) (near 10))
   (defobject =view= ((view-left x) (view-right (+ x view-width))

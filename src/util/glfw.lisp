@@ -304,20 +304,10 @@
 (defconstant +key-repeat+ #x00030005)
 (defconstant +auto-poll-events+ #x00030006)
 
-;; glfwWaitThread wait modes
-(defconstant +wait+ #x00040001)
-(defconstant +nowait+ #x00040002)
-
 ;; glfwGetJoystickParam tokens
 (defconstant +present+ #x00050001)
 (defconstant +axes+ #x00050002)
 (defconstant +buttons+ #x00050003)
-
-;; glfwReadImage/glfwLoadTexture2D flags
-(defconstant +no-rescale-bit+ #x00000001) ; Only for glfwReadImage
-(defconstant +origin-ul-bit+ #x00000002)
-(defconstant +build-mipmaps-bit+ #x00000004) ; Only for glfwLoadTexture2D
-(defconstant +alpha-map-bit+ #x00000008)
 
 ;; Time spans longer than this (seconds) are considered to be infinity
 (defconstant +infinity+ 100000d0)

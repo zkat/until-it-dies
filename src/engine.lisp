@@ -91,8 +91,12 @@ but it's not a mortal sin to just use it as a singleton."))
       (uid-glfw:set-window-size window-width window-height))))
 
 (defreply update ((engine =engine=) dt &key)
-  (mapcar (fun (update _ dt)) (joysticks engine))
+  (declare (ignore dt))
   (values))
+
+(defreply update :before ((engine =engine=) dt &key)
+  (declare (ignore dt))
+  (mapcar (fun (update-joystick engine _)) (joysticks engine)))
 
 (defreply draw ((engine =engine=) &key)
   (values))
@@ -156,30 +160,30 @@ but it's not a mortal sin to just use it as a singleton."))
   (values))
 
 ;;; joystick events
-(defreply joystick-button-down ((engine =engine=) (joystick =joystick=) button)
-  (declare (ignore button))
+(defreply joystick-button-down ((engine =engine=) joystick button)
+  (declare (ignore joystick button))
   (values))
 
-(defreply joystick-button-up ((engine =engine=) (joystick =joystick=) button)
-  (declare (ignore button))
+(defreply joystick-button-up ((engine =engine=) joystick button)
+  (declare (ignore joystick button))
   (values))
 
-(defreply joystick-move((engine =engine=) (joystick =joystick=) axis state)
-  (declare (ignore axis state))
+(defreply joystick-move ((engine =engine=) joystick axis state)
+  (declare (ignore joystick axis state))
   (values))
 
-(defreply update ((joystick =joystick=) dt &key)
-  (declare (ignore dt))
+(defun update-joystick (engine joystick)
   (with-properties (joystick-number num-axes num-buttons axis-positions button-states)
       joystick
     (let ((old-axis-positions axis-positions)
           (old-button-states button-states)
           (new-axis-positions (glfw-joystick-axis-positions joystick-number num-axes))
           (new-button-states (glfw-joystick-button-states joystick-number num-buttons)))
-      (maybe-fire-joystick-axis-events *engine* joystick old-axis-positions new-axis-positions)
-      (maybe-fire-joystick-button-events *engine* joystick old-button-states new-button-states)
+      (maybe-fire-joystick-axis-events engine joystick old-axis-positions new-axis-positions)
+      (maybe-fire-joystick-button-events engine joystick old-button-states new-button-states)
       (setf axis-positions new-axis-positions
-            button-states new-button-states))))
+            button-states new-button-states)
+      t)))
 
 (defun maybe-fire-joystick-axis-events (engine joystick old-axes new-axes)
   (loop for old-axis in old-axes

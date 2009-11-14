@@ -26,6 +26,7 @@
    (mouse-visible-p t)
    (mouse-x 0)
    (mouse-y 0)
+   joysticks
    (window-width 400)
    (window-height 400)
    (title "Until It Dies application"))
@@ -90,7 +91,7 @@ but it's not a mortal sin to just use it as a singleton."))
       (uid-glfw:set-window-size window-width window-height))))
 
 (defreply update ((engine =engine=) dt &key)
-  (declare (ignore dt))
+  (mapcar (fun (update _ dt)) (joysticks engine))
   (values))
 
 (defreply draw ((engine =engine=) &key)
@@ -154,6 +155,44 @@ but it's not a mortal sin to just use it as a singleton."))
   (declare (ignore engine x y))
   (values))
 
+;;; joystick events
+(defmessage joystick-button-down (engine joystick button)
+  (:reply ((engine =engine=) (joystick =joystick=) button) (declare (ignore button)) nil))
+
+(defmessage joystick-button-up (engine joystick button)
+  (:reply ((engine =engine=) (joystick =joystick=) button) (declare (ignore button)) nil))
+
+(defmessage joystick-move (engine joystick axis state)
+  (:reply ((engine =engine=) (joystick =joystick=) axis state) (declare (ignore axis state)) nil))
+
+(defreply update ((joystick =joystick=) dt &key)
+  (declare (ignore dt))
+  (with-properties (joystick-number num-axes num-buttons axis-positions button-states)
+      joystick
+    (let ((old-axis-positions axis-positions)
+          (old-button-states button-states)
+          (new-axis-positions (glfw-joystick-axis-positions joystick-number num-axes))
+          (new-button-states (glfw-joystick-button-states joystick-number num-buttons)))
+      (maybe-fire-joystick-axis-events *engine* joystick old-axis-positions new-axis-positions)
+      (maybe-fire-joystick-button-events *engine* joystick old-button-states new-button-states)
+      (setf axis-positions new-axis-positions
+            button-states new-button-states))))
+
+(defun maybe-fire-joystick-axis-events (engine joystick old-axes new-axes)
+  (loop for old-axis in old-axes
+     for new-axis in old-axes
+     for axis-id from 0
+     unless (= old-axis new-axis)
+     do (joystick-move engine joystick axis-id new-axis)))
+
+(defun maybe-fire-joystick-button-events (engine joystick old-buttons new-buttons)
+  (loop for old-button in old-buttons
+     for new-button in new-buttons
+     unless (= old-button new-button)
+     do (if (eq new-button :released)
+            (joystick-button-up engine joystick button-id)
+            (joystick-button-down engine joystick button-id))))
+
 ;;; Other events
 (defreply window-resized (engine width height)
   "We don't really care about resize events right now."
@@ -182,6 +221,7 @@ but it's not a mortal sin to just use it as a singleton."))
 ;;; Main loop
 (defreply init ((engine =engine=))
   (setf (last-frame-time engine) 0)
+  (setf (joysticks engine) (available-joysticks))
   (setf cl-opengl-bindings:*gl-get-proc-address* #'uid-glfw:get-proc-address)
   (setup-ortho-projection (window-width engine) (window-height engine))
   engine)

@@ -17,7 +17,7 @@
       (funcall (case action
                  (:press 'key-down)
                  (:release 'key-up))
-               *engine* (uid-glfw:translate-control-key key)))))
+               *engine* (translate-glfw-control-key key)))))
 
 (cffi:defcallback char-hook :void ((key :int) (action uid-glfw:key/button-state))
   "Invokes KEY-DOWN or KEY-UP on the active engine, for character input."
@@ -33,7 +33,7 @@
 
 ;;; low-level stuff
 (defun glfw-available-joysticks ()
-  (loop for i below 16
+  (loop for i below 16 
      for joystick-present-p = (uid-glfw:get-joystick-param i :present)
      when (= 1 joystick-present-p)
      collect i))

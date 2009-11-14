@@ -268,9 +268,9 @@ we're done with it."
 ;;;
 (cffi:defcallback mouse-moved :void ((x :int) (y :int))
   (continuable
-    (let* ((view (current-view engine))
-           (width-factor (/ (view-width view) (window-width engine)))
-           (height-factor (/ (view-height view) (window-height engine))))
+    (let* ((view (current-view *engine*))
+           (width-factor (/ (view-width view) (window-width *engine*)))
+           (height-factor (/ (view-height view) (window-height *engine*))))
       (mouse-move *engine* (+ (view-left view) (* x width-factor))
                   (+ (view-bottom view) (* (- (window-height *engine*) y) height-factor))))))
 

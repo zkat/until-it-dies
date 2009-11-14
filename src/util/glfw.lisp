@@ -395,7 +395,7 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 (defcfun ("glfwGetWindowParam" %get-window-param) :int (param window-param))
 (defun get-window-param (param)
   (case param
-    (:opened
+    ((:opened :active :iconified :accelerated :window-no-resize :stereo)
      (when (= 1 (%get-window-param param)) t))
     (otherwise (%get-window-param param))))
 

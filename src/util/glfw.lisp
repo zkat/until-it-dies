@@ -75,7 +75,7 @@
            #:+accum-alpha-bits+ #:+aux-buffers+ #:+stereo+
            #:cond
            #:enable #:disable)
-  (:export #:+accelerated+ #:+accum-alpha-bits+ #:+accum-blue-bits+
+  (:export #:key/button-state #:key #:+accelerated+ #:+accum-alpha-bits+ #:+accum-blue-bits+
            #:+accum-green-bits+ #:+accum-red-bits+ #:+active+ #:+alpha-bits+
            #:+alpha-map-bit+ #:+auto-poll-events+ #:+aux-buffers+ #:+axes+
            #:+blue-bits+ #:+build-mipmaps-bit+ #:+buttons+ #:+depth-bits+ #:+false+
@@ -119,9 +119,6 @@
            #:with-init #:with-init-window #:with-lock-mutex #:with-open-window))
 (in-package #:uid-glfw)
 
-(defconstant +false+ 0)
-(defconstant +true+ 1)
-
 (defmacro defcfun+out+doc ((c-name lisp-name) return-type (&body args))
   (let ((internal-name (intern (format nil "%~a" lisp-name)))
         (in-arg-names (mapcar #'second (remove-if-not #'(lambda (arg)
@@ -162,6 +159,8 @@
 ;; Keyboard key definitions: 8-bit ISO-8859-1 (Latin 1) encoding is used
 ;; for printable keys (such as A-Z, 0-9 etc), and values above 256
 ;; represent special (non-printable) keys (e.g. F1, Page Up etc).
+(defconstant +key-special+ 256)
+(defconstant +key-last+ (+ 256 62))
 (cffi:defcenum key
   (:key-unknown -1)
   (:key-space 32)
@@ -240,7 +239,7 @@
   (:mouse-button-6 5)
   (:mouse-button-7 6)
   (:mouse-button-8 7)
-  (:mouse-button-last +mouse-button-8+)
+  (:mouse-button-last 7)
   ;; Mouse button aliases
   (:mouse-button-left 0)
   (:mouse-button-right 1)
@@ -393,7 +392,12 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 
 (defcfun ("glfwRestoreWindow" restore-window) :void)
 
-(defcfun ("glfwGetWindowParam" get-window-param) :int (param window-param))
+(defcfun ("glfwGetWindowParam" %get-window-param) :int (param window-param))
+(defun get-window-param (param)
+  (case param
+    (:opened
+     (when (= 1 (%get-window-param param)) t))
+    (otherwise (%get-window-param param))))
 
 (defcfun ("glfwSwapBuffers" swap-buffers) :void)
 
@@ -432,7 +436,7 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
           (foreign-slot-value mode 'vidmode 'greenbits)
           (foreign-slot-value mode 'vidmode 'bluebits))))
 
-(defcfun ("glfwGetKey" get-key) key/button-state (key key))
+(defcfun ("glfwGetKey" get-key) key/button-state (key :int))
 
 (defcfun ("glfwGetMouseButton" get-mouse-button) key/button-state (button mouse-button))
 
@@ -450,7 +454,8 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 (defcfun ("glfwSetMousePosCallback" set-mouse-pos-callback) :void (cbfun :pointer))
 (defcfun ("glfwSetMouseWheelCallback" set-mouse-wheel-callback) :void (cbfun :pointer))
 
-(defcfun ("glfwGetJoystickParam" %get-joystick-param) :int (joy :int) (param joystick-param))
+(defcfun ("glfwGetJoystickParam" %get-joystick-param) key/button-state
+  (joy :int) (param joystick-param))
 (defun get-joystick-param (joystick param)
   (if (eq :present param)
       (when (= 1 (%get-joystick-param joystick param))
@@ -464,8 +469,7 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
     (let ((numaxes (%get-joystick-pos joy pos numaxes)))
       (loop for i below numaxes collecting (mem-aref pos :float i)))))
 
-
-(defcfun ("glfwGetJoystickButtons" %get-joystick-buttons) :int (joy :int) (buttons :pointer) (numbuttons :int))
+(defcfun ("glfwGetJoystickButtons" %get-joystick-buttons)  (joy :int) (buttons :pointer) (numbuttons :int))
 (defun get-joystick-buttons (joy numbuttons)
   (with-foreign-object (buttons :unsigned-char numbuttons)
     (let ((numbuttons (%get-joystick-buttons joy buttons numbuttons)))

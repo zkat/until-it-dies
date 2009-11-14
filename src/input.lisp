@@ -10,21 +10,21 @@
 ;;;
 ;;; Callbacks for GLFW events
 ;;;
-(cffi:defcallback key-hook :void ((key :int) (action :int))
+(cffi:defcallback key-hook :void ((key :int) (action uid-glfw:key/button-state))
   "Invokes KEY-DOWN or KEY-UP on the active engine, for control keys."
   (unless (<= key 255)
     (continuable
       (funcall (case action
-                 (#.uid-glfw:+press+ 'key-down)
-                 (#.uid-glfw:+release+ 'key-up))
+                 (:press 'key-down)
+                 (:release 'key-up))
                *engine* (translate-glfw-control-key key)))))
 
-(cffi:defcallback char-hook :void ((key :int) (action :int))
+(cffi:defcallback char-hook :void ((key :int) (action uid-glfw:key/button-state))
   "Invokes KEY-DOWN or KEY-UP on the active engine, for character input."
   (continuable
     (funcall (case action
-               (#.uid-glfw:+press+ 'key-down)
-               (#.uid-glfw:+release+ 'key-up))
+               (:press 'key-down)
+               (:release 'key-up))
              *engine* (code-char key))))
 
 ;;;
@@ -82,22 +82,21 @@
 ;;; low-level stuff
 (defun glfw-available-joysticks ()
   (loop for i below 16 
-     for joystick-present-p = (uid-glfw:get-joystick-param i uid-glfw:+present+)
+     for joystick-present-p = (uid-glfw:get-joystick-param i :present)
      when (= 1 joystick-present-p)
      collect i))
 
 (defun glfw-joystick-num-buttons (joystick-number)
-  (uid-glfw:get-joystick-param joystick-number uid-glfw:+buttons+))
+  (uid-glfw:get-joystick-param joystick-number :buttons))
 
 (defun glfw-joystick-num-axes (joystick-number)
-  (uid-glfw:get-joystick-param joystick-number uid-glfw:+axes+))
+  (uid-glfw:get-joystick-param joystick-number :axes))
 
 (defun glfw-joystick-axis-positions (joystick-number num-axes)
   (uid-glfw:get-joystick-pos joystick-number num-axes))
 
 (defun glfw-joystick-button-states (joystick-number num-buttons)
-  (loop for state in (uid-glfw:get-joystick-buttons joystick-number num-buttons)
-     collect (if (= state uid-glfw:+press+) :pressed :released)))
+  (uid-glfw:get-joystick-buttons joystick-number num-buttons))
 
 ;;; Interface
 (defproto =joystick= ()

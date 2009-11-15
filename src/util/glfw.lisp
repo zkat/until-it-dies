@@ -420,12 +420,10 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 (defcfun ("glfwSetMousePosCallback" set-mouse-pos-callback) :void (cbfun :pointer))
 (defcfun ("glfwSetMouseWheelCallback" set-mouse-wheel-callback) :void (cbfun :pointer))
 
-(defcfun ("glfwGetJoystickParam" %get-joystick-param) key/button-state
-  (joy :int) (param joystick-param))
+(defcfun ("glfwGetJoystickParam" %get-joystick-param) :int (joy :int) (param joystick-param))
 (defun get-joystick-param (joystick param)
   (if (eq :present param)
-      (when (= 1 (%get-joystick-param joystick param))
-        t)
+      (cffi:translate-from-foreign (%get-joystick-param joystick param) 'boolean)
       (%get-joystick-param joystick param)))
 
 (defcfun ("glfwGetJoystickPos" %get-joystick-pos) :int (joy :int) (pos :pointer) (numaxes :int))

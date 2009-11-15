@@ -108,8 +108,7 @@
 (defreply draw ((engine *uid-demo*) &key)
   (let ((scale-factor 4))
     (with-color (mix-colors *white* *black* *blue* *green*)
-      (dotimes (i 1000)
-        (draw-point (make-point (random 600) (random 600)))))
+      (draw-points (loop for i below 100 collect (make-point (random 600) (random 600)))))
     (with-font *our-font*
       (draw-at 60 20 "Try left-clicking, right-clicking, and pressing the arrow keys!"
                :x-scale 1.5 :y-scale 1.5))

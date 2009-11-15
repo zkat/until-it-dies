@@ -45,6 +45,9 @@
         (gl:vertex x1 y2 z)))))
 
 (defun draw-circle (center radius &key (resolution 20) (color *color*) (filledp t))
+  ;; This circle-drawing algorithm is immensely more efficient than calculating cos/sin for every
+  ;; iteration. The original implementation of the algorith, and the explanation, are at
+  ;; http://www.allegro.cc/forums/thread/594175/715617#target
   (with-color color
     (let* ((theta (* 2 (/ pi resolution)))
            (tangential-factor (tan theta))

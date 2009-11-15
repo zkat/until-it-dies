@@ -142,40 +142,75 @@
 (defconstant +key-special+ 256)
 (defconstant +key-last+ (+ 256 62))
 (cffi:defcenum key
-
-  (:unknown -1) (:space 32) (:special 256) :escape
-
-  :f1 :f2 :f3 :f4 :f5 :f6 :f7 :f8 :f9 :f10 :f11 :f12 :f13
-  :f14 :f15 :f16 :f17 :f18 :f19 :f20 :f21 :f22 :f23 :f24 :f25
-
-  :up :down :left :right
-
-  :left-shift :right-shift :left-ctrl :right-ctrl :left-alt :right-alt
-
-  :tab :enter :backspace
-
-  :insert :delete :page-up :page-down :home :end
-
-  :keypad-0 :keypad-1 :keypad-2 :keypad-3 :keypad-4
-  :keypad-5 :keypad-6 :keypad-7 :keypad-8 :keypad-9
-  :keypad-divide :keypad-multiply :keypad-subtract :keypad-add
-  :keypad-decimal :keypad-equal :keypad-enter
-
-  (:last #.(+ 256 62)))
+  (:key-unknown -1)
+  (:key-space 32)
+  (:key-special 256)
+  (:key-esc #.(+ 256 1))
+  (:key-f1 #.(+ 256 2))
+  (:key-f2 #.(+ 256 3))
+  (:key-f3 #.(+ 256 4))
+  (:key-f4 #.(+ 256 5))
+  (:key-f5 #.(+ 256 6))
+  (:key-f6 #.(+ 256 7))
+  (:key-f7 #.(+ 256 8))
+  (:key-f8 #.(+ 256 9))
+  (:key-f9 #.(+ 256 10))
+  (:key-f10 #.(+ 256 11))
+  (:key-f11 #.(+ 256 12))
+  (:key-f12 #.(+ 256 13))
+  (:key-f13 #.(+ 256 14))
+  (:key-f14 #.(+ 256 15))
+  (:key-f15 #.(+ 256 16))
+  (:key-f16 #.(+ 256 17))
+  (:key-f17 #.(+ 256 18))
+  (:key-f18 #.(+ 256 19))
+  (:key-f19 #.(+ 256 20))
+  (:key-f20 #.(+ 256 21))
+  (:key-f21 #.(+ 256 22))
+  (:key-f22 #.(+ 256 23))
+  (:key-f23 #.(+ 256 24))
+  (:key-f24 #.(+ 256 25))
+  (:key-f25 #.(+ 256 26))
+  (:key-up #.(+ 256 27))
+  (:key-down #.(+ 256 28))
+  (:key-left #.(+ 256 29))
+  (:key-right #.(+ 256 30))
+  (:key-lshift #.(+ 256 31))
+  (:key-rshift #.(+ 256 32))
+  (:key-lctrl #.(+ 256 33))
+  (:key-rctrl #.(+ 256 34))
+  (:key-lalt #.(+ 256 35))
+  (:key-ralt #.(+ 256 36))
+  (:key-tab #.(+ 256 37))
+  (:key-enter #.(+ 256 38))
+  (:key-backspace #.(+ 256 39))
+  (:key-insert #.(+ 256 40))
+  (:key-del #.(+ 256 41))
+  (:key-pageup #.(+ 256 42))
+  (:key-pagedown #.(+ 256 43))
+  (:key-home #.(+ 256 44))
+  (:key-end #.(+ 256 45))
+  (:key-kp-0 #.(+ 256 46))
+  (:key-kp-1 #.(+ 256 47))
+  (:key-kp-2 #.(+ 256 48))
+  (:key-kp-3 #.(+ 256 49))
+  (:key-kp-4 #.(+ 256 50))
+  (:key-kp-5 #.(+ 256 51))
+  (:key-kp-6 #.(+ 256 52))
+  (:key-kp-7 #.(+ 256 53))
+  (:key-kp-8 #.(+ 256 54))
+  (:key-kp-9 #.(+ 256 55))
+  (:key-kp-divide #.(+ 256 56))
+  (:key-kp-multiply #.(+ 256 57))
+  (:key-kp-subtract #.(+ 256 58))
+  (:key-kp-add #.(+ 256 59))
+  (:key-kp-decimal #.(+ 256 60))
+  (:key-kp-equal #.(+ 256 61))
+  (:key-kp-enter #.(+ 256 62))
+  (:key-last #.(+ 256 62)))
 
 ;; Mouse button definitions
 (defcenum mouse-button
-<<<<<<< HEAD
-  :mouse-button-1
-  :mouse-button-2
-  :mouse-button-3
-  :mouse-button-4
-  :mouse-button-5
-  :mouse-button-6
-  :mouse-button-7
-  :mouse-button-8
-  :mouse-button-last
-=======
   (:mouse-button-1 0)
   (:mouse-button-2 1)
   (:mouse-button-3 2)
@@ -185,7 +220,6 @@
   (:mouse-button-7 6)
   (:mouse-button-8 7)
   (:mouse-button-last 7)
->>>>>>> MORE PORTING
   ;; Mouse button aliases
   (:mouse-button-left 0)
   :mouse-button-right
@@ -397,11 +431,7 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
     (let ((numaxes (%get-joystick-pos joy pos numaxes)))
       (loop for i below numaxes collecting (mem-aref pos :float i)))))
 
-<<<<<<< HEAD
 (defcfun ("glfwGetJoystickButtons" %get-joystick-buttons) :int (joy :int) (buttons :pointer) (numbuttons :int))
-=======
-(defcfun ("glfwGetJoystickButtons" %get-joystick-buttons)  (joy :int) (buttons :pointer) (numbuttons :int))
->>>>>>> MORE PORTING
 (defun get-joystick-buttons (joy numbuttons)
   (with-foreign-object (buttons :unsigned-char numbuttons)
     (let ((numbuttons (%get-joystick-buttons joy buttons numbuttons)))

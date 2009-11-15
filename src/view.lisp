@@ -17,11 +17,6 @@
                      (view-bottom y) (view-top (+ y height))
                      (view-far far) (view-near near))))
 
-(defmessage view-width (view))
-(defmessage (setf view-width) (new-value view))
-(defmessage view-height (view))
-(defmessage (setf view-height) (new-value view))
-
 (defreply view-width ((view =view=))
   (- (view-right view) (view-left view)))
 

@@ -148,6 +148,15 @@ followed by the main engine loop."))
 ;;;
 ;;; Views
 ;;;
+
+(defmessage view-width (view))
+
+(defmessage (setf view-width) (new-value view))
+
+(defmessage view-height (view))
+
+(defmessage (setf view-height) (new-value view))
+
 (defmessage zoom-view (view zoom-factor))
 
 (defmessage move-view (view dx dy))

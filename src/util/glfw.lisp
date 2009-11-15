@@ -158,91 +158,89 @@
 ;; Keyboard key definitions: 8-bit ISO-8859-1 (Latin 1) encoding is used
 ;; for printable keys (such as A-Z, 0-9 etc), and values above 256
 ;; represent special (non-printable) keys (e.g. F1, Page Up etc).
-(defconstant +key-special+ 256)
-(defconstant +key-last+ (+ 256 62))
 (cffi:defcenum key
   (:key-unknown -1)
   (:key-space 32)
   (:key-special 256)
-  (:key-esc #.(+ 256 1))
-  (:key-f1 #.(+ 256 2))
-  (:key-f2 #.(+ 256 3))
-  (:key-f3 #.(+ 256 4))
-  (:key-f4 #.(+ 256 5))
-  (:key-f5 #.(+ 256 6))
-  (:key-f6 #.(+ 256 7))
-  (:key-f7 #.(+ 256 8))
-  (:key-f8 #.(+ 256 9))
-  (:key-f9 #.(+ 256 10))
-  (:key-f10 #.(+ 256 11))
-  (:key-f11 #.(+ 256 12))
-  (:key-f12 #.(+ 256 13))
-  (:key-f13 #.(+ 256 14))
-  (:key-f14 #.(+ 256 15))
-  (:key-f15 #.(+ 256 16))
-  (:key-f16 #.(+ 256 17))
-  (:key-f17 #.(+ 256 18))
-  (:key-f18 #.(+ 256 19))
-  (:key-f19 #.(+ 256 20))
-  (:key-f20 #.(+ 256 21))
-  (:key-f21 #.(+ 256 22))
-  (:key-f22 #.(+ 256 23))
-  (:key-f23 #.(+ 256 24))
-  (:key-f24 #.(+ 256 25))
-  (:key-f25 #.(+ 256 26))
-  (:key-up #.(+ 256 27))
-  (:key-down #.(+ 256 28))
-  (:key-left #.(+ 256 29))
-  (:key-right #.(+ 256 30))
-  (:key-lshift #.(+ 256 31))
-  (:key-rshift #.(+ 256 32))
-  (:key-lctrl #.(+ 256 33))
-  (:key-rctrl #.(+ 256 34))
-  (:key-lalt #.(+ 256 35))
-  (:key-ralt #.(+ 256 36))
-  (:key-tab #.(+ 256 37))
-  (:key-enter #.(+ 256 38))
-  (:key-backspace #.(+ 256 39))
-  (:key-insert #.(+ 256 40))
-  (:key-del #.(+ 256 41))
-  (:key-pageup #.(+ 256 42))
-  (:key-pagedown #.(+ 256 43))
-  (:key-home #.(+ 256 44))
-  (:key-end #.(+ 256 45))
-  (:key-kp-0 #.(+ 256 46))
-  (:key-kp-1 #.(+ 256 47))
-  (:key-kp-2 #.(+ 256 48))
-  (:key-kp-3 #.(+ 256 49))
-  (:key-kp-4 #.(+ 256 50))
-  (:key-kp-5 #.(+ 256 51))
-  (:key-kp-6 #.(+ 256 52))
-  (:key-kp-7 #.(+ 256 53))
-  (:key-kp-8 #.(+ 256 54))
-  (:key-kp-9 #.(+ 256 55))
-  (:key-kp-divide #.(+ 256 56))
-  (:key-kp-multiply #.(+ 256 57))
-  (:key-kp-subtract #.(+ 256 58))
-  (:key-kp-add #.(+ 256 59))
-  (:key-kp-decimal #.(+ 256 60))
-  (:key-kp-equal #.(+ 256 61))
-  (:key-kp-enter #.(+ 256 62))
+  :key-esc
+  :key-f1
+  :key-f2
+  :key-f3
+  :key-f4
+  :key-f5
+  :key-f6
+  :key-f7
+  :key-f8
+  :key-f9
+  :key-f10
+  :key-f11
+  :key-f12
+  :key-f13
+  :key-f14
+  :key-f15
+  :key-f16
+  :key-f17
+  :key-f18
+  :key-f19
+  :key-f20
+  :key-f21
+  :key-f22
+  :key-f23
+  :key-f24
+  :key-f25
+  :key-up
+  :key-down
+  :key-left
+  :key-right
+  :key-lshift
+  :key-rshift
+  :key-lctrl
+  :key-rctrl
+  :key-lalt
+  :key-ralt
+  :key-tab
+  :key-enter
+  :key-backspace
+  :key-insert
+  :key-del
+  :key-pageup
+  :key-pagedown
+  :key-home
+  :key-end
+  :key-kp-0
+  :key-kp-1
+  :key-kp-2
+  :key-kp-3
+  :key-kp-4
+  :key-kp-5
+  :key-kp-6
+  :key-kp-7
+  :key-kp-8
+  :key-kp-9
+  :key-kp-divide
+  :key-kp-multiply
+  :key-kp-subtract
+  :key-kp-add
+  :key-kp-decimal
+  :key-kp-equal
+  :key-kp-enter
   (:key-last #.(+ 256 62)))
 
 ;; Mouse button definitions
 (defcenum mouse-button
-  (:mouse-button-1 0)
-  (:mouse-button-2 1)
-  (:mouse-button-3 2)
-  (:mouse-button-4 3)
-  (:mouse-button-5 4)
-  (:mouse-button-6 5)
-  (:mouse-button-7 6)
-  (:mouse-button-8 7)
-  (:mouse-button-last 7)
+  :mouse-button-1
+  :mouse-button-2
+  :mouse-button-3
+  :mouse-button-4
+  :mouse-button-5
+  :mouse-button-6
+  :mouse-button-7
+  :mouse-button-8
+  :mouse-button-last
   ;; Mouse button aliases
   (:mouse-button-left 0)
-  (:mouse-button-right 1)
-  (:mouse-button-middle 2))
+  :mouse-button-right
+  :mouse-button-middle)
 
 ;; Joystick identifiers
 (defcenum joystick-identifier

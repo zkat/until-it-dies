@@ -83,6 +83,11 @@
     (gl:with-primitives :points
       (set-point point))))
 
+(defun draw-points (points &key (color *color*))
+  (with-color color
+    (gl:with-primitives :points
+      (map nil #'set-point points))))
+
 (defun draw-line (p1 p2 &key (color *color*))
   (with-color color
     (gl:with-primitives :lines

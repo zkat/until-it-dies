@@ -44,13 +44,24 @@
         (gl:tex-coord u1 v1)
         (gl:vertex x1 y2 z)))))
 
-(defun draw-circle (center radius &key (resolution 5) (color *color*) (filledp t))
+(defun draw-circle (center radius &key (resolution 20) (color *color*) (filledp t))
   (with-color color
-    (gl:with-primitives (if filledp :triangle-fan :line-loop)
-      (loop for angle upto 360 by resolution
-         for radian = (degrees->radians angle)
-         do (gl:vertex (+ (point-x center) (* radius (cos radian)))
-                       (+ (point-y center) (* radius (sin radian))))))))
+    (let* ((theta (* 2 (/ pi resolution)))
+           (tangential-factor (tan theta))
+           (radial-factor (- 1 (cos theta))))
+      (gl:with-primitives (if filledp :triangle-fan :line-loop)
+        (loop with x = (+ (point-x center) radius)
+           with y = (point-y center)
+           repeat resolution
+           do (gl:vertex x y (point-z center))
+             (let ((tx (- (- y (point-y center))))
+                   (ty (- x (point-x center))))
+               (incf x (* tx tangential-factor))
+               (incf y (* ty tangential-factor)))
+             (let ((rx (- (point-x center) x))
+                   (ry (- (point-y center) y)))
+               (incf x (* rx radial-factor))
+               (incf y (* ry radial-factor))))))))
 
 (defun draw-triangle (p1 p2 p3 &key (color *color*))
   (with-color color

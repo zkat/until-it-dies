@@ -343,8 +343,7 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 (declaim (inline open-window))
 (defun open-window (width height &key (redbits 0) (greenbits 0) (bluebits 0)
                     (alphabits 0) (depthbits 0) (stencilbits 0) (mode :window))
-  (%open-window width height :redbits redbits :greenbits greenbits :bluebits bluebits
-                :alphabits alphabits :depthbits depthbits :stencilbits stencilbits :mode mode))
+  (%open-window width height redbits greenbits bluebits alphabits depthbits stencilbits mode))
 
 (defcfun ("glfwOpenWindowHint" %open-window-hint) :void (target window-param) (hint :int))
 (defun open-window-hint (target hint)

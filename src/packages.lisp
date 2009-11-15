@@ -65,6 +65,7 @@
    :fps
    :quit
    :create-view ; Move me!
+   :current-view ; I'm important too!
 
    ;; primitives
    :make-color

@@ -34,7 +34,7 @@
 ;; Find a CFFI integer type the same foreign-size as a pointer
 (defctype intptr #.(find-symbol (format nil "INT~d" (* 8 (cffi:foreign-type-size :pointer)))
                                 (find-package '#:keyword)))
-(defctype sizeiptr #.(find-symbol (format nil "INT~d" (* 8 (cffi:foreign-type-size :pointer))) 
+(defctype sizeiptr #.(find-symbol (format nil "INT~d" (* 8 (cffi:foreign-type-size :pointer)))
                                   (find-package '#:keyword)))
 
 (defctype handle :unsigned-int)
@@ -360,7 +360,7 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
                                        (redbits 0) (greenbits 0) (bluebits 0) (alphabits 0)
                                        (depthbits 0) (stencilbits 0) (mode :window))
                             &body forms)
-  `(if (%open-window ,width ,height ,redbits ,greenbits ,bluebits ,alphabits 
+  `(if (%open-window ,width ,height ,redbits ,greenbits ,bluebits ,alphabits
                      ,depthbits ,stencilbits ,mode)
        (unwind-protect
             (block with-open-window
@@ -485,4 +485,3 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 
 (defcfun ("glfwEnable" enable) :void (token enable/disable))
 (defcfun ("glfwDisable" disable) :void (token enable/disable))
-

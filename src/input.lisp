@@ -17,7 +17,7 @@
       (funcall (case action
                  (:press 'key-down)
                  (:release 'key-up))
-               *engine* (translate-glfw-control-key key)))))
+               *engine* (uid-glfw:translate-control-key key)))))
 
 (cffi:defcallback char-hook :void ((key :int) (action uid-glfw:key/button-state))
   "Invokes KEY-DOWN or KEY-UP on the active engine, for character input."

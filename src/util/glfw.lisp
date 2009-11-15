@@ -242,26 +242,6 @@
   :mouse-button-right
   :mouse-button-middle)
 
-;; Joystick identifiers
-(defcenum joystick-identifier
-  (:joystick-1 0)
-  (:joystick-2 1)
-  (:joystick-3 2)
-  (:joystick-4 3)
-  (:joystick-5 4)
-  (:joystick-6 5)
-  (:joystick-7 6)
-  (:joystick-8 7)
-  (:joystick-9 8)
-  (:joystick-10 9)
-  (:joystick-11 10)
-  (:joystick-12 11)
-  (:joystick-13 12)
-  (:joystick-14 13)
-  (:joystick-15 14)
-  (:joystick-16 15)
-  (:joystick-last 15))
-
 ;;========================================================================
 ;; Other definitions
 ;;========================================================================

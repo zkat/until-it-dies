@@ -301,7 +301,7 @@ we're done with it."
 ;;;
 (defreply run ((engine =engine=))
   (uid-glfw:with-init
-    (uid-glfw:open-window-hint :window-no-resize (resizablep engine))
+    (uid-glfw:open-window-hint :window-no-resize (not (resizablep engine)))
     (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine)
                                 :mode (if (windowedp engine) :window :fullscreen))
       (with-engine engine

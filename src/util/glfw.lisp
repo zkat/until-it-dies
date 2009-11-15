@@ -100,13 +100,13 @@
            #:boolean #:broadcast-cond #:close-window #:defcfun+doc #:defcfun+out+doc
            #:disable #:do-window #:enable #:extension-supported #:free-image #:get-desktop-mode
            #:get-gl-version #:get-joystick-buttons #:get-joystick-param #:get-joystick-pos
-           #:get-key #:get-mouse-button #:get-mouse-pos #:get-mouse-wheel #:get-version #:get-video-modes
-           #:get-window-param #:get-window-size #:iconify-window #:init #:load-memory-texture-2d
-           #:load-texture-2d #:load-texture-image-2d #:open-window #:open-window-hint
-           #:poll-events #:read-image #:read-memory-image #:restore-window #:set-char-callback
-           #:set-key-callback #:set-mouse-button-callback #:set-mouse-pos #:set-mouse-pos-callback
-           #:set-mouse-wheel #:set-mouse-wheel-callback #:set-time #:set-window-close-callback
-           #:set-window-pos #:set-window-refresh-callback #:set-window-size
+           #:get-key #:get-mouse-button #:get-mouse-pos #:get-mouse-wheel #:get-proc-address
+           #:get-version #:get-video-modes #:get-window-param #:get-window-size #:iconify-window
+           #:init #:load-memory-texture-2d #:load-texture-2d #:load-texture-image-2d #:open-window
+           #:open-window-hint #:poll-events #:read-image #:read-memory-image #:restore-window
+           #:set-char-callback #:set-key-callback #:set-mouse-button-callback #:set-mouse-pos
+           #:set-mouse-pos-callback #:set-mouse-wheel #:set-mouse-wheel-callback #:set-time
+           #:set-window-close-callback #:set-window-pos #:set-window-refresh-callback #:set-window-size
            #:set-window-size-callback #:set-window-title #:swap-buffers #:swap-interval #:terminate
            #:translate-control-key #:with-init #:with-init-window #:with-lock-mutex #:with-open-window))
 (in-package #:uid-glfw)

@@ -94,6 +94,7 @@
    :draw-triangle
    :draw-quad
    :draw-point
+   :draw-points
    :draw-line
    :draw-polygon
 

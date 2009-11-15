@@ -40,7 +40,7 @@
    :num-buttons
    :axis-positions
    :button-states
-   
+
    ;; Engine
    :=engine=
    :*engine*
@@ -64,6 +64,7 @@
    :mouse-visible-p
    :fps
    :quit
+   :create-view ; Move me!
 
    ;; primitives
    :make-color

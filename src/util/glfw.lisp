@@ -115,8 +115,9 @@
            #:set-mouse-wheel #:set-mouse-wheel-callback #:set-time #:set-window-close-callback
            #:set-window-pos #:set-window-refresh-callback #:set-window-size
            #:set-window-size-callback #:set-window-title #:signal-cond #:sleep #:swap-buffers
-           #:swap-interval #:terminate #:unlock-mutex #:wait-cond #:wait-events #:wait-thread
-           #:with-init #:with-init-window #:with-lock-mutex #:with-open-window))
+           #:swap-interval #:terminate #:translate-control-key #:unlock-mutex #:wait-cond
+           #:wait-events #:wait-thread #:with-init #:with-init-window #:with-lock-mutex
+           #:with-open-window))
 (in-package #:uid-glfw)
 
 (defmacro defcfun+out+doc ((c-name lisp-name) return-type (&body args))
@@ -411,6 +412,9 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
           (foreign-slot-value mode 'vidmode 'bluebits))))
 
 (defcfun ("glfwGetKey" get-key) key/button-state (key :int))
+
+(defun translate-control-key (key)
+  (foreign-enum-keyword 'key key))
 
 (defcfun ("glfwGetMouseButton" get-mouse-button) key/button-state (button mouse-button))
 

@@ -1,8 +1,11 @@
 (defpackage uid-demo
-  (:use :cl :sheeple :until-it-dies :until-it-dies.demo.resource-info)
+  (:use :cl :sheeple :until-it-dies)
   (:shadow :speed)
   (:export :run-demo))
 (in-package :uid-demo)
+
+(defvar *resource-directory*
+  (merge-pathnames "res/" (load-time-value (or #.*compile-file-truename* *load-truename*))))
 
 (defparameter *uid-demo* (create-engine :title "UID Demo"
                                         :resizablep nil

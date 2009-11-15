@@ -272,8 +272,7 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
             (block with-open-window
               (uid-glfw:set-window-title ,title)
               ,@forms)
-         (when (uid-glfw:get-window-param :opened)
-           (close-window)))
+         (terminate))
        (error "Error initializing glfw window.")))
 
 (defcfun ("glfwSetWindowCloseCallback" set-window-close-callback) :void (cbfun :pointer))

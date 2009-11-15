@@ -153,8 +153,7 @@
 
 ;; Key and button state/action definitions
 (defcenum key/button-state
-  (:release 0)
-  (:press 1))
+  :release :press)
 
 ;; Keyboard key definitions: 8-bit ISO-8859-1 (Latin 1) encoding is used
 ;; for printable keys (such as A-Z, 0-9 etc), and values above 256

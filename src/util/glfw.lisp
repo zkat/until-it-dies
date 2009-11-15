@@ -298,9 +298,8 @@
 
 (defcfun ("glfwTerminate" terminate) :void)
 
-(defcfun+out+doc ("glfwGetVersion" get-version) :void ((:out major :int)
-                                                       (:out minor :int)
-                                                       (:out rev :int)))
+(defcfun+out+doc ("glfwGetVersion" get-version) :void
+  ((:out major :int) (:out minor :int) (:out rev :int)))
 
 (defmacro with-init (&body forms)
   "Call uid-glfw:init, execute forms and clean-up with uid-glfw:terminate once finished.
@@ -454,9 +453,8 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 
 (defcfun ("glfwGetProcAddress" get-proc-address) :pointer (procname :string))
 
-(defcfun+out+doc ("glfwGetGLVersion" get-gl-version) :void ((:out major :int)
-                                                            (:out minor :int)
-                                                            (:out rev :int)))
+(defcfun+out+doc ("glfwGetGLVersion" get-gl-version) :void
+  ((:out major :int) (:out minor :int) (:out rev :int)))
 
 (defcfun ("glfwEnable" enable) :void (token enable/disable))
 (defcfun ("glfwDisable" disable) :void (token enable/disable))

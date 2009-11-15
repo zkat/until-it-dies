@@ -358,9 +358,8 @@ Signals an error on failure to initialize. Wrapped in a block named uid-glfw:wit
 (defmacro with-open-window ((title width height &key (redbits 0) (greenbits 0) (bluebits 0)
                                    (alphabits 0) (depthbits 0) (stencilbits 0) (mode :window))
                             &body forms)
-  `(if (%open-window ,width ,height :redbits ,redbits :greenbits ,greenbits
-                     :bluebits ,bluebits :alphabits ,alphabits
-                     :depthbits ,depthbits :stencilbits ,stencilbits :mode ,mode)
+  `(if (%open-window ,width ,height ,redbits ,greenbits ,bluebits
+                     ,alphabits ,depthbits ,stencilbits ,mode)
        (unwind-protect
             (block with-open-window
               (uid-glfw:set-window-title ,title)

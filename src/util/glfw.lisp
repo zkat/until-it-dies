@@ -79,28 +79,17 @@
            #:+alpha-map-bit+ #:+auto-poll-events+ #:+aux-buffers+ #:+axes+
            #:+blue-bits+ #:+build-mipmaps-bit+ #:+buttons+ #:+depth-bits+ #:+false+
            #:+fsaa-samples+ #:+fullscreen+ #:+green-bits+ #:+iconified+ #:+infinity+
-           #:+key-backspace+ #:+key-del+ #:+key-down+ #:+key-end+ #:+key-enter+ #:+key-esc+
-           #:+key-f1+ #:+key-f10+ #:+key-f11+ #:+key-f12+ #:+key-f13+ #:+key-f14+ #:+key-f15+
-           #:+key-f16+ #:+key-f17+ #:+key-f18+ #:+key-f19+ #:+key-f2+ #:+key-f20+ #:+key-f21+
-           #:+key-f22+ #:+key-f23+ #:+key-f24+ #:+key-f25+ #:+key-f3+ #:+key-f4+ #:+key-f5+
-           #:+key-f6+ #:+key-f7+ #:+key-f8+ #:+key-f9+ #:+key-home+ #:+key-insert+
-           #:+key-kp-0+ #:+key-kp-1+ #:+key-kp-2+ #:+key-kp-3+ #:+key-kp-4+ #:+key-kp-5+
-           #:+key-kp-6+ #:+key-kp-7+ #:+key-kp-8+ #:+key-kp-9+ #:+key-kp-add+ #:+key-kp-decimal+
-           #:+key-kp-divide+ #:+key-kp-enter+ #:+key-kp-equal+ #:+key-kp-multiply+
-           #:+key-kp-subtract+ #:+key-lalt+ #:+key-last+ #:+key-lctrl+ #:+key-left+
-           #:+key-lshift+ #:+key-pagedown+ #:+key-pageup+ #:+key-ralt+ #:+key-rctrl+
-           #:+key-repeat+ #:+key-right+ #:+key-rshift+ #:+key-space+ #:+key-special+
-           #:+key-tab+ #:+key-unknown+ #:+key-up+ #:+mouse-button-1+ #:+mouse-button-2+
-           #:+mouse-button-3+ #:+mouse-button-4+ #:+mouse-button-5+ #:+mouse-button-6+
-           #:+mouse-button-7+ #:+mouse-button-8+ #:+mouse-button-last+ #:+mouse-button-left+
-           #:+mouse-button-middle+ #:+mouse-button-right+ #:+mouse-cursor+
-           #:+no-rescale-bit+ #:+nowait+ #:+opened+ #:+origin-ul-bit+ #:+present+ #:+press+
-           #:+red-bits+ #:+refresh-rate+ #:+release+ #:+stencil-bits+ #:+stereo+ #:+sticky-keys+
-           #:+sticky-mouse-buttons+ #:+system-keys+ #:+true+ #:+wait+ #:+window+ #:+window-no-resize+
-           #:boolean #:broadcast-cond #:close-window #:defcfun+doc #:defcfun+out+doc
-           #:disable #:do-window #:enable #:extension-supported #:free-image #:get-desktop-mode
-           #:get-gl-version #:get-joystick-buttons #:get-joystick-param #:get-joystick-pos
-           #:get-key #:get-mouse-button #:get-mouse-pos #:get-mouse-wheel #:get-proc-address
+           #:+mouse-button-1+ #:+mouse-button-2+ #:+mouse-button-3+ #:+mouse-button-4+
+           #:+mouse-button-5+ #:+mouse-button-6+ #:+mouse-button-7+ #:+mouse-button-8+
+           #:+mouse-button-last+ #:+mouse-button-left+ #:+mouse-button-middle+
+           #:+mouse-button-right+ #:+mouse-cursor+ #:+no-rescale-bit+ #:+nowait+ #:+opened+
+           #:+origin-ul-bit+ #:+present+ #:+press+ #:+red-bits+ #:+refresh-rate+ #:+release+
+           #:+stencil-bits+ #:+stereo+ #:+sticky-keys+ #:+sticky-mouse-buttons+ #:+system-keys+
+           #:+true+ #:+wait+ #:+window+ #:+window-no-resize+ #:boolean #:broadcast-cond
+           #:close-window #:defcfun+doc #:defcfun+out+doc #:disable #:do-window #:enable
+           #:extension-supported #:free-image #:get-desktop-mode #:get-gl-version
+           #:get-joystick-buttons #:get-joystick-param #:get-joystick-pos #:get-key
+           #:get-mouse-button #:get-mouse-pos #:get-mouse-wheel #:get-proc-address
            #:get-version #:get-video-modes #:get-window-param #:get-window-size #:iconify-window
            #:init #:load-memory-texture-2d #:load-texture-2d #:load-texture-image-2d #:open-window
            #:open-window-hint #:poll-events #:read-image #:read-memory-image #:restore-window
@@ -151,72 +140,26 @@
 ;; for printable keys (such as A-Z, 0-9 etc), and values above 256
 ;; represent special (non-printable) keys (e.g. F1, Page Up etc).
 (cffi:defcenum key
-  (:key-unknown -1)
-  (:key-space 32)
-  (:key-special 256)
-  :key-esc
-  :key-f1
-  :key-f2
-  :key-f3
-  :key-f4
-  :key-f5
-  :key-f6
-  :key-f7
-  :key-f8
-  :key-f9
-  :key-f10
-  :key-f11
-  :key-f12
-  :key-f13
-  :key-f14
-  :key-f15
-  :key-f16
-  :key-f17
-  :key-f18
-  :key-f19
-  :key-f20
-  :key-f21
-  :key-f22
-  :key-f23
-  :key-f24
-  :key-f25
-  :key-up
-  :key-down
-  :key-left
-  :key-right
-  :key-lshift
-  :key-rshift
-  :key-lctrl
-  :key-rctrl
-  :key-lalt
-  :key-ralt
-  :key-tab
-  :key-enter
-  :key-backspace
-  :key-insert
-  :key-del
-  :key-pageup
-  :key-pagedown
-  :key-home
-  :key-end
-  :key-kp-0
-  :key-kp-1
-  :key-kp-2
-  :key-kp-3
-  :key-kp-4
-  :key-kp-5
-  :key-kp-6
-  :key-kp-7
-  :key-kp-8
-  :key-kp-9
-  :key-kp-divide
-  :key-kp-multiply
-  :key-kp-subtract
-  :key-kp-add
-  :key-kp-decimal
-  :key-kp-equal
-  :key-kp-enter
-  (:key-last #.(+ 256 62)))
+
+  (:unknown -1) (:space 32) (:special 256) :escape
+
+  :f1 :f2 :f3 :f4 :f5 :f6 :f7 :f8 :f9 :f10 :f11 :f12 :f13
+  :f14 :f15 :f16 :f17 :f18 :f19 :f20 :f21 :f22 :f23 :f24 :f25
+
+  :up :down :left :right
+
+  :left-shift :right-shift :left-ctrl :right-ctrl :left-alt :right-alt
+
+  :tab :enter :backspace
+
+  :insert :delete :page-up :page-down :home :end
+
+  :keypad-0 :keypad-1 :keypad-2 :keypad-3 :keypad-4
+  :keypad-5 :keypad-6 :keypad-7 :keypad-8 :keypad-9
+  :keypad-divide :keypad-multiply :keypad-subtract :keypad-add
+  :keypad-decimal :keypad-equal :keypad-enter
+
+  (:last #.(+ 256 62)))
 
 ;; Mouse button definitions
 (defcenum mouse-button

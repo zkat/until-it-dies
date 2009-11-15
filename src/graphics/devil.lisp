@@ -131,7 +131,7 @@
 
 (defun init-devil ()
   (uid-il:init)
-  (uid-ilut:init))
+  #+nil(uid-ilut:init)) ; ILUT is broken on x86 for now, and I don't use anything that requires this
 
 (defun shutdown-devil ()
   (uid-il:shutdown))
@@ -141,4 +141,4 @@
   (init-devil))
 
 (eval-when (:load-toplevel :execute)
-  (init-devil))
+  (reinit-devil))

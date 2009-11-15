@@ -302,8 +302,8 @@ we're done with it."
 (defreply run ((engine =engine=))
   (uid-glfw:with-init
     (uid-glfw:open-window-hint :window-no-resize (resizable engine))
-    (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine) 0 0 0 0
-                                0 0 (if (windowedp engine) :window :fullscreen))
+    (uid-glfw:with-open-window ((title engine) (window-width engine) (window-height engine)
+                                :mode (if (windowedp engine) :window :fullscreen))
       (with-engine engine
         (uid-glfw:set-key-callback (cffi:callback key-hook))
         (uid-glfw:set-char-callback (cffi:callback char-hook))

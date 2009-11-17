@@ -26,9 +26,10 @@
 (defun set-point (point)
   (gl:vertex (point-x point) (point-y point) (point-z point)))
 
-(defun draw-rectangle (x y width height &key (z 0) (u1 0) (v1 0) (u2 1) (v2 1) (color *color*))
+(defun draw-rectangle (x y width height &key (z 0) (u1 0) (v1 0) (u2 1) (v2 1)
+                       (color *color*) (filledp t))
   (with-color color
-    (gl:with-primitives :quads
+    (gl:with-primitives (if filledp :quads :lines)
       (let* ((w/2 (/ width 2.0))
              (h/2 (/ height 2.0))
              (x1 (- x w/2))
@@ -66,27 +67,29 @@
                (incf x (* rx radial-factor))
                (incf y (* ry radial-factor))))))))
 
-(defun draw-triangle (p1 p2 p3 &key (color *color*))
+(defun draw-triangle (p1 p2 p3 &key (color *color*) (filledp t))
   (with-color color
-    (gl:with-primitives :triangles
+    (gl:with-primitives (if filledp :triangles :lines)
       (set-point p1)
       (set-point p2)
       (set-point p3))))
 
-(defun draw-quad (p1 p2 p3 p4 &key (color *color*))
+(defun draw-quad (p1 p2 p3 p4 &key (color *color*) (filledp t))
   (with-color color
-    (gl:with-primitives :quads
+    (gl:with-primitives (if filledp :quads :lines)
      (set-point p1)
      (set-point p2)
      (set-point p3)
      (set-point p4))))
 
-(defun draw-point (point &key (color *color*))
+(defun draw-point (point &key (color *color*) (size 1))
+  (gl:point-size size)
   (with-color color
     (gl:with-primitives :points
       (set-point point))))
 
-(defun draw-points (points &key (color *color*))
+(defun draw-points (points &key (color *color*) (size 1))
+  (gl:point-size size)
   (with-color color
     (gl:with-primitives :points
       (map nil #'set-point points))))
@@ -97,7 +100,7 @@
       (set-point p1)
       (set-point p2))))
 
-(defun draw-polygon (points &key (color *color*))
+(defun draw-polygon (points &key (color *color*) (filledp t))
   (with-color color
-    (gl:with-primitives :polygon
+    (gl:with-primitives (if filledp :polygon :lines)
       (map nil 'set-point points))))

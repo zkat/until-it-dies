@@ -9,11 +9,16 @@
 (define-foreign-library avcodec
   (:unix "libavcodec.so")
   (t (:default "libavcodec")))
+(define-foreign-library swscale
+  (:unix "libswscale.so")
+  (t (:default "libswscale")))
+
 (use-foreign-library avformat)
-(use-foreign-librare avcodec)
+(use-foreign-library avcodec)
+(use-foreign-library swscale)
 
 (defcfun ("av_register_all" av-register-all) :void)
-
+(av-register-all)
 (defcstruct av-format-context
   (av-class :pointer)
   (iformat :pointer)
@@ -181,3 +186,39 @@
 (defcfun ("avcodec_close" avcodec-close) :int (context :pointer))
 (defcfun ("av_close_input_file" av-close-input-file) :void (context :pointer))
 
+(defcfun ("avcodec_decode_audio2" avcodec-decode-audio2) :int
+  (codec-context :pointer) (samples :pointer) (frame-size-ptr :pointer)
+  (buffer :pointer) (buffer-size :int))
+
+(defcfun ("av_dup_packet" av-dup-packet) :int (packet :pointer))
+
+(defcstruct av-rational
+  (num :int)
+  (den :int))
+
+(defcfun ("av_q2d" av-q2d) :double (rational av-rational))
+
+(defcfun ("avcodec_default_get_buffer" avcodec-default-get-buffer) :int
+  (codec-context :pointer) (pic :pointer))
+
+(defcfun ("avcodec_default_release_buffer" avcodec-default-release-buffer) :void
+  (codec-context :pointer) (pic :pointer))
+
+(defcfun ("av_freep" av-freep) :void (ptr :pointer))
+
+(defcfun ("av_gettime" av-gettime) :int64)
+
+(defcfun ("av_seek_frame" av-seek-frame) :int
+  (context :pointer) (stream-index :int)
+  (timestamp :int64) (flags :int))
+
+(defcfun ("av_rescale_q" av-rescale-q) :int64
+  (a :int64) (bq av-rational) (cq av-rational))
+
+(defcfun ("av_init_packet" av-init-packet) :void (packet :pointer))
+
+(defcfun ("avcodec_flush_buffers" avcodec-flush-buffers) :void (codec-context :pointer))
+
+(defcfun ("sws_scale" sws-scale) :int
+  (context :pointer) (source :pointer) (src-stride :pointer)
+  (src-slice-y :int) (src-slice-h :int) (dst :pointer) (dst-stride :pointer))

@@ -366,6 +366,26 @@
   (:byte 2)
   (:any 4))
 
+(defcenum sws-flag
+  (:fast-bilinear 1)
+  (:bilinear 2)
+  (:bicubic 4)
+  (:x 8)
+  (:point #x10)
+  (:area #x20)
+  (:bicublin #x40)
+  (:gauss #x80)
+  (:sinc #x100)
+  (:lanczos #x200)
+  (:spline #x400)
+  (:src-v-chr-drop-mask #x30000)
+  (:src-v-chr-drop-shift 16)
+  (:cpu-caps-mmx #x80000000)
+  (:cpu-caps-mmx2 #x20000000)
+  (:cpu-caps-3dnow #x40000000)
+  (:cpu-caps-altivec #x10000000)
+  (:cpu-caps-bfin #x01000000))
+
 ;;;
 ;;; Structs
 ;;;
@@ -825,6 +845,12 @@
 
 (defcfun ("avcodec_flush_buffers" avcodec-flush-buffers) :void (codec-context :pointer))
 
+(defcfun ("sws_getContext" sws-get-context) :pointer
+  (src-w :int) (src-h :int) (src-format pixel-format)
+  (dst-w :int) (dst-h :int) (dst-format pixel-format)
+  (flags sws-flag) (src-filter :pointer) (dst-filter :pointer)
+  (param :pointer))
+
 (defcfun ("sws_scale" sws-scale) :int
   (context :pointer) (source :pointer) (src-stride :pointer)
   (src-slice-y :int) (src-slice-h :int) (dst :pointer) (dst-stride :pointer))
@@ -884,8 +910,7 @@
                         (error "av-seek-frame failed."))
                       (loop
                          (with-foreign-objects ((packet 'av-packet)
-                                                #+ni(frame-finished :boolean))
-                           ;; av-read-frame errors out here with -32 for some reason.
+                                                (frame-finished :boolean))
                            (let ((successp (av-read-frame format-context packet)))
                              (when (minusp successp)
                                (print successp)
@@ -893,7 +918,12 @@
                                (return)))
                            (when (= stream-index (foreign-slot-value (mem-ref packet 'av-packet)
                                                                      'av-packet 'stream-index))
-                             (print "Got a packet from the video stream :-o"))
+                             (with-foreign-slots ((data size) packet av-packet)
+                               (avcodec-decode-video codec-context frame frame-finished data size)
+                               (when frame-finished
+                                 ;; we've got a video frame!
+                                 #+nil(sws-scale )
+                                 )))
                            (av-free-packet packet)))
                       ;; gotta make sure to close -all- this shit.
                       (avcodec-close codec-context)

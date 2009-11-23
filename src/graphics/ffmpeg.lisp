@@ -783,8 +783,6 @@
   (context :pointer) (picture :pointer) (got-picture-ptr :pointer)
   (buffer :pointer) (buffer-size :int))
 
-(defcfun ("av_free_packet" av-free-packet) :void (packet :pointer))
-
 (defcfun ("img_convert" img-convert) :int
   (destination :pointer) (dest-pix-format pixel-format)
   (source :pointer) (pixel-format pixel-format) (width :int) (height :int))
@@ -833,6 +831,10 @@
               (progn ,@body)
               (error "Failed"))
        (av-close-input-file (mem-ref ,context-pointer-var :pointer)))))
+
+(defun av-free-packet (packet)
+  (unless (or (null-pointer-p packet) (null-pointer-p (foreign-slot-value packet 'av-packet 'destruct)))
+    (foreign-funcall-pointer (foreign-slot-value packet 'av-packet 'destruct) () av-packet packet :void)))
 
 (defun try-opening-file ()
   (let ((file "/home/zkat/AMV Stop The Rock -Indifferent Productions [XVID].avi"))

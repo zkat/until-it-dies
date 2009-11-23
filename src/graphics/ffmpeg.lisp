@@ -358,6 +358,9 @@
   (:gray16 #+big-endian 35 #+little-endian 36)
   (:rgb48 #+big-endian 44 #+little-endian 45))
 
+(defcenum av-stream-parse-type
+  :none :full :headers :timestamps)
+
 ;;;
 ;;; Structs
 ;;;
@@ -412,9 +415,6 @@
   (read-seek :pointer) ; TODOoffset_t (*read_seek)(void *opaque,
                                         ; int stream_index, int64_t timestamp, int flags);
   )
-
-(defcenum av-stream-parse-type
-  :none :full :headers :timestamps)
 
 (defcstruct av-index-entry
   (pos :int64)

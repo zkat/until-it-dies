@@ -20,6 +20,9 @@
 (defcfun ("av_register_all" av-register-all) :void)
 (av-register-all)
 
+;;;
+;;; Enums
+;;;
 (defcenum context-flag
   (:nofile #x0001)
   (:neednumber #x0002)
@@ -30,48 +33,6 @@
   (:generic-index #x0100)
   (:ts-discount #x0200)
   (:variable-fps #x0400))
-
-(defcstruct av-format-context
-  (av-class :pointer)
-  (iformat :pointer)
-  (oformat :pointer)
-  (priv-data :pointer)
-  (pb :pointer)
-  (nb-streams :uint)
-  (streams :pointer)
-  (filename :string)
-  (timestamp :int64)
-  (title :string)
-  (author :string)
-  (copyright :string)
-  (comment :string)
-  (album :string)
-  (year :int)
-  (track :int)
-  (genre :string)
-  (ctx-flags context-flag)
-  (packet-buffer :pointer)
-  (start-time :int64)
-  (duration :int64)
-  (file-size :int64)
-  (bit-rate :int)
-  (cur-st :pointer)
-  (cur-ptr :pointer)
-  (cur-len :int)
-  (cur-pkt av-packet)
-  (data-offset :int64)
-  (index-built :int)
-  (mux-rate :int)
-  (packet-size :int)
-  (preload :int)
-  (max-delay :int)
-  (loop-output :int)
-  (flags :int)
-  (loop-input :int)
-  (probesize :uint)
-  (max-analyze-duration :int)
-  (key :pointer)
-  (keylen :int))
 
 (defcenum av-packet
   (pts :int64)
@@ -89,16 +50,8 @@
   (pkt av-packet)
   (next :pointer))
 
-(defcfun ("av_open_input_file" av-open-input-file) :int
-  (format-context :pointer) (filename :string) (input-format :pointer)
-  (buffer-size :int) (format-params :pointer))
-
-(defcfun ("av_find_stream_info" av-find-stream-info) :int (format-context :pointer))
-
-(defcfun ("dump_format" dump-format) :void
-  (format-context :pointer) (index :int) (url :pointer) (outputp :boolean))
-
 (defcenum codec-type (:unknown -1) :video :audio :data :subtitle :attachment :nb)
+
 (defcenum codec-id
   :NONE
   :MPEG1VIDEO
@@ -361,6 +314,106 @@
   (:nonkey 32)
   (:all 48))
 
+;; todo - pixfmt.h defines some extra constants. enum those, too?
+(defcenum pixel-format
+  (:none -1)
+  :yuv420p
+  :yuyv422
+  :rgb24
+  :bgr24
+  :yuv422p
+  :yuv444p
+  :rgb32
+  :yuv410p
+  :yuv411p
+  :rgb565
+  :rgb555
+  :gray8
+  :monowhite
+  :monoblack
+  :pal8
+  :yuvj420p
+  :yuvj422p
+  :yuvj444p
+  :xvmc-mpeg2-mc
+  :xvmc-mpeg2-idct
+  :uyvy422
+  :uyyvyy411
+  :bgr32
+  :bgr565
+  :bgr555
+  :bgr8
+  :bgr8
+  :bgr4
+  :bgr4-byte
+  :grb8
+  :rgb4
+  :rgb4-byte
+  :nv12
+  :nv21
+  :rgb32-1
+  :bgr-1
+  :gray16be
+  :gray16le
+  :yuv440p
+  :yuvj440p
+  :vdpau-h264
+  :vdpau-mpeg1
+  :vdpau-mpeg2
+  :vdpau-wmv3
+  :vdpau-vc1
+  :rgb48be
+  :rgb48le
+  :vaapi-moco
+  :vaapi-idct
+  :vaapi-vld
+  :nb)
+
+;;;
+;;; Structs
+;;;
+(defcstruct av-format-context
+  (av-class :pointer)
+  (iformat :pointer)
+  (oformat :pointer)
+  (priv-data :pointer)
+  (pb :pointer)
+  (nb-streams :uint)
+  (streams :pointer)
+  (filename :string)
+  (timestamp :int64)
+  (title :string)
+  (author :string)
+  (copyright :string)
+  (comment :string)
+  (album :string)
+  (year :int)
+  (track :int)
+  (genre :string)
+  (ctx-flags context-flag)
+  (packet-buffer :pointer)
+  (start-time :int64)
+  (duration :int64)
+  (file-size :int64)
+  (bit-rate :int)
+  (cur-st :pointer)
+  (cur-ptr :pointer)
+  (cur-len :int)
+  (cur-pkt av-packet)
+  (data-offset :int64)
+  (index-built :int)
+  (mux-rate :int)
+  (packet-size :int)
+  (preload :int)
+  (max-delay :int)
+  (loop-output :int)
+  (flags :int)
+  (loop-input :int)
+  (probesize :uint)
+  (max-analyze-duration :int)
+  (key :pointer)
+  (keylen :int))
+
 (defcstruct av-codec-context
   (av-class :pointer)
   (bit-rate :int)
@@ -572,9 +625,6 @@
   (sample-fmts :pointer)
   (channel-layouts :pointer))
 
-(defcfun ("avcodec_find_decoder" avcodec-find-decoder) av-codec (id codec-id))
-(defcfun ("avcodec_open" avcodec-open) :int (av-context av-codec-context) (codec av-codec))
-
 (defcstruct av-frame
   (data :pointer)
   (line-size :pointer)
@@ -606,67 +656,34 @@
   (dct-coeff :pointer)
   (ref-index :pointer)
   (reordered-opaque :int64))
-(defcfun ("avcodec_alloc_frame" avcodec-alloc-frame) av-frame)
 
-(defcenum pixel-format
-  (:none -1)
-  :yuv420p
-  :yuyv422
-  :rgb24
-  :bgr24
-  :yuv422p
-  :yuv444p
-  :rgb32
-  :yuv410p
-  :yuv411p
-  :rgb565
-  :rgb555
-  :gray8
-  :monowhite
-  :monoblack
-  :pal8
-  :yuvj420p
-  :yuvj422p
-  :yuvj444p
-  :xvmc-mpeg2-mc
-  :xvmc-mpeg2-idct
-  :uyvy422
-  :uyyvyy411
-  :bgr32
-  :bgr565
-  :bgr555
-  :bgr8
-  :bgr8
-  :bgr4
-  :bgr4-byte
-  :grb8
-  :rgb4
-  :rgb4-byte
-  :nv12
-  :nv21
-  :rgb32-1
-  :bgr-1
-  :gray16be
-  :gray16le
-  :yuv440p
-  :yuvj440p
-  :vdpau-h264
-  :vdpau-mpeg1
-  :vdpau-mpeg2
-  :vdpau-wmv3
-  :vdpau-vc1
-  :rgb48be
-  :rgb48le
-  :vaapi-moco
-  :vaapi-idct
-  :vaapi-vld
-  :nb)
-;; todo - pixfmt.h defines some extra constants. enum those, too?
+(defcstruct av-rational
+  (num :int)
+  (den :int))
+
+;;;
+;;; C Functions
+;;;
+(defcfun ("av_open_input_file" av-open-input-file) :int
+  (format-context :pointer) (filename :string) (input-format :pointer)
+  (buffer-size :int) (format-params :pointer))
+
+(defcfun ("av_find_stream_info" av-find-stream-info) :int (format-context :pointer))
+
+(defcfun ("dump_format" dump-format) :void
+  (format-context :pointer) (index :int) (url :pointer) (outputp :boolean))
+
+(defcfun ("avcodec_find_decoder" avcodec-find-decoder) av-codec (id codec-id))
+
+(defcfun ("avcodec_open" avcodec-open) :int (av-context av-codec-context) (codec av-codec))
+
+(defcfun ("avcodec_alloc_frame" avcodec-alloc-frame) av-frame)
 
 (defcfun ("avpicture_get_size" avpicture-get-size) :int
   (pix-fmt pixel-format) (width :int) (height :int))
 
 (defcfun ("av_malloc" av-malloc) :pointer (size :int))
+
 (defcfun ("av_free" av-free) :pointer (pointer :pointer))
 
 (defcfun ("avpicture_fill" avpicture-fill) :int
@@ -693,10 +710,6 @@
   (buffer :pointer) (buffer-size :int))
 
 (defcfun ("av_dup_packet" av-dup-packet) :int (packet :pointer))
-
-(defcstruct av-rational
-  (num :int)
-  (den :int))
 
 (defcfun ("av_q2d" av-q2d) :double (rational av-rational))
 

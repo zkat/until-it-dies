@@ -34,22 +34,6 @@
   (:ts-discount #x0200)
   (:variable-fps #x0400))
 
-(defcenum av-packet
-  (pts :int64)
-  (dts :int64)
-  (data :pointer)
-  (size :int)
-  (stream-index :int)
-  (flags :int)
-  (duration :int)
-  (destruct :pointer)
-  (priv :pointer)
-  (pos :int64))
-
-(defcenum av-packet-list
-  (pkt av-packet)
-  (next :pointer))
-
 (defcenum codec-type (:unknown -1) :video :audio :data :subtitle :attachment :nb)
 
 (defcenum codec-id
@@ -343,7 +327,6 @@
   :bgr565
   :bgr555
   :bgr8
-  :bgr8
   :bgr4
   :bgr4-byte
   :grb8
@@ -372,14 +355,117 @@
 ;;;
 ;;; Structs
 ;;;
+(defcstruct av-packet
+  (pts :int64)
+  (dts :int64)
+  (data :pointer)
+  (size :int)
+  (stream-index :int)
+  (flags :int)
+  (duration :int)
+  (destruct :pointer)
+  (priv :pointer)
+  (pos :int64))
+
+(defcstruct av-packet-list
+  (pkt av-packet)
+  (next :pointer))
+
+(defcstruct av-rational
+  (num :int)
+  (den :int))
+
+(defcstruct av-frac
+  (val :int64)
+  (num :int64)
+  (den :int64))
+
+(defctype offset-t :int64)
+
+(defcstruct byte-io-context
+  (buffer :string)
+  (buffer-size :int)
+  (buf_ptr (:pointer :unsigned-char))
+  (buf_end (:pointer :unsigned-char))
+  (opaque (:pointer :void))
+  (read-packeter :pointer) ; TODO int (*read_packet)(void *opaque, uint8_t *buf, int buf_size);
+  (write-packet :pointer) ; TODO int (*write_packet)(void *opaque, uint8_t *buf, int buf_size);
+  (seek :pointer) ; TODO offset_t (*seek)(void *opaque, offset_t offset, int whence);
+  (pos offset-t)
+  (must-flush :int)
+  (eof-reached :int)
+  (write-flag :int)
+  (is_streamed :int)
+  (max_packet_size :int)
+  (checksum :unsigned-long)
+  (checksum_ptr (:pointer :unsigned-char))
+  (update-checksum :pointer) ; TODO unsigned long (*update_checksum)
+                                        ;(unsigned long checksum, const uint8_t *buf, unsigned int size);
+  (error :int)
+  (read-pause :pointer) ; TODO int (*read_pause)(void *opaque, int pause);
+  (read-seek :pointer) ; TODOoffset_t (*read_seek)(void *opaque,
+                                        ; int stream_index, int64_t timestamp, int flags);
+  )
+
+(defcenum av-stream-parse-type
+  :none :full :headers :timestamps)
+
+(defcstruct av-index-entry
+  (pos :int64)
+  (timestamp :int64)
+  (flags :int)
+  (size :int)
+  (min-distance :int))
+
+(defcstruct av-probe-data
+  (filename :string)
+  (buf :pointer)
+  (buf-size :int))
+
+(defcstruct av-stream
+  (index :int)
+  (id :int)
+  (codec :pointer)
+  (r-frame-rate av-rational)
+  (priv-data :pointer)
+  (first-dts :int64)
+  (pts av-frac)
+  (time-base av-rational)
+  (pts-wrap-bits :int)
+  (discard av-discard)
+  (quality :float)
+  (start-time :int64)
+  (duration :int64)
+  (language :char :count 4)
+  (need-parsing av-stream-parse-type)
+  (parser :pointer)
+  (cur-dts :int64)
+  (last-ip-duration :int)
+  (last-ip-pts :int64)
+  (index-entries :pointer)
+  (nb-index-entries :int)
+  (index-entries-allocated-size :uint)
+  (nb-frames :int64)
+  (unused :int64)
+  (filename :string)
+  (dispasition :int)
+  (probe-data av-probe-data)
+  (pts-buffer :pointer)
+  (sample-aspect-ratio av-rational)
+  (metadata :pointer)
+  (cur-ptr :pointer)
+  (cur-len :int)
+  (cur-pkt av-packet)
+  (reference-dts :int64))
+
 (defcstruct av-format-context
   (av-class :pointer)
   (iformat :pointer)
   (oformat :pointer)
   (priv-data :pointer)
-  (pb :pointer)
+  (pb (:pointer byte-io-context))
   (nb-streams :uint)
-  (streams :pointer)
+  (streams (:pointer av-stream))
   (filename :string)
   (timestamp :int64)
   (title :string)
@@ -449,7 +535,6 @@
   (hurry-up :int)
   (codec :pointer)
   (priv-data :pointer)
-  (rtp-mode :int)
   (rtp-payload-size :int)
   (rtp-callback :pointer)
   (mv-bits :int)
@@ -462,7 +547,7 @@
   (misc-bits :int)
   (frame-bits :int)
   (opaque :pointer)
-  (codec-name :string)
+  (codec-name :char :count 32)
   (codec-type codec-type)
   (codec-id codec-id)
   (codec-tag :uint)
@@ -511,7 +596,7 @@
   (coded-frame :pointer)
   (debug :int)
   (debug-mv :int)
-  (error :pointer)
+  (error :uint64 :count 4)
   (mb-qmin :int)
   (mb-qmax :int)
   (me-cmp :int)
@@ -657,10 +742,6 @@
   (ref-index :pointer)
   (reordered-opaque :int64))
 
-(defcstruct av-rational
-  (num :int)
-  (den :int))
-
 ;;;
 ;;; C Functions
 ;;;
@@ -671,7 +752,7 @@
 (defcfun ("av_find_stream_info" av-find-stream-info) :int (format-context :pointer))
 
 (defcfun ("dump_format" dump-format) :void
-  (format-context :pointer) (index :int) (url :pointer) (outputp :boolean))
+  (format-context :pointer) (index :int) (url :string) (outputp :boolean))
 
 (defcfun ("avcodec_find_decoder" avcodec-find-decoder) av-codec (id codec-id))
 
@@ -737,3 +818,40 @@
 (defcfun ("sws_scale" sws-scale) :int
   (context :pointer) (source :pointer) (src-stride :pointer)
   (src-slice-y :int) (src-slice-h :int) (dst :pointer) (dst-stride :pointer))
+
+;;; trying it out
+(defmacro with-open-input-file ((filename context-pointer-var) &body body)
+  `(with-foreign-objects ((,context-pointer-var :pointer))
+     (unwind-protect
+          (if (zerop (av-open-input-file ,context-pointer-var ,filename (null-pointer) 0 (null-pointer)))
+              (progn ,@body)
+              (error "Failed"))
+       (av-close-input-file (mem-ref ,context-pointer-var :pointer)))))
+
+(defun try-opening-file ()
+  (let ((file "/home/zkat/AMV Stop The Rock -Indifferent Productions [XVID].avi"))
+    (with-open-input-file (file ctx-ptr)
+      (when (minusp (av-find-stream-info (mem-ref ctx-ptr :pointer)))
+        (error "Failed harder"))
+      #+nil(dump-format (mem-ref ctx-ptr :pointer) 0 file nil)
+      (let* ((num-streams (foreign-slot-value (mem-ref ctx-ptr :pointer)
+                                              'av-format-context 'nb-streams))
+             (streams (foreign-slot-value (mem-ref ctx-ptr :pointer) 'av-format-context 'streams))
+             (index (loop for i below num-streams
+                       when (eq :video (foreign-slot-value (foreign-slot-value
+                                                            (mem-aref streams 'av-stream i)
+                                                            'av-stream 'codec)
+                                                           'av-codec-context 'codec-type))
+                       return i)))
+        (when index
+          (let* ((codec-id (foreign-slot-value
+                            (foreign-slot-value
+                             (mem-aref (foreign-slot-value
+                                        (mem-ref ctx-ptr :pointer)
+                                        'av-format-context 'streams)
+                                       'av-stream index)
+                             'av-codec-context 'codec)
+                            'av-codec-context 'codec-id)))
+            (if (null-pointer-p (avcodec-find-decoder codec-id))
+                (error "Ohnoes")
+                (print "Codec SUCCESS"))))))))

@@ -361,20 +361,26 @@
 (defcenum av-stream-parse-type
   :none :full :headers :timestamps)
 
+(defcenum av-seek-flag
+  (:backward 1)
+  (:byte 2)
+  (:any 4))
+
 ;;;
 ;;; Structs
 ;;;
 (defcstruct av-packet
   (pts :int64)
   (dts :int64)
-  (data :pointer)
+  (data (:pointer :uint8))
   (size :int)
   (stream-index :int)
   (flags :int)
   (duration :int)
   (destruct :pointer)
   (priv :pointer)
-  (pos :int64))
+  (pos :int64)
+  (convergence-duration :int64))
 
 (defcstruct av-packet-list
   (pkt av-packet)
@@ -810,7 +816,7 @@
 
 (defcfun ("av_seek_frame" av-seek-frame) :int
   (context :pointer) (stream-index :int)
-  (timestamp :int64) (flags :int))
+  (timestamp :int64) (flags av-seek-flag))
 
 (defcfun ("av_rescale_q" av-rescale-q) :int64
   (a :int64) (bq av-rational) (cq av-rational))
@@ -839,46 +845,58 @@
 (defun try-opening-file ()
   (let ((file "/home/zkat/AMV Stop The Rock -Indifferent Productions [XVID].avi"))
     (with-open-input-file (file ctx-ptr)
-      (when (minusp (av-find-stream-info (mem-ref ctx-ptr :pointer)))
-        (error "Problem setting stream info."))
-      #+nil(dump-format (mem-ref ctx-ptr :pointer) 0 file nil)
-      (let* ((num-streams (foreign-slot-value (mem-ref ctx-ptr :pointer)
-                                              'av-format-context 'nb-streams))
-             (streams (foreign-slot-value (mem-ref ctx-ptr :pointer) 'av-format-context 'streams))
-             (stream-index (loop for i below num-streams
-                       when (eq :video (foreign-slot-value (foreign-slot-value
-                                                            (mem-aref streams 'av-stream i)
-                                                            'av-stream 'codec)
-                                                           'av-codec-context 'codec-type))
-                       return i)))
-        (when stream-index
-          (let* ((codec-context (foreign-slot-value
-                                 (mem-aref (foreign-slot-value
-                                            (mem-ref ctx-ptr :pointer)
-                                            'av-format-context 'streams)
-                                           'av-stream stream-index)
-                                 'av-stream 'codec))
-                 (codec-id (foreign-slot-value codec-context 'av-codec-context 'codec-id))
-                 (codec (avcodec-find-decoder codec-id)))
-            (if (null-pointer-p codec)
-                (error "Unsupported codec.")
-                (let* ((frame (avcodec-alloc-frame))
-                       (frame-rgb (avcodec-alloc-frame)))
-                  ;; todo - should make sure these get allocated properly (not null pointers)
-                  (when (minusp (avcodec-open codec-context codec))
-                    (error "Could not open codec."))
-                  (let* ((width (foreign-slot-value codec-context 'av-codec-context 'width))
-                         (height (foreign-slot-value codec-context 'av-codec-context 'height))
-                         (buffer (av-malloc (* (foreign-type-size :uint8)
-                                               (avpicture-get-size :rgb24 width height)))))
-                    (avpicture-fill frame-rgb buffer :rgb24 width height)
-                    #+nil(loop with packet = (null-pointer)
-                       while (plusp (av-read-frame (mem-ref ctx-ptr :pointer) packet))
-                       do (when (= stream-index (foreign-slot-value packet 'av-packet 'stream-index))
-                            (print "Got a packet from the video stream :-o"))
-                         (av-free-packet packet))
-                    ;; gotta make sure to close -all- this shit.
-                    (avcodec-close codec-context)
-                    (av-free frame)
-                    (av-free frame-rgb)
-                    (av-free buffer))))))))))
+      (let ((format-context (mem-ref ctx-ptr :pointer)))
+        (when (minusp (av-find-stream-info format-context))
+          (error "Problem setting stream info."))
+        #+nil(dump-format format-context 0 file nil)
+        (let* ((num-streams (foreign-slot-value format-context
+                                                'av-format-context 'nb-streams))
+               (streams (foreign-slot-value format-context 'av-format-context 'streams))
+               (stream-index (loop for i below num-streams
+                                when (eq :video (foreign-slot-value (foreign-slot-value
+                                                                     (mem-aref streams 'av-stream i)
+                                                                     'av-stream 'codec)
+                                                                    'av-codec-context 'codec-type))
+                                return i)))
+          (when stream-index
+            (let* ((codec-context (foreign-slot-value
+                                   (mem-aref (foreign-slot-value
+                                              format-context
+                                              'av-format-context 'streams)
+                                             'av-stream stream-index)
+                                   'av-stream 'codec))
+                   (codec-id (foreign-slot-value codec-context 'av-codec-context 'codec-id))
+                   (codec (avcodec-find-decoder codec-id)))
+              (if (null-pointer-p codec)
+                  (error "Unsupported codec.")
+                  (let* ((frame (avcodec-alloc-frame))
+                         (frame-rgb (avcodec-alloc-frame)))
+                    (format t "Usinc codec: ~A" (foreign-string-to-lisp (foreign-slot-value codec 'av-codec 'name)))
+                    ;; todo - should make sure these get allocated properly (not null pointers)
+                    (when (minusp (avcodec-open codec-context codec))
+                      (error "Could not open codec."))
+                    (let* ((width (foreign-slot-value codec-context 'av-codec-context 'width))
+                           (height (foreign-slot-value codec-context 'av-codec-context 'height))
+                           (buffer (av-malloc (* (foreign-type-size :uint8)
+                                                 (avpicture-get-size :rgb24 width height)))))
+                      (avpicture-fill frame-rgb buffer :rgb24 width height)
+                      (when (minusp (av-seek-frame format-context -1 0 :backward))
+                        (error "av-seek-frame failed."))
+                      (loop
+                         (with-foreign-objects ((packet 'av-packet)
+                                                #+ni(frame-finished :boolean))
+                           ;; av-read-frame errors out here with -32 for some reason.
+                           (let ((successp (av-read-frame format-context packet)))
+                             (when (minusp successp)
+                               (print successp)
+                               (av-free-packet packet)
+                               (return)))
+                           (when (= stream-index (foreign-slot-value (mem-ref packet 'av-packet)
+                                                                     'av-packet 'stream-index))
+                             (print "Got a packet from the video stream :-o"))
+                           (av-free-packet packet)))
+                      ;; gotta make sure to close -all- this shit.
+                      (avcodec-close codec-context)
+                      (av-free frame)
+                      (av-free frame-rgb)
+                      (av-free buffer)))))))))))

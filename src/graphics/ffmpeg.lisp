@@ -832,23 +832,23 @@
   (let ((file "/home/zkat/AMV Stop The Rock -Indifferent Productions [XVID].avi"))
     (with-open-input-file (file ctx-ptr)
       (when (minusp (av-find-stream-info (mem-ref ctx-ptr :pointer)))
-        (error "Failed harder"))
+        (error "Problem setting stream info."))
       #+nil(dump-format (mem-ref ctx-ptr :pointer) 0 file nil)
       (let* ((num-streams (foreign-slot-value (mem-ref ctx-ptr :pointer)
                                               'av-format-context 'nb-streams))
              (streams (foreign-slot-value (mem-ref ctx-ptr :pointer) 'av-format-context 'streams))
-             (index (loop for i below num-streams
+             (stream-index (loop for i below num-streams
                        when (eq :video (foreign-slot-value (foreign-slot-value
                                                             (mem-aref streams 'av-stream i)
                                                             'av-stream 'codec)
                                                            'av-codec-context 'codec-type))
                        return i)))
-        (when index
+        (when stream-index
           (let* ((codec-context (foreign-slot-value
                                  (mem-aref (foreign-slot-value
                                             (mem-ref ctx-ptr :pointer)
                                             'av-format-context 'streams)
-                                           'av-stream index)
+                                           'av-stream stream-index)
                                  'av-stream 'codec))
                  (codec-id (foreign-slot-value codec-context 'av-codec-context 'codec-id))
                  (codec (avcodec-find-decoder codec-id)))
@@ -864,9 +864,9 @@
                          (buffer (av-malloc (* (foreign-type-size :uint8)
                                                (avpicture-get-size :rgb24 width height)))))
                     (avpicture-fill frame-rgb buffer :rgb24 width height)
-                    (loop with packet = (null-pointer)
+                    #+nil(loop with packet = (null-pointer)
                        while (plusp (av-read-frame (mem-ref ctx-ptr :pointer) packet))
-                       do (when (= index (foreign-slot-value packet 'av-packet 'stream-index))
+                       do (when (= stream-index (foreign-slot-value packet 'av-packet 'stream-index))
                             (print "Got a packet from the video stream :-o"))
                          (av-free-packet packet))
                     ;; gotta make sure to close -all- this shit.

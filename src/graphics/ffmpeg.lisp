@@ -329,13 +329,13 @@
   :bgr8
   :bgr4
   :bgr4-byte
-  :grb8
+  :rgb8
   :rgb4
   :rgb4-byte
   :nv12
   :nv21
   :rgb32-1
-  :bgr-1
+  :bgr32-1
   :gray16be
   :gray16le
   :yuv440p
@@ -350,7 +350,13 @@
   :vaapi-moco
   :vaapi-idct
   :vaapi-vld
-  :nb)
+  :nb
+  (:rgba #+big-endian 33 #+little-endian 22)
+  (:bgra #+big-endian 34 #+little-endian 6)
+  (:argb #+big-endian 6 #+little-endian 34)
+  (:abgr #+big-endian 22 #+little-endian 33)
+  (:gray16 #+big-endian 35 #+little-endian 36)
+  (:rgb48 #+big-endian 44 #+little-endian 45))
 
 ;;;
 ;;; Structs
@@ -874,4 +880,3 @@
                     (av-free frame)
                     (av-free frame-rgb)
                     (av-free buffer))))))))))
-

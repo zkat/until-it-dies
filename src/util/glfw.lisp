@@ -233,15 +233,21 @@
 (defcfun+out+doc ("glfwGetVersion" get-version) :void
   ((:out major :int) (:out minor :int) (:out rev :int)))
 
+(defmacro without-fp-traps (&body body)
+  `(#+ (and sbcl x86-64) sb-int:with-float-traps-masked (:invalid :divide-by-zero)
+    #- (and sbcl x86-64) progn
+     ,@body))
+
 (defmacro with-init (&body forms)
   "Call uid-glfw:init, execute forms and clean-up with uid-glfw:terminate once finished.
 This makes a nice wrapper to an application higher-level form.
 Signals an error on failure to initialize. Wrapped in a block named uid-glfw:with-init."
-  `(if (uid-glfw:init)
-       (unwind-protect
-            (block with-init ,@forms)
-         (uid-glfw:terminate))
-       (error "Error initializing glfw.")))
+  `(without-fp-traps
+     (if (uid-glfw:init)
+        (unwind-protect
+             (block with-init ,@forms)
+          (uid-glfw:terminate))
+        (error "Error initializing glfw."))))
 
 (defcfun ("glfwOpenWindow" %open-window) boolean
   (width :int) (height :int)

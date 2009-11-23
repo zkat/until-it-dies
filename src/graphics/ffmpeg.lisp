@@ -844,14 +844,13 @@
                                                            'av-codec-context 'codec-type))
                        return i)))
         (when index
-          (let* ((codec-id (foreign-slot-value
-                            (foreign-slot-value
-                             (mem-aref (foreign-slot-value
-                                        (mem-ref ctx-ptr :pointer)
-                                        'av-format-context 'streams)
-                                       'av-stream index)
-                             'av-codec-context 'codec)
-                            'av-codec-context 'codec-id)))
+          (let* ((codec-context (foreign-slot-value
+                                 (mem-aref (foreign-slot-value
+                                            (mem-ref ctx-ptr :pointer)
+                                            'av-format-context 'streams)
+                                           'av-stream index)
+                                 'av-stream 'codec))
+                 (codec-id (foreign-slot-value codec-context 'av-codec-context 'codec-id)))
             (if (null-pointer-p (avcodec-find-decoder codec-id))
                 (error "Ohnoes")
                 (print "Codec SUCCESS"))))))))

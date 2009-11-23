@@ -73,7 +73,6 @@
 (defcfun ("avcodec_find_decoder" avcodec-find-decoder) av-codec (id codec-id))
 (defcfun ("avcodec_open" avcodec-open) :int (av-context av-codec-context) (codec av-codec))
 
-(defcfun ("avcodec_alloc_frame" avcodec-alloc-frame) av-frame)
 (defcstruct av-frame
   (data :pointer)
   (line-size :pointer)
@@ -105,6 +104,7 @@
   (dct-coeff :pointer)
   (ref-index :pointer)
   (reordered-opaque :int64))
+(defcfun ("avcodec_alloc_frame" avcodec-alloc-frame) av-frame)
 
 (defcenum pixel-format
   (:none -1)

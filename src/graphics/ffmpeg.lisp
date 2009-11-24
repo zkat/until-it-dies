@@ -863,7 +863,9 @@
 ;;; trying it out
 (defstruct (video (:constructor make-video (filename)))
   format-context
+  video-stream
   video-stream-index
+  audio-stream
   audio-stream-index
   filename)
 
@@ -880,7 +882,9 @@
           (setf (video-format-context video)
                 (mem-ref ctx-ptr :pointer)
                 (video-video-stream-index video)
-                (find-video-stream-index (video-format-context video)))
+                (find-video-stream-index (video-format-context video))
+                (video-video-stream video)
+                (find-video-stream (video-format-context video) (video-video-stream-index video)))
           (when (minusp (av-find-stream-info (video-format-context video)))
             (error "Problem setting stream info for video."))
           video)
@@ -900,6 +904,13 @@
 
 (defun codec-context-codec-id (codec-context)
   (foreign-slot-value codec-context 'av-codec-context 'codec-id))
+
+(defun find-video-stream (format-context index)
+  (mem-aref (foreign-slot-value
+             format-context
+             'av-format-context 'streams)
+            'av-stream
+            index))
 
 (defun find-video-stream-index (format-context)
   (with-foreign-slots ((nb-streams streams) format-context av-format-context)
@@ -942,6 +953,7 @@
                (frame-rgb (avcodec-alloc-frame)))
           (assert (not (null-pointer-p frame)))
           (assert (not (null-pointer-p frame-rgb)))
+          ;; いそがしいですね
           (let* ((width (foreign-slot-value codec-context 'av-codec-context 'width))
                  (height (foreign-slot-value codec-context 'av-codec-context 'height))
                  (buffer (av-malloc (* (foreign-type-size :uint8)

@@ -812,10 +812,6 @@
   (context :pointer) (picture :pointer) (got-picture-ptr :pointer)
   (buffer :pointer) (buffer-size :int))
 
-(defcfun ("img_convert" img-convert) :int
-  (destination :pointer) (dest-pix-format pixel-format)
-  (source :pointer) (pixel-format pixel-format) (width :int) (height :int))
-
 (defcfun ("avcodec_close" avcodec-close) :int (context :pointer))
 (defcfun ("av_close_input_file" av-close-input-file) :void (context :pointer))
 

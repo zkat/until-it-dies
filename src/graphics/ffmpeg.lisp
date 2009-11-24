@@ -873,36 +873,55 @@
               (error "Failed"))
        (av-close-input-file (mem-ref ,context-pointer-var :pointer)))))
 
+(defstruct (video (:constructor make-video (format-context filename
+                                            &aux
+                                            (video-stream-index
+                                             (find-video-stream-index format-context)))))
+  format-context
+  video-stream-index
+  audio-stream-index
+  filename)
+
+(defun video-codec-context (video)
+  (let ((format-context (video-format-context video))
+        (stream-index (video-video-stream-index video)))
+    (foreign-slot-value (mem-aref (foreign-slot-value
+                                   format-context
+                                   'av-format-context 'streams)
+                                  'av-stream stream-index)
+                        'av-stream 'codec)))
+
+(defun codec-context-codec-id (codec-context)
+  (foreign-slot-value codec-context 'av-codec-context 'codec-id))
+
+(defun find-video-stream-index (format-context)
+  (with-foreign-slots ((nb-streams streams) format-context av-format-context)
+    (loop for i below nb-streams
+         when (eq :video (foreign-slot-value (foreign-slot-value
+                                              (mem-aref streams 'av-stream i)
+                                              'av-stream 'codec)
+                                             'av-codec-context 'codec-type))
+         return i)))
+
 (defun try-opening-file ()
   (let ((file "/home/zkat/AMV Stop The Rock -Indifferent Productions [XVID].avi"))
     (with-open-input-file (file ctx-ptr)
-      (let ((format-context (mem-ref ctx-ptr :pointer)))
+      (let* ((format-context (mem-ref ctx-ptr :pointer))
+             (video (make-video format-context file)))
         (when (minusp (av-find-stream-info format-context))
           (error "Problem setting stream info."))
+        (print video)
         #+nil(dump-format format-context 0 file nil)
-        (let* ((num-streams (foreign-slot-value format-context
-                                                'av-format-context 'nb-streams))
-               (streams (foreign-slot-value format-context 'av-format-context 'streams))
-               (stream-index (loop for i below num-streams
-                                when (eq :video (foreign-slot-value (foreign-slot-value
-                                                                     (mem-aref streams 'av-stream i)
-                                                                     'av-stream 'codec)
-                                                                    'av-codec-context 'codec-type))
-                                return i)))
+        (let* ((stream-index (video-video-stream-index video)))
           (when stream-index
-            (let* ((codec-context (foreign-slot-value
-                                   (mem-aref (foreign-slot-value
-                                              format-context
-                                              'av-format-context 'streams)
-                                             'av-stream stream-index)
-                                   'av-stream 'codec))
-                   (codec-id (foreign-slot-value codec-context 'av-codec-context 'codec-id))
+            (let* ((codec-context (video-codec-context video))
+                   (codec-id (codec-context-codec-id codec-context))
                    (codec (avcodec-find-decoder codec-id)))
               (if (null-pointer-p codec)
                   (error "Unsupported codec.")
                   (let* ((frame (avcodec-alloc-frame))
                          (frame-rgb (avcodec-alloc-frame)))
-                    (format t "Using codec: ~A" (foreign-string-to-lisp (foreign-slot-value codec 'av-codec 'name)))
+                    (format t "~&Using codec: ~A~%" (foreign-string-to-lisp (foreign-slot-value codec 'av-codec 'name)))
                     (assert (not (null-pointer-p frame)))
                     (assert (not (null-pointer-p frame-rgb)))
                     (when (minusp (avcodec-open codec-context codec))
@@ -932,10 +951,14 @@
                                  (avcodec-decode-video codec-context frame frame-finished data size)
                                  (when frame-finished
                                    ;; we've got a video frame!
-                                   (print "Finished a frame."))))
+                                   (print-frame frame-rgb)
+                                   (return))))
                              (av-free-packet packet))))
                       ;; gotta make sure to close -all- this shit.
                       (avcodec-close codec-context)
                       (av-free frame)
                       (av-free frame-rgb)
                       (av-free buffer)))))))))))
+
+(defun print-frame (frame)
+  (print (foreign-slot-value frame 'av-frame 'data)))

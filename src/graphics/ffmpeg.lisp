@@ -971,8 +971,7 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
                (source-frame (make-frame))
                (target-frame (make-frame)))
           (let ((buffer (buffer-frame target-frame codec-context :rgb24)))
-            (when (minusp (av-seek-frame (video-format-context video) -1 0 :backward))
-              (error "av-seek-frame failed."))
+            (rewind-video video)
             (let ((sws-context (make-sws-context codec-context :rgb24 :bicubic)))
               (loop for packet = (read-frame video) do
                    (unless packet
@@ -989,6 +988,10 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
             (av-free buffer)
             (av-free target-frame)
             (av-free source-frame)))))))
+
+(defun rewind-video (video)
+  (when (minusp (av-seek-frame (video-format-context video) -1 0 :backward))
+    (error "av-seek-frame failed.")))
 
 (defun convert-frame (sws-context codec-context source-frame target-frame)
   (with-foreign-slots ((height) codec-context av-codec-context)

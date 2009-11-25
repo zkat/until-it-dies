@@ -761,7 +761,7 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
   (channel-layouts :pointer))
 
 (defcstruct av-frame
-  (data :pointer)
+  (data :pointer :count 4)
   (line-size :int :count 4)
   (base :pointer)
   (key-frame :int)
@@ -793,7 +793,7 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
   (reordered-opaque :int64))
 
 (defcstruct av-picture
-  (data :pointer)
+  (data :pointer :count 4)
   (line-size :int :count 4))
 
 ;;;

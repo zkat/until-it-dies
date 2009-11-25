@@ -775,7 +775,7 @@
 
 (defcstruct av-picture
   (data :pointer)
-  (linesize :int :count 4))
+  (line-size :int :count 4))
 
 ;;;
 ;;; C Functions
@@ -949,28 +949,35 @@
       #+nil(dump-format format-context 0 file nil)
       (with-video-codec video
         (let* ((codec-context (video-codec-context video))
-               (source-frame (make-frame))
-               (target-frame (make-frame)))
+               (source-frame (make-frame)))
           ;; いそがしいですね
-          (let ((buffer (buffer-frame target-frame codec-context :rgba)))
+          (with-foreign-object (target-frame 'av-picture)
             (when (minusp (av-seek-frame (video-format-context video) -1 0 :backward))
               (error "av-seek-frame failed."))
             (let ((sws-context (make-sws-context codec-context :rgba :bicubic)))
+              (print "Creating SWS Context")
               (loop for packet = (read-frame video) do
                    (unless packet
                      (return))
                    (when (and (= (video-video-stream-index video)
                                  (packet-stream-index packet))
                               (decode-packet-into-frame video packet source-frame))
+                     (print "Got a full frame.")
                      ;; we've got a video frame!
+                     (convert-frame sws-context codec-context source-frame target-frame)
+                     (print "Converted frame.")
                      (print-frame target-frame)
                      (av-free-packet packet)
                      (return))
                    (av-free-packet packet)))
-          ;; gotta make sure to close -all- this shit.
-            (av-free source-frame)
-            (av-free target-frame)
-            (av-free buffer)))))))
+            (av-free source-frame)))))))
+
+(defun convert-frame (sws-context codec-context source-frame target-frame)
+  (with-foreign-slots ((height) codec-context av-codec-context)
+    (sws-scale sws-context (foreign-slot-value source-frame 'av-frame 'data)
+               (print (foreign-slot-value source-frame 'av-frame 'line-size))
+               0 height (foreign-slot-value target-frame 'av-picture 'data)
+               (foreign-slot-value target-frame 'av-picture 'line-size))))
 
 (defun buffer-frame (frame codec-context target-pixel-format)
   (with-foreign-slots ((width height) codec-context av-codec-context)

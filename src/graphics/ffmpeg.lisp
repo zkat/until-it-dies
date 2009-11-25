@@ -949,31 +949,36 @@
       #+nil(dump-format format-context 0 file nil)
       (with-video-codec video
         (let* ((codec-context (video-codec-context video))
-               (frame (make-frame))
-               (frame-rgb (make-frame)))
+               (source-frame (make-frame))
+               (target-frame (make-frame)))
           ;; いそがしいですね
-          (with-foreign-slots ((width height) codec-context av-codec-context)
-            (let ((buffer (av-malloc (* (foreign-type-size :uint8)
-                                        (avpicture-get-size :rgb24 width height)))))
-              (avpicture-fill frame-rgb buffer :rgba width height)
-              (when (minusp (av-seek-frame (video-format-context video) -1 0 :backward))
-                (error "av-seek-frame failed."))
-              (let ((sws-context (make-sws-context codec-context :rgba :bicubic)))
-                (loop for packet = (read-frame video) do
-                     (unless packet
-                       (return))
-                     (when (and (= (video-video-stream-index video)
-                                   (packet-stream-index packet))
-                                (decode-packet-into-frame video packet frame))
-                       ;; we've got a video frame!
-                       (print-frame frame-rgb)
-                       (av-free-packet packet)
-                       (return))
-                     (av-free-packet packet)))
-              ;; gotta make sure to close -all- this shit.
-              (av-free frame)
-              (av-free frame-rgb)
-              (av-free buffer))))))))
+          (let ((buffer (buffer-frame target-frame codec-context :rgba)))
+            (when (minusp (av-seek-frame (video-format-context video) -1 0 :backward))
+              (error "av-seek-frame failed."))
+            (let ((sws-context (make-sws-context codec-context :rgba :bicubic)))
+              (loop for packet = (read-frame video) do
+                   (unless packet
+                     (return))
+                   (when (and (= (video-video-stream-index video)
+                                 (packet-stream-index packet))
+                              (decode-packet-into-frame video packet source-frame))
+                     ;; we've got a video frame!
+                     (print-frame target-frame)
+                     (av-free-packet packet)
+                     (return))
+                   (av-free-packet packet)))
+          ;; gotta make sure to close -all- this shit.
+            (av-free source-frame)
+            (av-free target-frame)
+            (av-free buffer)))))))
+
+(defun buffer-frame (frame codec-context target-pixel-format)
+  (with-foreign-slots ((width height) codec-context av-codec-context)
+    (let ((buffer (av-malloc (* (foreign-type-size :uint8)
+                                (avpicture-get-size target-pixel-format width height)))))
+      (if (null-pointer-p buffer) (error "Error allocating frame buffer.")
+          (avpicture-fill frame buffer target-pixel-format width height))
+      buffer)))
 
 (defun make-frame ()
   (let ((frame (avcodec-alloc-frame)))

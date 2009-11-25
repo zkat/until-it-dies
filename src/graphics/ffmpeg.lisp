@@ -1,7 +1,26 @@
 (defpackage #:ffmpeg-bindings
   (:use :cl :cffi)
-  (:nicknames :%uid-ffmpeg))
+  (:nicknames :%uid-ffmpeg)
+  (:shadow :with-foreign-slots))
 (in-package :ffmpeg-bindings)
+
+(defmacro with-foreign-slots ((slots ptr type) &body body)
+  "Create local symbol macros for each var in VARS to reference
+foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
+  (let ((ptr-var (gensym "PTR")))
+    `(let ((,ptr-var ,ptr))
+       (symbol-macrolet
+           ,(mapcar (lambda (slot-entry)
+                      (let ((var-name (if (symbolp slot-entry)
+                                          slot-entry
+                                          (car slot-entry)))
+                            (slot-name (if (symbolp slot-entry)
+                                           slot-entry
+                                           (cadr slot-entry))))
+                        `(,var-name
+                          (foreign-slot-value ,ptr-var ',type ',slot-name))))
+                    slots)
+         ,@body))))
 
 (define-foreign-library avformat
   (:unix "libavformat.so")
@@ -949,35 +968,34 @@
       #+nil(dump-format format-context 0 file nil)
       (with-video-codec video
         (let* ((codec-context (video-codec-context video))
-               (source-frame (make-frame)))
-          ;; いそがしいですね
-          (with-foreign-object (target-frame 'av-picture)
+               (source-frame (make-frame))
+               (target-frame (make-frame)))
+          (let ((buffer (buffer-frame target-frame codec-context :rgb24)))
             (when (minusp (av-seek-frame (video-format-context video) -1 0 :backward))
               (error "av-seek-frame failed."))
-            (let ((sws-context (make-sws-context codec-context :rgba :bicubic)))
-              (print "Creating SWS Context")
+            (let ((sws-context (make-sws-context codec-context :rgb24 :bicubic)))
               (loop for packet = (read-frame video) do
                    (unless packet
                      (return))
                    (when (and (= (video-video-stream-index video)
                                  (packet-stream-index packet))
                               (decode-packet-into-frame video packet source-frame))
-                     (print "Got a full frame.")
                      ;; we've got a video frame!
                      (convert-frame sws-context codec-context source-frame target-frame)
-                     (print "Converted frame.")
                      (print-frame target-frame)
                      (av-free-packet packet)
                      (return))
                    (av-free-packet packet)))
+            (av-free buffer)
+            (av-free target-frame)
             (av-free source-frame)))))))
 
 (defun convert-frame (sws-context codec-context source-frame target-frame)
   (with-foreign-slots ((height) codec-context av-codec-context)
-    (sws-scale sws-context (foreign-slot-value source-frame 'av-frame 'data)
-               (print (foreign-slot-value source-frame 'av-frame 'line-size))
-               0 height (foreign-slot-value target-frame 'av-picture 'data)
-               (foreign-slot-value target-frame 'av-picture 'line-size))))
+    (with-foreign-slots (((src-data data) (src-line-size line-size)) source-frame av-frame)
+      (with-foreign-slots (((dst-data data) (dst-line-size line-size)) target-frame av-frame)
+        ;; memory fault happens in the call to sws-scale. >:(
+        (sws-scale sws-context src-data src-line-size 0 height dst-data dst-line-size)))))
 
 (defun buffer-frame (frame codec-context target-pixel-format)
   (with-foreign-slots ((width height) codec-context av-codec-context)

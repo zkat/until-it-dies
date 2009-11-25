@@ -55,6 +55,9 @@ texture they are drawn with. Their TEXTURE property should contain a texture.")
 (defreply create ((image =image=) &key filepath)
   (defobject =image= ((texture (create-texture filepath)))))
 
+(defreply create ((image =image=) &key filepath)
+  (defobject =image= ((texture (create-texture filepath)))))
+
 (defun create-image (filepath)
   (let* ((texture (create-texture filepath)))
     (defobject (=image=) ((texture texture)))))
@@ -211,6 +214,9 @@ figure out which frames to draw.")
                            :wrap wrap
                            :align align
                            :valign valign)))))
+
+(defreply create ((text =text=) &key (string ""))
+  (defobject =text= ((string-to-draw string))))
 
 (defreply create ((text =text=) &key (string ""))
   (defobject =text= ((string-to-draw string))))

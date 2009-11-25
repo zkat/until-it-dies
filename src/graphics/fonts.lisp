@@ -17,11 +17,11 @@
    loadedp)
   :documentation "A font is used by the text-drawing system to draw strings to screen.")
 
-(defreply create ((font =font=) &key filepath (size 10) (res 20))
+(defreply create ((font =font=) &key filepath (size 12) (res 20))
   (unless filepath (error "Must provide a filepath."))
   (defobject (=font=) ((filepath filepath) (size size) (res res))))
 
-(defun create-font (filepath &key (size 10) (res 20))
+(defun create-font (filepath &key (size 12) (res 20))
   (defobject (=font=) ((filepath filepath) (size size) (res res))))
 
 (defvar *font* =font=)

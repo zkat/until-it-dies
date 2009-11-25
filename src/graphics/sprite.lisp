@@ -53,6 +53,9 @@ facilities for drawing textured onto components."))
    "Images are textured components that are initialized to be the same size as the
 texture they are drawn with. Their TEXTURE property should contain a texture."))
 
+(defreply create ((image =image=) &key filepath)
+  (defobject =image= ((texture (create-texture filepath)))))
+
 (defun create-image (filepath)
   (let* ((texture (create-texture filepath)))
     (defobject (=image=) ((texture texture)))))
@@ -102,6 +105,16 @@ figure out which frames to draw."))
   (frame-height animation))
 (defreply width ((animation =animation=))
   (frame-width animation))
+
+(defreply create ((animation =animation=) &key filepath frame-width
+                  frame-height frame-delay num-frames (type :loop))
+  (defobject (=animation=)
+      ((texture (create-texture filepath))
+       (frame-width frame-width)
+       (frame-height frame-height)
+       (frame-delay frame-delay)
+       (num-frames num-frames)
+       (animation-type type))))
 
 (defun create-animation (filepath frame-width frame-height frame-delay
                          num-frames &optional (type :loop))
@@ -181,6 +194,9 @@ figure out which frames to draw."))
         :rotation rotation
         :font font
         :wrap wrap))
+
+(defreply create ((text =text=) &key (string ""))
+  (defobject =text= ((string-to-draw string))))
 
 (defun create-text (string)
   (defobject (=text=) ((string-to-draw string))))

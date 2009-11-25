@@ -12,6 +12,11 @@
   ((view-left 0) (view-right 400) (view-bottom 0) (view-top 400)
    (view-far 0) (view-near 10) (view-zoom 1.0)))
 
+(defreply create ((view =view=) &key (x 0) (y 0) (width 1) (height 1) (far 0) (near 10))
+  (defobject =view= ((view-left x) (view-right (+ x width))
+                     (view-bottom y) (view-top (+ y height))
+                     (view-far far) (view-near near))))
+
 (defun create-view (x y width height &key (far 0) (near 10))
   (defobject =view= ((view-left x) (view-right (+ x width))
                      (view-bottom y) (view-top (+ y height))

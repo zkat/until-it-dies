@@ -970,7 +970,8 @@
                        ;; we've got a video frame!
                        (print-frame frame-rgb)
                        (av-free-packet packet)
-                       (return))))
+                       (return))
+                     (av-free-packet packet)))
               ;; gotta make sure to close -all- this shit.
               (av-free frame)
               (av-free frame-rgb)

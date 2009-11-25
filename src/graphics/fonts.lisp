@@ -17,6 +17,10 @@
    (loadedp nil))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
 
+(defreply create ((font =font=) &key filepath (size 12) (res 20))
+  (unless filepath (error "Must provide a filepath."))
+  (defobject (=font=) ((filepath filepath) (size size) (res res))))
+
 (defun create-font (filepath &key (size 12) (res 20))
   (defobject (=font=) ((filepath filepath) (size size) (res res))))
 

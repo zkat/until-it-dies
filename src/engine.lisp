@@ -51,7 +51,8 @@ but it's not a mortal sin to just use it as a singleton."))
 (defreply init-object :after ((engine =engine=) &key)
   (setf (keys-held-down engine) (make-hash-table)
         (resource-manager engine) (object :parents =resource-manager=)
-        (event-queue engine) (object :parents =event-queue=)))
+        (event-queue engine) (object :parents =event-queue=)
+        (current-view engine) (create-view 0 0 (window-width engine) (window-height engine))))
 
 (defun create-engine (&key (clear-color *black*) resizablep (title "UID Application")
                       (window-width 500) (window-height 500) key-repeat-p

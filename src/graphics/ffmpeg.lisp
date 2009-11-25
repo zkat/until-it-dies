@@ -968,26 +968,23 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
       #+nil(dump-format format-context 0 file nil)
       (with-video-codec video
         (let* ((codec-context (video-codec-context video))
-               (source-frame (make-frame))
-               (target-frame (make-frame)))
-          (let ((buffer (buffer-frame target-frame codec-context :rgb24)))
-            (rewind-video video)
-            (let ((sws-context (make-sws-context codec-context :rgb24 :bicubic)))
-              (loop for packet = (read-frame video) do
-                   (unless packet
-                     (return))
-                   (when (and (= (video-video-stream-index video)
-                                 (packet-stream-index packet))
-                              (decode-packet-into-frame video packet source-frame))
-                     ;; we've got a video frame!
-                     (convert-frame sws-context codec-context source-frame target-frame)
-                     (print-frame target-frame)
-                     (av-free-packet packet)
-                     (return))
-                   (av-free-packet packet)))
-            (av-free buffer)
-            (av-free target-frame)
-            (av-free source-frame)))))))
+               (source-frame (make-frame)))
+          (with-foreign-object (target-frame 'av-picture)
+            (let ((buffer (buffer-frame target-frame codec-context :rgb24)))
+              (rewind-video video)
+              (let ((sws-context (make-sws-context codec-context :rgb24 :bicubic)))
+                (loop for packet = (read-frame video) do
+                     (unless packet
+                       (return))
+                     (when (and (= (video-video-stream-index video)
+                                   (packet-stream-index packet))
+                                (decode-packet-into-frame video packet source-frame))
+                       ;; we've got a video frame!
+                       (convert-frame sws-context codec-context source-frame target-frame)
+                       (print-frame target-frame)
+                       (av-free-packet packet))))
+              (av-free buffer)
+              (av-free source-frame))))))))
 
 (defun rewind-video (video)
   (when (minusp (av-seek-frame (video-format-context video) -1 0 :backward))

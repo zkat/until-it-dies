@@ -873,6 +873,8 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
   (context :pointer) (source :pointer) (src-stride :pointer)
   (src-slice-y :int) (src-slice-h :int) (dst :pointer) (dst-stride :pointer))
 
+(defcfun ("sws_freeContext" sws-free-context) :void (context :pointer))
+
 (defun av-free-packet (packet)
   (unless (or (null-pointer-p packet)
               (null-pointer-p (foreign-slot-value packet 'av-packet 'destruct)))
@@ -982,7 +984,8 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
                        ;; we've got a video frame!
                        (convert-frame sws-context codec-context source-frame target-frame)
                        (print-frame target-frame)
-                       (av-free-packet packet))))
+                       (av-free-packet packet)))
+                (sws-free-context sws-context))
               (av-free buffer)
               (av-free source-frame))))))))
 

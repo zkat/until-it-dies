@@ -949,10 +949,8 @@
       #+nil(dump-format format-context 0 file nil)
       (with-video-codec video
         (let* ((codec-context (video-codec-context video))
-               (frame (avcodec-alloc-frame))
-               (frame-rgb (avcodec-alloc-frame)))
-          (assert (not (null-pointer-p frame)))
-          (assert (not (null-pointer-p frame-rgb)))
+               (frame (make-frame))
+               (frame-rgb (make-frame)))
           ;; いそがしいですね
           (with-foreign-slots ((width height) codec-context av-codec-context)
             (let ((buffer (av-malloc (* (foreign-type-size :uint8)
@@ -976,6 +974,12 @@
               (av-free frame)
               (av-free frame-rgb)
               (av-free buffer))))))))
+
+(defun make-frame ()
+  (let ((frame (avcodec-alloc-frame)))
+    (if (null-pointer-p frame)
+        (error "Couldn't make frame.")
+        frame)))
 
 (defun make-sws-context (codec-context target-format flags)
   (with-foreign-slots ((width height pix-fmt) codec-context av-codec-context)

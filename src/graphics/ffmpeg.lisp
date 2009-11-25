@@ -42,6 +42,9 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
 ;;;
 ;;; Enums
 ;;;
+(defconstant +av-nopts-value+ #x8000000000000000)
+(defconstant +av-time-base+ 1000000)
+
 (defcenum context-flag
   (:nofile #x0001)
   (:neednumber #x0002)
@@ -880,6 +883,10 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
               (null-pointer-p (foreign-slot-value packet 'av-packet 'destruct)))
     (foreign-funcall-pointer (foreign-slot-value packet 'av-packet 'destruct)
                              () av-packet packet :void)))
+
+(defun av-q2d (rational)
+  (with-foreign-slots ((num den) rational av-rational)
+    (/ num (float den 1d0))))
 
 ;;; trying it out
 (defstruct (video (:constructor make-video (filename)))

@@ -954,39 +954,52 @@
           (assert (not (null-pointer-p frame)))
           (assert (not (null-pointer-p frame-rgb)))
           ;; いそがしいですね
-          (let* ((width (foreign-slot-value codec-context 'av-codec-context 'width))
-                 (height (foreign-slot-value codec-context 'av-codec-context 'height))
-                 (buffer (av-malloc (* (foreign-type-size :uint8)
-                                       (avpicture-get-size :rgb24 width height)))))
-            (avpicture-fill frame-rgb buffer :rgb24 width height)
-            (when (minusp (av-seek-frame (video-format-context video) -1 0 :backward))
-              (error "av-seek-frame failed."))
-            (let ((sws-context (sws-get-context width height
-                                                (foreign-slot-value codec-context 'av-codec-context 'pix-fmt)
-                                                width height :rgba :bicubic (null-pointer) (null-pointer) (null-pointer))))
-              (when (null-pointer-p sws-context)
-                (error "Couldn't initialize conversion context."))
-              (loop
-                 (with-foreign-objects ((packet 'av-packet)
-                                        (frame-finished :boolean))
-                   (let ((successp (av-read-frame (video-format-context video) packet)))
-                     (when (minusp successp)
+          (with-foreign-slots ((width height) codec-context av-codec-context)
+            (let ((buffer (av-malloc (* (foreign-type-size :uint8)
+                                        (avpicture-get-size :rgb24 width height)))))
+              (avpicture-fill frame-rgb buffer :rgba width height)
+              (when (minusp (av-seek-frame (video-format-context video) -1 0 :backward))
+                (error "av-seek-frame failed."))
+              (let ((sws-context (make-sws-context codec-context :rgba :bicubic)))
+                (loop for packet = (read-frame video) do
+                     (unless packet
+                       (return))
+                     (when (and (= (video-video-stream-index video)
+                                   (packet-stream-index packet))
+                                (decode-packet-into-frame video packet frame))
+                       ;; we've got a video frame!
+                       (print-frame frame-rgb)
                        (av-free-packet packet)
-                       (return)))
-                   (when (= (video-video-stream-index video)
-                            (foreign-slot-value (mem-ref packet 'av-packet)
-                                                'av-packet 'stream-index))
-                     (with-foreign-slots ((data size) packet av-packet)
-                       (avcodec-decode-video codec-context frame frame-finished data size)
-                       (when frame-finished
-                         ;; we've got a video frame!
-                         (print-frame frame-rgb)
-                         (return))))
-                   (av-free-packet packet))))
-            ;; gotta make sure to close -all- this shit.
-            (av-free frame)
-            (av-free frame-rgb)
-            (av-free buffer)))))))
+                       (return))))
+              ;; gotta make sure to close -all- this shit.
+              (av-free frame)
+              (av-free frame-rgb)
+              (av-free buffer))))))))
+
+(defun make-sws-context (codec-context target-format flags)
+  (with-foreign-slots ((width height pix-fmt) codec-context av-codec-context)
+    (let ((context (sws-get-context width height pix-fmt width height
+                                    target-format flags (null-pointer)
+                                    (null-pointer) (null-pointer))))
+      (if (null-pointer-p context)
+          (error "Couldn't initialize conversion context.")
+          context))))
+
+(defun decode-packet-into-frame (video packet frame)
+  "Decodes a PACKET into FRAME. Returns T when the frame has finished."
+  (with-foreign-object (frame-finished-p :boolean)
+    (with-foreign-slots ((data size) packet av-packet)
+      (avcodec-decode-video (video-codec-context video) frame frame-finished-p data size)
+      frame-finished-p)))
+
+(defun packet-stream-index (packet)
+  (foreign-slot-value (mem-ref packet 'av-packet)
+                      'av-packet 'stream-index))
+
+(defun read-frame (video)
+  (with-foreign-object (packet 'av-packet)
+    (let ((successp (av-read-frame (video-format-context video) packet)))
+      (if (minusp successp) (prog1 nil (av-free-packet packet)) packet))))
 
 (defun print-frame (frame)
   (print (foreign-slot-value frame 'av-frame 'data)))

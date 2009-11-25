@@ -950,7 +950,7 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
           (error "Unsupported codec."))
         (when (minusp (avcodec-open codec-context codec))
           (error "Could not open codec."))
-        (format t "~&Using codec: ~A~%"
+        #+nil(format t "~&Using codec: ~A~%"
                 (foreign-string-to-lisp
                  (foreign-slot-value codec 'av-codec 'name)))
         codec-context)
@@ -966,7 +966,6 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
 (defun try-opening-file (&optional (file "/home/zkat/AMV Stop The Rock -Indifferent Productions [XVID].avi"))
   (let ((video (make-video file)))
     (with-loaded-video video
-      (print video)
       #+nil(dump-format format-context 0 file nil)
       (with-video-codec video
         (let* ((codec-context (video-codec-context video))
@@ -1040,4 +1039,4 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
       (if (minusp successp) (prog1 nil (av-free-packet packet)) packet))))
 
 (defun print-frame (frame)
-  (print (foreign-slot-value frame 'av-frame 'data)))
+  (print (mem-ref (mem-ref (foreign-slot-value frame 'av-frame 'data) :pointer) :uint8)))

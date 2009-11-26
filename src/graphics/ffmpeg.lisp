@@ -843,8 +843,6 @@ foreign slots in PTR of TYPE.  Similar to WITH-SLOTS."
 
 (defcfun ("av_dup_packet" av-dup-packet) :int (packet :pointer))
 
-(defcfun ("av_q2d" av-q2d) :double (rational av-rational))
-
 (defcfun ("avcodec_default_get_buffer" avcodec-default-get-buffer) :int
   (codec-context :pointer) (pic :pointer))
 

@@ -43,6 +43,14 @@
                (gl:texturep tex-id))
       t)))
 
+(defreply width :before ((texture =texture=))
+  (unless (loadedp texture)
+    (load-resource texture)))
+
+(defreply height :before ((texture =texture=))
+  (unless (loadedp texture)
+    (load-resource texture)))
+
 ;;;
 ;;; File textures
 ;;;

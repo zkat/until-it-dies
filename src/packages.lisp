@@ -58,7 +58,6 @@
    :set-gl-window
    :swap-buffers
 
-
    ;; primitives
    :make-color
    :mix-colors

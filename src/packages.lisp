@@ -51,21 +51,24 @@
    :dt
    :event-queue
    :resource-manager
-   :default-font
    :clear-color
    :pausedp
-   :joysticks
-   :mouse-x
-   :mouse-y
-   :window-width
-   :window-height
-   :title
+   :resizablep
+   :windowedp
    :key-repeat-p
    :mouse-visible-p
+   :mouse-x
+   :mouse-y
+   :joysticks
+   :window-width
+   :window-height
+   :current-view ; I'm important too!
+   :title
    :fps
    :quit
-   :create-view ; Move me!
-   :current-view ; I'm important too!
+
+   ;; Views
+   :create-view
 
    ;; primitives
    :make-color

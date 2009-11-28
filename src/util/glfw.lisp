@@ -234,7 +234,8 @@
   ((:out major :int) (:out minor :int) (:out rev :int)))
 
 (defmacro without-fp-traps (&body body)
-  `(#+ (and sbcl x86-64) sb-int:with-float-traps-masked (:invalid :divide-by-zero)
+  `(#+ (and sbcl x86-64) sb-int:with-float-traps-masked
+       #+ (and sbcl x86-64)(:invalid :divide-by-zero)
     #- (and sbcl x86-64) progn
      ,@body))
 

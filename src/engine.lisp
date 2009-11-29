@@ -48,7 +48,7 @@ The engine handles the following aspects of UID applications:
 It's a good idea to create a delegate of =engine= for each application being created,
 but it's not a mortal sin to just use it as a singleton."))
 
-(defreply init-object :after ((engine =engine=) &key)
+(defreply shared-init :after ((engine =engine=) &key)
   (setf (keys-held-down engine) (make-hash-table)
         (resource-manager engine) (object :parents =resource-manager=)
         (event-queue engine) (object :parents =event-queue=)

@@ -112,8 +112,7 @@
     (with-color (mix-colors *white* *black* *blue* *green*)
       (draw-points (loop for i below 100 collect (make-point (random 600) (random 600)))))
     (with-font *our-font*
-      (draw-at 60 20 "Try left-clicking, right-clicking, and pressing the arrow keys!"
-               :x-scale 1.5 :y-scale 1.5))
+      (draw-at 60 20 "Try left-clicking, right-clicking, and pressing the arrow keys!"))
     (draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (draw *circle*)
     (draw *alien* :rotation 45)))

@@ -54,18 +54,6 @@ but it's not a mortal sin to just use it as a singleton.")
         (event-queue engine) (create =event-queue=)
         (current-view engine) (create-view 0 0 (window-width engine) (window-height engine))))
 
-(defun create-engine (&key (clear-color *black*) resizablep (title "UID Application")
-                      (window-width 500) (window-height 500) key-repeat-p
-                      (mouse-visible-p t) (windowedp t) current-view)
-  (defobject =engine= ((clear-color clear-color)
-                       (resizablep resizablep)
-                       (title title) (key-repeat-p key-repeat-p)
-                       (windowedp windowedp)
-                       (window-width window-width)
-                       (window-height window-height)
-                       (mouse-visible-p mouse-visible-p)
-                       (current-view (or current-view (create-view 0 0 window-width window-height))))))
-
 (defreply (setf key-repeat-p) :after (new-value (engine =engine=))
   (when (initializedp engine)
     (if new-value

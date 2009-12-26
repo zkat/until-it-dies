@@ -16,8 +16,8 @@
    (last-frame-time 0)
    (dt 0)
    (keys-held-down (make-hash-table))
-   (event-queue (object :parents =event-queue=))
-   (resource-manager (object :parents =resource-manager=))
+   (event-queue (create =event-queue=))
+   (resource-manager (create =resource-manager=))
    (clear-color (make-color :r 0 :g 0 :b 0 :a 0))
    pausedp
    resizablep
@@ -30,7 +30,7 @@
    joysticks
    (window-width 400)
    (window-height 400)
-   (current-view (object :parents =view=))
+   (current-view (create =view=))
    (title "Until It Dies application"))
   :documentation
   "Engines are objects that contain information about
@@ -50,8 +50,8 @@ but it's not a mortal sin to just use it as a singleton.")
 
 (defreply shared-init :after ((engine =engine=) &key)
   (setf (keys-held-down engine) (make-hash-table)
-        (resource-manager engine) (object :parents =resource-manager=)
-        (event-queue engine) (object :parents =event-queue=)
+        (resource-manager engine) (create =resource-manager=)
+        (event-queue engine) (create =event-queue=)
         (current-view engine) (create-view 0 0 (window-width engine) (window-height engine))))
 
 (defun create-engine (&key (clear-color *black*) resizablep (title "UID Application")

@@ -32,8 +32,8 @@
    (window-height 400)
    (current-view (object :parents =view=))
    (title "Until It Dies application"))
-  (:documentation
-   "Engines are objects that contain information about
+  :documentation
+  "Engines are objects that contain information about
 -how- to run an application.
 
 The engine handles the following aspects of UID applications:
@@ -46,7 +46,7 @@ The engine handles the following aspects of UID applications:
     * The main loop
 
 It's a good idea to create a delegate of =engine= for each application being created,
-but it's not a mortal sin to just use it as a singleton."))
+but it's not a mortal sin to just use it as a singleton.")
 
 (defreply shared-init :after ((engine =engine=) &key)
   (setf (keys-held-down engine) (make-hash-table)

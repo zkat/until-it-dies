@@ -11,7 +11,7 @@
 ;;; Sound
 ;;;
 ;; TODO - check for errors when loading/unloading/playing
-(defproto =sound= (=resource=)
+(defproto =sound= =resource=
   ((buffer-id nil)
    (source-id nil)
    (source-position '(0 0 0))
@@ -49,7 +49,7 @@
     (al:source (source-id sound) :direction (source-direction sound))))
 
 ;;; File sounds
-(defproto =file-sound= (=file-resource= =sound=) ())
+(defproto =file-sound= (=file-resource= =sound=))
 
 (defreply load-resource ((sound =file-sound=))
   (with-properties (buffer-id source-id source-position source-velocity

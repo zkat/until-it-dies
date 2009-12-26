@@ -11,11 +11,11 @@
 ;;; Fonts
 ;;;
 (defproto =font= (=file-resource=)
-  ((font-pointer nil)
+  (font-pointer
    (size 12)
    (res 100)
-   (loadedp nil))
-  (:documentation "A font is used by the text-drawing system to draw strings to screen."))
+   loadedp)
+  :documentation "A font is used by the text-drawing system to draw strings to screen.")
 
 (defreply create ((font =font=) &key filepath (size 12) (res 20))
   (unless filepath (error "Must provide a filepath."))

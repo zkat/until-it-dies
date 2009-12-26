@@ -13,13 +13,13 @@
 (defproto =event= ()
   ((payload (lambda () (print "=event='s event fired.")))
    (exec-time 0))
-  (:documentation
-   "An event is a  block of code that is executed by an event-queue.
+  :documentation
+  "An event is a  block of code that is executed by an event-queue.
 Event firing can be delayed by milliseconds, and they are guaranteed
 to not fire until they are 'cooked'.
 Events can be asynchronously added to an event-queue, which can
 remain inactive until execution is ready to start again, and they
-will still be 'fired' in the order they were added."))
+will still be 'fired' in the order they were added.")
 
 (defvar *event-queue*)
 (defun make-event (payload &key
@@ -59,9 +59,9 @@ will still be 'fired' in the order they were added."))
 ;;;
 (defproto =event-queue= ()
   ((queue (make-priority-queue :key #'exec-time)))
-  (:documentation "An event queue is a container for events. Events are inserted
+  :documentation "An event queue is a container for events. Events are inserted
 into it and automatically sorted according to the event's execution time. The queue
-works like a min-priority queue. The top event can be peeked at, or popped."))
+works like a min-priority queue. The top event can be peeked at, or popped.")
 
 (defreply init-object :after ((obj =event-queue=) &key)
   (setf (queue obj) (make-priority-queue :key #'exec-time)))

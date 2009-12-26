@@ -11,8 +11,7 @@
 ;;;
 ;;; Sprite prototype
 ;;;
-(defproto =sprite= ()
-  ())
+(defproto =sprite= ())
 
 (defun draw-at (x y obj &rest all-keys)
   (apply #'draw obj :x x :y y all-keys))
@@ -20,11 +19,11 @@
 ;;;
 ;;; Textured prototype
 ;;;
-(defproto =textured= (=sprite=)
+(defproto =textured= =sprite=
   ((texture =texture=))
-  (:documentation
-   "Not to be confused with =texture=; =textured= is a mixin that provides
-facilities for drawing textured onto components."))
+  :documentation
+  "Not to be confused with =texture=; =textured= is a mixin that provides
+facilities for drawing textured onto components.")
 
 (defreply calculate-tex-coords ((textured =textured=))
   (declare (ignore textured))
@@ -47,11 +46,11 @@ facilities for drawing textured onto components."))
 ;;;
 ;;; Image prototype
 ;;;
-(defproto =image= (=textured=)
+(defproto =image= =textured=
   (texture)
-  (:documentation
-   "Images are textured components that are initialized to be the same size as the
-texture they are drawn with. Their TEXTURE property should contain a texture."))
+  :documentation
+  "Images are textured components that are initialized to be the same size as the
+texture they are drawn with. Their TEXTURE property should contain a texture.")
 
 (defreply create ((image =image=) &key filepath)
   (defobject =image= ((texture (create-texture filepath)))))
@@ -96,10 +95,10 @@ texture they are drawn with. Their TEXTURE property should contain a texture."))
    (frame-step 1)
    (timer 0)
    (animation-type :loop))
-  (:documentation
-   "Animations are like images, but they use the provided texture
+  :documentation
+  "Animations are like images, but they use the provided texture
 as a sprite sheet. Based on certain provided parameters, they
-figure out which frames to draw."))
+figure out which frames to draw.")
 
 (defreply height ((animation =animation=))
   (frame-height animation))
@@ -166,7 +165,7 @@ figure out which frames to draw."))
 ;;;
 ;;; Text prototype
 ;;;
-(defproto =text= (=sprite=)
+(defproto =text= =sprite=
   ((string-to-draw "Hello World")))
 
 (defreply draw ((string =string=)

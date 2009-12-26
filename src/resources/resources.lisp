@@ -10,19 +10,20 @@
 ;;;
 ;;; Generic resources prototype
 ;;;
-(defproto =resource= () ()
-  (:documentation
-   "A resource is an object with some aspect that needs to
+(defproto =resource= ()
+  ()
+  :documentation
+  "A resource is an object with some aspect that needs to
 be (or should be) manually loaded and unloaded. Usually, this
 means things like images or music, which need to be freed
 from memory under some circumstances. A resource object should
 know everything necessary in order to load whatever it is
 managing into and out of memory (it should be ready to respond
-to LOAD-RESOURCE and UNLOAD-RESOURCE)."))
+to LOAD-RESOURCE and UNLOAD-RESOURCE).")
 
-(defproto =file-resource= (=resource=)
-  ((filepath nil))
-  (:documentation "File resources are resources that get loaded from files."))
+(defproto =file-resource= =resource=
+  (filepath)
+  :documentation "File resources are resources that get loaded from files.")
 
 (defreply load-resource :before ((resource =resource=))
   "Before actually loading anything, we should make sure that the engine is initialized."
@@ -34,12 +35,12 @@ to LOAD-RESOURCE and UNLOAD-RESOURCE)."))
 ;;;
 (defproto =resource-manager= ()
   (resources)
-  (:documentation
-   "Resource managers can handle multiple resources at a time,
+  :documentation
+  "Resource managers can handle multiple resources at a time,
 and take care of loading/unloading all of them in big chunks.
 The with-resource-manager macro accepts a =resource-manager=
 object and binds -that- object to the *resource-manager*
-variable within its scope."))
+variable within its scope.")
 (defreply init-object :after ((obj =resource-manager=) &key)
   (setf (resources obj) nil))
 

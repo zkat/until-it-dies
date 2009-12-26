@@ -14,9 +14,9 @@
    (green 1)
    (blue 1)
    (alpha 1))
-  (:documentation
-   "A color is an object that represents a certain RGBA value.
-The values are used directly by opengl, and should range between 0 and 1 (instead of 0-255)"))
+  :documentation
+  "A color is an object that represents a certain RGBA value.
+The values are used directly by opengl, and should range between 0 and 1 (instead of 0-255)")
 (defun make-color (&key (r 1) (g 1) (b 1) (a 1) (name nil name-supplied-p))
   ;; Ugly hack needed because of defobject's macroness
   (if name-supplied-p

@@ -1,5 +1,5 @@
 (defpackage uid-demo
-  (:use :cl :sheeple :until-it-dies)
+  (:use :cl :sheeple)
   (:shadow :speed)
   (:export :run-demo))
 (in-package :uid-demo)

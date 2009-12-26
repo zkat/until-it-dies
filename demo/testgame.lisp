@@ -109,12 +109,14 @@
                (< 0 y))
       (decf y (* speed dt)))))
 
+(defparameter *dot-color* (uid:mix-colors uid:*white* uid:*black* uid:*blue* uid:*green*))
 (defreply uid:draw ((engine =uid-demo=) &key)
   (let ((scale-factor 4))
-    (uid:with-color (uid:mix-colors uid:*white* uid:*black* uid:*blue* uid:*green*)
-      (uid:draw-points (loop for i below 100 collect (uid:make-point (random 600) (random 600)))))
+    (uid:with-color *dot-color*
+      (uid:draw-points (loop for i below 100 collect (uid:make-point (random (uid:window-width engine))
+                                                                     (random (uid:window-height engine))))))
     (uid:with-font *our-font*
-      (uid:draw-at 60 20 "Try left-clicking, right-clicking, and pressing the arrow keys!"))
+      (uid:draw-at 45 20 "Try left-clicking, right-clicking, and pressing the arrow keys!"))
     (uid:draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (uid:draw *circle*)
     (uid:draw *alien* :rotation 45)))

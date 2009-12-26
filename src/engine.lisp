@@ -16,13 +16,6 @@
    (initializedp :initform nil :accessor initializedp)
    (windows :initform nil :accessor windows :initarg :windows)))
 
-(defgeneric run (engine))
-
-(defmethod on-update ((engine engine) dt)
-  (loop for window in (windows engine)
-     when (openp window)
-     do (on-update window dt)))
-
 (defmethod on-draw ((engine engine))
   (loop for window in (windows engine)
      when (openp window)

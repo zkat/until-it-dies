@@ -62,7 +62,7 @@
    :joysticks
    :window-width
    :window-height
-   :current-view ; I'm important too!
+   :current-view
    :title
    :fps
    :quit

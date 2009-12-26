@@ -7,9 +7,11 @@
 (defvar *resource-directory*
   (merge-pathnames "res/" (load-time-value (or #.*compile-file-truename* *load-truename*))))
 
-(defparameter *uid-demo* (create =engine= 
-                                 :title "UID Demo" :resizablep nil
-                                 :window-width 600 :window-height 600))
+(defproto =uid-demo= uid:=engine=
+  ((uid:title "UID Demo")
+   (uid:resizablep nil)
+   (uid:window-width 400)
+   (uid:window-height 400)))
 
 (defproto =game-object= ()
   ((x 0)

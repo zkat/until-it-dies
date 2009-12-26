@@ -12,7 +12,7 @@
 ;;;
 (defproto =font= (=file-resource=)
   (font-pointer
-   (size 10)
+   (size 12)
    (res 100)
    loadedp)
   :documentation "A font is used by the text-drawing system to draw strings to screen.")

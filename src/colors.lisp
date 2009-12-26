@@ -20,7 +20,7 @@ The values are used directly by opengl, and should range between 0 and 1 (instea
 (defun make-color (&key (r 1) (g 1) (b 1) (a 1) (name nil name-supplied-p))
   ;; Ugly hack needed because of defobject's macroness
   (if name-supplied-p
-      (defobject =color= ((red r) (green g) (blue b) (alpha a)) (:nickname name))
+      (defobject =color= ((red r) (green g) (blue b) (alpha a)) :nickname name)
       (defobject =color= ((red r) (green g) (blue b) (alpha a)))))
 
 ;; Some standard colors

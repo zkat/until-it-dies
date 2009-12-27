@@ -15,6 +15,10 @@
    initializedp
    (last-frame-time 0)
    (dt 0)
+   ;; fps stuff
+   fps-stack
+   (num-frames 0)
+   (cumulative-mean-fps 0)
    (keys-held-down (make-hash-table))
    (event-queue (create =event-queue=))
    (resource-manager (create =resource-manager=))
@@ -82,6 +86,22 @@ but it's not a mortal sin to just use it as a singleton.")
     (with-properties (window-width window-height) engine
       (uid-glfw:set-window-size window-width window-height))))
 
+;;;
+;;; FPS
+;;;
+(defparameter *fps-sample-size* 10)
+(defmessage last-fps (engine)
+  (:reply ((engine =engine=))
+    (car (fps-stack engine))))
+
+(defmessage mean-fps (engine)
+  (:reply ((engine =engine=) &aux (fps-stack (fps-stack engine)))
+    (when fps-stack
+      (/ (reduce #'+ fps-stack) (length fps-stack)))))
+
+;;;
+;;; Updating
+;;;
 (defreply update ((engine =engine=) dt &key)
   (declare (ignore dt))
   (values))
@@ -201,11 +221,21 @@ but it's not a mortal sin to just use it as a singleton.")
   (values))
 
 (defun update-time (engine)
-  (with-properties (dt last-frame-time) engine
-    (multiple-value-bind (new-dt now)
-        (time-difference last-frame-time)
-      (setf last-frame-time now)
-      (setf dt new-dt))))
+  (with-properties (fps-stack last-frame-time cumulative-mean-fps num-frames dt) engine
+    (when (> (length fps-stack) *fps-sample-size*)
+      (setf (cdr (last fps-stack 2)) nil))
+    (let ((now (uid:now)))
+      (when last-frame-time
+        (let ((time-delta (- now last-frame-time)))
+          (setf dt time-delta)
+          (unless (zerop time-delta)
+            (push (/ time-delta)
+                  fps-stack)
+            (setf cumulative-mean-fps (/ (+ (last-fps engine)
+                                            (* num-frames cumulative-mean-fps))
+                                         (1+ num-frames)))
+            (incf num-frames))))
+      (setf last-frame-time now))))
 
 (defreply step-engine ((engine =engine=))
   (let ((color (clear-color engine)))
@@ -219,17 +249,22 @@ but it's not a mortal sin to just use it as a singleton.")
   (uid-glfw:swap-buffers))
 
 ;;; Main loop
+(defreply init :before ((engine =engine=))
+  (setf (fps-stack engine) nil
+        (cumulative-mean-fps engine) 0
+        (num-frames engine) 0
+        (last-frame-time engine) 0))
+
 (defreply init ((engine =engine=))
-  (setf (last-frame-time engine) 0)
-  (setf (joysticks engine) (available-joysticks))
-  (setf cl-opengl-bindings:*gl-get-proc-address* #'uid-glfw:get-proc-address)
+  (setf (joysticks engine) (available-joysticks)
+        cl-opengl-bindings:*gl-get-proc-address* #'uid-glfw:get-proc-address)
   (set-view (current-view engine))
   engine)
 
 (defreply init :after ((engine =engine=))
   (setf (mouse-visible-p engine) (mouse-visible-p engine)
-        (key-repeat-p engine) (key-repeat-p engine))
-  (setf (initializedp engine) t))
+        (key-repeat-p engine) (key-repeat-p engine)
+        (initializedp engine) t))
 
 (defreply teardown ((engine =engine=))
   "Do nothing by default."

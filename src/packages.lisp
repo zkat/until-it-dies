@@ -66,6 +66,9 @@
    :title
    :fps
    :quit
+   :cumulative-mean-fps
+   :last-fps
+   :mean-fps
 
    ;; Views
    :create-view

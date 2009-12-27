@@ -28,6 +28,7 @@
 ;; We use defproto here for convenience, but keep our *earmuffs*
 (defproto *alien* =game-object=
   ((content (uid:create-image (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
+   (rotation 0)
    visiblep (x 255) (y 356)))
 
 (defparameter *bah* (uid:create-sound (merge-pathnames "sample.wav" *resource-directory*)))
@@ -119,7 +120,7 @@
       (uid:draw-at 45 20 "Try left-clicking, right-clicking, and pressing the arrow keys!"))
     (uid:draw *anim* :x-scale scale-factor :y-scale scale-factor)
     (uid:draw *circle*)
-    (uid:draw *alien* :rotation 45)))
+    (uid:draw *alien* :rotation (rotation *alien*))))
 
 (defreply uid:mouse-move :after ((engine =uid-demo=) x y)
   (with-properties ((alien-x x) (alien-y y)) *alien*
@@ -129,7 +130,9 @@
   (with-properties (visiblep) *alien*
     (case button
       (0 (setf visiblep (not visiblep)))
-      (1 (uid:play *bah*)))))
+      (1 (uid:play *bah*))
+      (3 (incf (rotation *alien*) 5))
+      (4 (decf (rotation *alien*) 5)))))
 
 (defreply uid:joystick-button-down ((engine =uid-demo=) joystick button)
   (when (= 0 (uid:joystick-number joystick))

@@ -27,15 +27,15 @@
   (gl:vertex (point-x point) (point-y point) (point-z point)))
 
 (defun draw-rectangle (x y width height &key (z 0) (u1 0) (v1 0) (u2 1) (v2 1)
-                       (color *color*) (filledp t))
+                       (color *color*) (filledp t) (from-centerp t))
   (with-color color
-    (gl:with-primitives (if filledp :quads :lines)
+    (gl:with-primitives (if filledp :quads :line-loop)
       (let* ((w/2 (/ width 2.0))
              (h/2 (/ height 2.0))
-             (x1 (- x w/2))
-             (x2 (+ x w/2))
-             (y1 (+ y h/2))
-             (y2 (- y h/2)))
+             (x1 (if from-centerp (- x w/2) x))
+             (x2 (if from-centerp (+ x w/2) (+ x width)))
+             (y1 (if from-centerp (+ y h/2) y))
+             (y2 (if from-centerp (- y h/2) (+ y height))))
         (gl:tex-coord u1 v2)
         (gl:vertex x1 y1 z)
         (gl:tex-coord u2 v2)
@@ -69,14 +69,14 @@
 
 (defun draw-triangle (p1 p2 p3 &key (color *color*) (filledp t))
   (with-color color
-    (gl:with-primitives (if filledp :triangles :lines)
+    (gl:with-primitives (if filledp :triangles :line-loop)
       (set-point p1)
       (set-point p2)
       (set-point p3))))
 
 (defun draw-quad (p1 p2 p3 p4 &key (color *color*) (filledp t))
   (with-color color
-    (gl:with-primitives (if filledp :quads :lines)
+    (gl:with-primitives (if filledp :quads :line-loop)
      (set-point p1)
      (set-point p2)
      (set-point p3)
@@ -102,5 +102,5 @@
 
 (defun draw-polygon (points &key (color *color*) (filledp t))
   (with-color color
-    (gl:with-primitives (if filledp :polygon :lines)
+    (gl:with-primitives (if filledp :polygon :line-loop)
       (map nil 'set-point points))))

@@ -16,6 +16,9 @@
    :init
    :teardown
    :run
+   :attach
+   :detach
+   :detach-all
    :step-engine
 
    :attach

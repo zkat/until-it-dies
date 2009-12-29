@@ -19,6 +19,7 @@
    :run
    :update
    :draw
+
    :attach
    :detach
    :detach-all
@@ -74,6 +75,7 @@
    :mean-fps
 
    ;; Views
+   :=view=
    :create-view
 
    ;; primitives

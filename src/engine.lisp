@@ -53,10 +53,13 @@ It's a good idea to create a delegate of =engine= for each application being cre
 but it's not a mortal sin to just use it as a singleton.")
 
 (defreply shared-init :after ((engine =engine=) &key)
-  (setf (keys-held-down engine) (make-hash-table)
-        (resource-manager engine) (create =resource-manager=)
-        (event-queue engine) (create =event-queue=)
-        (current-view engine) (create-view 0 0 (window-width engine) (window-height engine))))
+  (setf (keys-held-down engine) (make-hash-table))
+  (unless (direct-property-p engine 'resource-manager)
+    (setf (resource-manager engine) (create =resource-manager=)))
+  (unless (direct-property-p engine 'event-queue)
+    (setf (event-queue engine) (create =event-queue=)))
+  (unless (direct-property-p engine 'current-view)
+    (setf (current-view engine) (create-view 0 0 (window-width engine) (window-height engine) :prototype (current-view engine)))))
 
 (defreply (setf key-repeat-p) :after (new-value (engine =engine=))
   (when (initializedp engine)

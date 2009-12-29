@@ -19,6 +19,9 @@
    :run
    :update
    :draw
+   :attach
+   :detach
+   :detach-all
 
    ;; events
    :key-up

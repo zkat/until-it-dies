@@ -58,8 +58,25 @@
    :key-repeat-p
    :mouse-x
    :mouse-y
+<<<<<<< HEAD
    :set-gl-window
    :swap-buffers
+=======
+   :joysticks
+   :window-width
+   :window-height
+   :current-view
+   :title
+   :fps
+   :quit
+   :cumulative-mean-fps
+   :last-fps
+   :mean-fps
+
+   ;; Views
+   :=view=
+   :create-view
+>>>>>>> Added view to exported symbols in packages.
 
    ;; primitives
    :make-color

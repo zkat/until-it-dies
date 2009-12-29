@@ -70,12 +70,12 @@ the case of =texture= objects.)"))
 ;;;
 ;;; Resource management messages
 ;;;
-(defmessage attach (resource manager)
-  (:documentation "Sets up RESOURCE to be managed by MANAGER."))
-(defmessage detach (resource manager)
-  (:documentation "Ends the management of RESOURCE by MANAGER."))
-(defmessage detach-all (manager)
-  (:documentation "Removes all resources from MANAGER."))
+(defmessage attach (object container)
+  (:documentation "Attaches OBJECT to CONTAINER (whatever that may mean)."))
+(defmessage detach (object container)
+  (:documentation "Removes OBJECT from CONTAINER."))
+(defmessage detach-all (container)
+  (:documentation "Empties CONTAINER."))
 
 ;;;
 ;;; Texture messages
@@ -91,7 +91,7 @@ the case of =texture= objects.)"))
 ;;;
 (defmessage init (object)
   (:documentation
-   "This buzzword takes care of any initialization that needs to be
+   "This message takes care of any initialization that needs to be
 done before entering the engine loop."))
 
 (defmessage teardown (object)
@@ -100,7 +100,7 @@ done before entering the engine loop."))
 
 (defmessage run (engine)
   (:documentation
-   "Runs the engine. ENGINE is initialized inside this buzzword,
+   "Runs the engine. ENGINE is initialized inside this message,
 followed by the main engine loop."))
 
 (defmessage update (object dt &key)

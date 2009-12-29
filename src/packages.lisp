@@ -75,6 +75,12 @@
 
    ;; Views
    :=view=
+   :view-left
+   :view-right
+   :view-bottom
+   :view-top
+   :view-far
+   :view-near
    :create-view
 >>>>>>> Added view to exported symbols in packages.
 

@@ -17,10 +17,8 @@
                      (view-bottom y) (view-top (+ y height))
                      (view-far far) (view-near near))))
 
-(defun create-view (x y width height &key (far 0) (near 10))
-  (defobject =view= ((view-left x) (view-right (+ x width))
-                     (view-bottom y) (view-top (+ y height))
-                     (view-far far) (view-near near))))
+(defun create-view (x y width height &key (far 0) (near 10) (prototype =view=))
+  (create prototype :x x :y y :width width :height height :far far :near near))
 
 (defreply view-width ((view =view=))
   (- (view-right view) (view-left view)))

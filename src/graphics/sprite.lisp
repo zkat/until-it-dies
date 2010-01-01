@@ -16,6 +16,10 @@
 (defun draw-at (x y obj &rest all-keys)
   (apply #'draw obj :x x :y y all-keys))
 
+(defreply draw :around ((sprite =sprite=) &rest all-keys &key x y x-offset y-offset)
+  "All sprites should be offset with with x and y offset before drawing"
+  (call-next-reply sprite :x (+ x x-offset) :y (+ y y-offset) all-keys))
+
 ;;;
 ;;; Textured prototype
 ;;;
@@ -29,7 +33,7 @@ facilities for drawing textured onto components.")
   (declare (ignore textured))
   (vector 0 0 1 1))
 
-(defreply draw :before ((textured =textured=) &key x y )
+(defreply draw :before ((textured =textured=) &key x y)
   "Before we a draw textured sprite, we should bind its texture."
   (declare (ignore x y))
   (gl:enable :texture-2d :blend)

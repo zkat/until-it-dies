@@ -16,10 +16,6 @@
 (defun draw-at (x y obj &rest all-keys)
   (apply #'draw obj :x x :y y all-keys))
 
-(defreply draw :around ((sprite =sprite=) &rest all-keys &key x y x-offset y-offset)
-  "All sprites should be offset with with x and y offset before drawing"
-  (call-next-reply sprite :x (+ x x-offset) :y (+ y y-offset) all-keys))
-
 ;;;
 ;;; Textured prototype
 ;;;
@@ -75,8 +71,10 @@ texture they are drawn with. Their TEXTURE property should contain a texture.")
 
 (defreply draw ((image =image=)
                 &key x y x-scale y-scale
-                rotation (z 0))
-  (let ((tex-coords (calculate-tex-coords image))
+                rotation (z 0) (x-offset 0) (y-offset 0))
+  (let ((x (+ x x-offset))
+        (y (+ y y-offset))
+        (tex-coords (calculate-tex-coords image))
         (height (height image))
         (width (width image)))
     (when tex-coords
@@ -175,28 +173,32 @@ figure out which frames to draw.")
 (defreply draw ((string =string=)
                 &key x y x-scale y-scale
                 rotation (font *font*)
-                wrap (z 0))
-  (when wrap
-    (warn "UID doesn't support wrapping of text right now."))
-  (unless (loadedp font)
-    (load-resource font))
-  (gl:with-pushed-matrix
-    (gl:translate x y z)
-    (when rotation
-      (gl:rotate (- rotation) 0 0 1))
-    (gl:scale (or x-scale 1) (or y-scale 1) 1)
-    (uid-ftgl:render-font (font-pointer font) string :all)))
+                wrap (z 0) (x-offset 0) (y-offset 0))
+  (let ((x (+ x x-offset))
+        (y (+ y y-offset)))
+    (when wrap
+      (warn "UID doesn't support wrapping of text right now."))
+    (unless (loadedp font)
+      (load-resource font))
+    (gl:with-pushed-matrix
+      (gl:translate x y z)
+      (when rotation
+        (gl:rotate (- rotation) 0 0 1))
+      (gl:scale (or x-scale 1) (or y-scale 1) 1)
+      (uid-ftgl:render-font (font-pointer font) string :all))))
 
 (defreply draw ((text =text=)
                 &key x y x-scale y-scale
                 rotation (font *font*)
-                wrap (z 1))
+                wrap (z 1) (x-offset 0) (y-offset 0))
   (draw (string-to-draw text) x y :z z
         :x-scale x-scale
         :y-scale y-scale
         :rotation rotation
         :font font
-        :wrap wrap))
+        :wrap wrap
+        :x-offset x-offset
+        :y-offset y-offset))
 
 (defreply create ((text =text=) &key (string ""))
   (defobject =text= ((string-to-draw string))))

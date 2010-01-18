@@ -12,16 +12,16 @@
 ;;;
 (defproto =font= (=file-resource=)
   (font-pointer
-   (size 12)
+   (size 10)
    (res 100)
    loadedp)
   :documentation "A font is used by the text-drawing system to draw strings to screen.")
 
-(defreply create ((font =font=) &key filepath (size 12) (res 20))
+(defreply create ((font =font=) &key filepath (size 10) (res 20))
   (unless filepath (error "Must provide a filepath."))
   (defobject (=font=) ((filepath filepath) (size size) (res res))))
 
-(defun create-font (filepath &key (size 12) (res 20))
+(defun create-font (filepath &key (size 10) (res 20))
   (defobject (=font=) ((filepath filepath) (size size) (res res))))
 
 (defvar *font* =font=)
@@ -37,20 +37,17 @@
 
 (defreply load-resource ((font =font=))
   (setf (font-pointer font)
-        (uid-ftgl:create-texture-font (namestring (filepath font))))
-  (uid-ftgl:set-font-face-size (font-pointer font)
-                           (size font)
-                           (res font))
+        (zpb-ttf:open-font-loader (namestring (filepath font))))
   (setf (loadedp font) t)
   font)
 
 (defreply load-resource :after ((font =font=))
   (let ((ptr (font-pointer font)))
     (finalize font (lambda ()
-                     (uid-ftgl:destroy-font ptr)))))
+                     (zpb-ttf:close-font-loader ptr)))))
 
 (defreply unload-resource ((font =font=))
-  (uid-ftgl:destroy-font (font-pointer font))
+  (zpb-ttf:close-font-loader (font-pointer font))
   (setf (font-pointer font) nil)
   (setf (loadedp font) nil)
   font)

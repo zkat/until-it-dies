@@ -174,7 +174,14 @@ figure out which frames to draw.")
                 &key x y x-scale y-scale
                 rotation (font *font*)
                 wrap (z 0) (x-offset 0) (y-offset 0))
-  (let ((x (+ x x-offset))
+  (unless (loadedp font)
+    (load-resource font))
+  (gl:with-pushed-matrix
+    (let ((x (+ x x-offset))
+          (y (+ y y-offset)))
+      (gl:translate x y z)
+      (draw-string (font-pointer font) string :size (size font)))))
+ #| (let ((x (+ x x-offset))
         (y (+ y y-offset)))
     (when wrap
       (warn "UID doesn't support wrapping of text right now."))
@@ -185,7 +192,7 @@ figure out which frames to draw.")
       (when rotation
         (gl:rotate (- rotation) 0 0 1))
       (gl:scale (or x-scale 1) (or y-scale 1) 1)
-      (uid-ftgl:render-font (font-pointer font) string :all))))
+      (uid-ftgl:render-font (font-pointer font) string :all))))|#
 
 (defreply draw ((text =text=)
                 &key x y x-scale y-scale

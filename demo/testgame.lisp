@@ -42,7 +42,8 @@
    (speed 300) (x 50) (y 50)))
 
 (defproto *our-font* uid:=font=
-  ((uid:filepath (merge-pathnames "example.otf" *resource-directory*))))
+  ((uid:filepath (merge-pathnames "example.ttf" *resource-directory*))
+   (uid:size 15)))
 
 (defproto *circle* =game-object=
   ((x 100) (y 100) (dx/dt 0.0) (dy/dt 0.0)

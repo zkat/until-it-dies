@@ -12,6 +12,6 @@
                       :components
                       ((:file "devil")
                        (:file "textures" :depends-on ("devil"))
-                       (:file "ftgl")
-                       (:file "fonts" :depends-on ("ftgl"))
+                       (:file "font-backend")
+                       (:file "fonts" :depends-on ("font-backend"))
                        (:file "sprite" :depends-on ("fonts" "textures"))))))))

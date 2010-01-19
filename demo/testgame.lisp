@@ -43,7 +43,7 @@
 
 (defproto *our-font* uid:=font=
   ((uid:filepath (merge-pathnames "example.ttf" *resource-directory*))
-   (uid:size 15)))
+   (uid:size 10)))
 
 (defproto *circle* =game-object=
   ((x 100) (y 100) (dx/dt 0.0) (dy/dt 0.0)

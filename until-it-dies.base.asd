@@ -6,7 +6,7 @@
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "BSD-style"
-  :depends-on (sheeple cl-opengl zpb-ttf)
+  :depends-on (sheeple cl-opengl cl-glu zpb-ttf)
   :serial t
   :components
   ((:module "src"

@@ -17,7 +17,8 @@
                       ((:file "opengl-hacks")
                        (:file "priority-queue")
                        (:file "glfw")
-                       (:file "utils")))
+                       (:file "utils")
+                       (:file "split-sequence")))
              (:module "resources" :depends-on ("util" "messages")
                       :components
                       ((:file "finalizers")

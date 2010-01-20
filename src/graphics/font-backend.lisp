@@ -6,7 +6,7 @@
 ;;;;
 ;;;; Low level text drawing tools.
 
-;;;; Based on nklein's code from this code:
+;;;; Based on nklein's code from this page:
 ;;;; http://nklein.com/2009/12/rendering-text-with-cl-opengl-and-zpb-ttf
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -132,3 +132,35 @@
                    (make-point bx2 by2)
                    (make-point bx1 by2)))))
   cutoff)
+
+(defun units->pixels (units font-loader size)
+  (truncate (* units (/ size (zpb-ttf:units/em font-loader)))))
+
+(defun word-length (font-loader word)
+  (if (= (length word) 0)
+      0
+      (+ (zpb-ttf:advance-width (zpb-ttf:find-glyph (char word 0) font-loader))
+         (word-length font-loader (subseq word 1)))))
+
+(defun wrap-text (text width font-loader font-size &key height align)
+  (let ((words (split-sequence #\Space text))
+        (line-width (/ width (/ font-size (zpb-ttf:units/em font-loader))))
+        (space-width (zpb-ttf:advance-width (zpb-ttf:find-glyph #\Space font-loader)))
+        (line-height (+ (zpb-ttf:ymax (zpb-ttf:find-glyph #\A font-loader)) (zpb-ttf:line-gap font-loader))))
+    (let ((line-list '())
+          (line (car words))
+          (width-left (- line-width (word-length font-loader (car words)))))
+      (let ((lines (dolist (word (cdr words) (push line line-list))
+                     (let ((cur-word-length (word-length font-loader word)))
+                       (cond
+                         ((> cur-word-length width-left)
+                          (push (copy-seq line) line-list)
+                          (setq line word
+                                width-left (- line-width cur-word-length)))
+                         (t
+                          (setf line (concatenate 'string line " " word))
+                          (setf width-left (- width-left cur-word-length space-width))))))))
+        (loop
+           for line in lines
+           for index from 0 to (length lines)
+           collect (cons line (* index (units->pixels line-height font-loader font-size))))))))

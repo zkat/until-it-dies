@@ -173,39 +173,39 @@ figure out which frames to draw.")
 (defreply draw ((string =string=)
                 &key x y x-scale y-scale
                 rotation (font *font*)
-                wrap (z 0) (x-offset 0) (y-offset 0))
+                (z 0) (x-offset 0) (y-offset 0))
   (unless (loadedp font)
     (load-resource font))
   (gl:with-pushed-matrix
     (let ((x (+ x x-offset))
           (y (+ y y-offset)))
       (gl:translate x y z)
+      (when rotation
+        (gl:rotate (- rotation) 0 0 1))
+      (gl:scale (or x-scale 1) (or y-scale 1) 1)
       (draw-string (font-pointer font) string :size (size font)))))
- #| (let ((x (+ x x-offset))
-        (y (+ y y-offset)))
-    (when wrap
-      (warn "UID doesn't support wrapping of text right now."))
-    (unless (loadedp font)
-      (load-resource font))
-    (gl:with-pushed-matrix
+
+(defreply draw ((text =text=)
+                &key x y width height
+                x-scale y-scale
+                rotation wrap (align left)
+                (font *font*) (z 0)
+                (x-offset 0) (y-offset 0))
+  (unless (loadedp font)
+    (load-resource font))
+  (gl:with-pushed-matrix
+    (let ((x (+ x x-offset))
+          (y (+ y y-offset)))
       (gl:translate x y z)
       (when rotation
         (gl:rotate (- rotation) 0 0 1))
       (gl:scale (or x-scale 1) (or y-scale 1) 1)
-      (uid-ftgl:render-font (font-pointer font) string :all))))|#
-
-(defreply draw ((text =text=)
-                &key x y x-scale y-scale
-                rotation (font *font*)
-                wrap (z 1) (x-offset 0) (y-offset 0))
-  (draw (string-to-draw text) x y :z z
-        :x-scale x-scale
-        :y-scale y-scale
-        :rotation rotation
-        :font font
-        :wrap wrap
-        :x-offset x-offset
-        :y-offset y-offset))
+      (let ((line-list (if wrap
+                           (wrap-text (string-to-draw text) width (font-pointer font) (size font) :height height)
+                           (list (cons (string-to-draw text) 0)))))
+        (mapc #'(lambda (line)
+                  (draw-at 0 (cdr line) (car line) :font font))
+              line-list)))))
 
 (defreply create ((text =text=) &key (string ""))
   (defobject =text= ((string-to-draw string))))

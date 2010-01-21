@@ -27,18 +27,18 @@
 
 ;; We use defproto here for convenience, but keep our *earmuffs*
 (defproto *alien* =game-object=
-  ((content (uid:create-image (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
+  ((content (uid:make-image (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
    (rotation 0)
    visiblep (x 255) (y 356)))
 
-(defparameter *bah* (uid:create-sound (merge-pathnames "sample.wav" *resource-directory*)))
+(defparameter *bah* (uid:make-sound (merge-pathnames "sample.wav" *resource-directory*)))
 
 (defreply uid:draw :around ((thing *alien*) &key)
   (with-properties (visiblep) thing
     (when visiblep (call-next-reply))))
 
 (defproto *anim* =game-object=
-  ((content (uid:create-animation (merge-pathnames "explosion.png" *resource-directory*) 15 14 0.05 14))
+  ((content (uid:make-animation (merge-pathnames "explosion.png" *resource-directory*) 15 14 0.05 14))
    (speed 300) (x 50) (y 50)))
 
 (defproto *our-font* uid:=font=

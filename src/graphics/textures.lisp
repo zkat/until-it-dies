@@ -91,11 +91,11 @@
                                    (gl:texturep id))
                           (gl:delete-texture id))))))
 
-(defreply create ((texture =file-texture=) &key filepath)
+(defreply make ((texture =file-texture=) &key filepath)
   (defobject (=file-texture=)
       ((filepath filepath))))
 
-(defun create-texture (filepath)
+(defun make-texture (filepath)
   (defobject (=file-texture=)
       ((filepath filepath))))
 

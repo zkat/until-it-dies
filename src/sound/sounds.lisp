@@ -64,10 +64,10 @@
     (al:source source-id :source-relative source-relative-p))
   sound)
 
-(defreply create ((sound =file-sound=) &key filepath)
+(defreply make ((sound =file-sound=) &key filepath)
   (defobject =file-sound= ((filepath filepath))))
 
-(defun create-sound (filepath)
+(defun make-sound (filepath)
   (defobject =file-sound= ((filepath filepath))))
 
 (defmessage sound-state (sound))

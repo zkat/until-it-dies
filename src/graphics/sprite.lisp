@@ -52,14 +52,11 @@ facilities for drawing textures onto components.")
   "Images are textured components that are initialized to be the same size as the
 texture they are drawn with. Their TEXTURE property should contain a texture.")
 
-(defreply create ((image =image=) &key filepath)
-  (defobject =image= ((texture (create-texture filepath)))))
+(defreply make ((image =image=) &key filepath)
+  (defobject =image= ((texture (make-texture filepath)))))
 
-(defreply create ((image =image=) &key filepath)
-  (defobject =image= ((texture (create-texture filepath)))))
-
-(defun create-image (filepath)
-  (let* ((texture (create-texture filepath)))
+(defun make-image (filepath)
+  (let* ((texture (make-texture filepath)))
     (defobject (=image=) ((texture texture)))))
 
 (defreply height ((image =image=))
@@ -110,20 +107,20 @@ figure out which frames to draw.")
 (defreply width ((animation =animation=))
   (frame-width animation))
 
-(defreply create ((animation =animation=) &key filepath frame-width
+(defreply make ((animation =animation=) &key filepath frame-width
                   frame-height frame-delay num-frames (type :loop))
   (defobject (=animation=)
-      ((texture (create-texture filepath))
+      ((texture (make-texture filepath))
        (frame-width frame-width)
        (frame-height frame-height)
        (frame-delay frame-delay)
        (num-frames num-frames)
        (animation-type type))))
 
-(defun create-animation (filepath frame-width frame-height frame-delay
+(defun make-animation (filepath frame-width frame-height frame-delay
                          num-frames &optional (type :loop))
   (defobject (=animation=)
-      ((texture (create-texture filepath))
+      ((texture (make-texture filepath))
        (frame-width frame-width)
        (frame-height frame-height)
        (frame-delay frame-delay)
@@ -218,9 +215,9 @@ figure out which frames to draw.")
 (defreply create ((text =text=) &key (string ""))
   (defobject =text= ((string-to-draw string))))
 
-(defreply create ((text =text=) &key (string ""))
+(defreply make ((text =text=) &key (string ""))
   (defobject =text= ((string-to-draw string))))
 
-(defun create-text (string)
+(defun make-text (string)
   (defobject (=text=) ((string-to-draw string))))
 

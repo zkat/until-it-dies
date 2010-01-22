@@ -54,8 +54,9 @@
 ;;;
 ;;; File textures
 ;;;
-(defproto =file-texture= (=file-resource= =texture=) ()
-  (:documentation "A file texture is loaded from an image file."))
+(defproto =file-texture= (=file-resource= =texture=)
+  ()
+  :documentation "A file texture is loaded from an image file.")
 
 (defreply load-resource :before ((texture =texture=))
   (when (tex-id texture)

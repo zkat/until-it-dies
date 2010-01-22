@@ -188,7 +188,7 @@ figure out which frames to draw.")
 (defreply draw ((text =text=)
                 &key x y width height
                 x-scale y-scale
-                rotation wrap (align left)
+                rotation (wrap t) (align :left) (valign :bottom)
                 (font *font*) (z 0)
                 (x-offset 0) (y-offset 0))
   (unless (loadedp font)
@@ -200,12 +200,17 @@ figure out which frames to draw.")
       (when rotation
         (gl:rotate (- rotation) 0 0 1))
       (gl:scale (or x-scale 1) (or y-scale 1) 1)
-      (let ((line-list (if wrap
-                           (wrap-text (string-to-draw text) width (font-pointer font) (size font) :height height)
-                           (list (cons (string-to-draw text) 0)))))
-        (mapc #'(lambda (line)
-                  (draw-at 0 (cdr line) (car line) :font font))
-              line-list)))))
+      (mapc #'(lambda (line)
+                (draw-at (units->pixels (first line) (font-pointer font) (size font))
+                         (units->pixels (second line) (font-pointer font) (size font))
+                         (third line) :font font))
+              (format-text (string-to-draw text)
+                           :width width
+                           :height height
+                           :font font
+                           :wrap wrap
+                           :align align
+                           :valign valign)))))
 
 (defreply create ((text =text=) &key (string ""))
   (defobject =text= ((string-to-draw string))))

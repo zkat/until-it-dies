@@ -14,4 +14,5 @@
                        (:file "textures" :depends-on ("devil"))
                        (:file "font-backend")
                        (:file "fonts" :depends-on ("font-backend"))
-                       (:file "sprite" :depends-on ("fonts" "textures"))))))))
+                       (:file "font-format" :depends-on ("fonts"))
+                       (:file "sprite" :depends-on ("font-format" "textures"))))))))

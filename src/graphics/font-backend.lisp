@@ -12,6 +12,12 @@
 
 (in-package :until-it-dies)
 
+(defun scale-factor (size font-loader)
+  (/ size (zpb-ttf:units/em font-loader)))
+
+(defun units->pixels (units font-loader size)
+  (truncate (* units (scale-factor size font-loader))))
+
 (defun make-interpolator (ss cc ee)
   (let ((xx (+ ss (* -2 cc) ee))
         (yy (* 2 (- cc ss)))
@@ -62,7 +68,7 @@
 
 (defun calculate-cutoff (font-loader size)
   (gl:with-pushed-matrix
-    (let ((ss (/ size (zpb-ttf:units/em font-loader))))
+    (let ((ss (scale-factor size font-loader)))
       (gl:scale ss ss ss)
 
       (let ((modelview (gl:get-double :modelview-matrix))
@@ -99,7 +105,7 @@
          (bx2 (aref box 2))
          (by2 (aref box 3)))
 
-    (let ((ss (/ size (zpb-ttf:units/em font-loader))))
+    (let ((ss (scale-factor size font-loader)))
       (gl:scale ss ss ss))
 
     (gl:with-pushed-attrib (:current-bit :color-buffer-bit :line-bit
@@ -132,35 +138,3 @@
                    (make-point bx2 by2)
                    (make-point bx1 by2)))))
   cutoff)
-
-(defun units->pixels (units font-loader size)
-  (truncate (* units (/ size (zpb-ttf:units/em font-loader)))))
-
-(defun word-length (font-loader word)
-  (if (= (length word) 0)
-      0
-      (+ (zpb-ttf:advance-width (zpb-ttf:find-glyph (char word 0) font-loader))
-         (word-length font-loader (subseq word 1)))))
-
-(defun wrap-text (text width font-loader font-size &key height align)
-  (let ((words (split-sequence #\Space text))
-        (line-width (/ width (/ font-size (zpb-ttf:units/em font-loader))))
-        (space-width (zpb-ttf:advance-width (zpb-ttf:find-glyph #\Space font-loader)))
-        (line-height (+ (zpb-ttf:ymax (zpb-ttf:find-glyph #\A font-loader)) (zpb-ttf:line-gap font-loader))))
-    (let ((line-list '())
-          (line (car words))
-          (width-left (- line-width (word-length font-loader (car words)))))
-      (let ((lines (dolist (word (cdr words) (push line line-list))
-                     (let ((cur-word-length (word-length font-loader word)))
-                       (cond
-                         ((> cur-word-length width-left)
-                          (push (copy-seq line) line-list)
-                          (setq line word
-                                width-left (- line-width cur-word-length)))
-                         (t
-                          (setf line (concatenate 'string line " " word))
-                          (setf width-left (- width-left cur-word-length space-width))))))))
-        (loop
-           for line in lines
-           for index from 0 to (length lines)
-           collect (cons line (* index (units->pixels line-height font-loader font-size))))))))

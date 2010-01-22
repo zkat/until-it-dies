@@ -118,7 +118,7 @@
       (uid:draw-points (loop for i below 100 collect (uid:make-point (random (uid:window-width engine))
                                                                      (random (uid:window-height engine))))))
     (uid:with-font *our-font*
-      (uid:draw-at 40 20 (uid::create-text "Try clicking, mouse-wheeling, and pressing the arrow keys!") :width 100 :wrap t)
+      (uid:draw-at 40 20 (uid::create-text "Try clicking, mouse-wheeling, and pressing the arrow keys!") :width 100 :height 100 :align :middle :valign :top)
       (uid:draw-at 10 (- (uid:window-height engine) 20) (format nil "Mean FPS: ~,3f"
                                                                 (float (uid:mean-fps engine) 1.0))))
     (uid:draw *anim* :x-scale scale-factor :y-scale scale-factor)

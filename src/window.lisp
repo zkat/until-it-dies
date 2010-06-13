@@ -70,7 +70,11 @@
            (glop:create-window (title window)
                                (width window)
                                (height window)
-                               :fullscreen (fullscreenp window)))
+                               :fullscreen (fullscreenp window)
+                               :double-buffer t
+                               :stencil-buffer t
+                               :stencil-size 16
+                               :accum-buffer t))
      (set-gl-window window)
      (set-view (view window))
      (setf (openp window) t))

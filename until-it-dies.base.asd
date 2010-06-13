@@ -22,7 +22,8 @@
              (:file "colors" :depends-on ("util"))
              (:file "primitives" :depends-on ("colors"))
              (:file "resources" :depends-on ("util"))
-             (:file "window" :depends-on ("util"))
+             (:file "view" :depends-on ("util"))
+             (:file "window" :depends-on ("util" "view"))
              (:file "engine" :depends-on ("util" "window"))))))
 
 (asdf:defsystem until-it-dies.examples

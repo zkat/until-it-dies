@@ -13,7 +13,7 @@
 (defclass font (file-resource)
   ((font-pointer :initarg :font-pointer :accessor font-pointer :initform nil)
    (size :initarg :size :accessor size)
-   (res :initarg :res :accessor res)
+   (res :initarg :res :accessor res :initform 100)
    (loadedp :accessor loadedp :initform nil))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
 

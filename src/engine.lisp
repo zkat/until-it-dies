@@ -24,7 +24,7 @@
 (defmethod on-update ((engine engine) dt)
   (loop for window in (windows engine)
      when (openp window)
-     do (on-update window (time-delta engine))))
+     do (on-update window dt)))
 
 (defun update-time (engine)
   (with-accessors ((dt time-delta) (last-time last-tick-time)) engine

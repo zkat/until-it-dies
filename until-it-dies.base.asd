@@ -43,7 +43,7 @@
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "BSD-style"
-  :depends-on (until-it-dies.base)
+  :depends-on (until-it-dies.base zpb-ttf split-sequence)
   :components
   ((:module "src"
             :components

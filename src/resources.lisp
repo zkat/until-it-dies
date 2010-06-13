@@ -21,7 +21,8 @@ managing into and out of memory (it should be ready to respond
 to LOAD-RESOURCE and UNLOAD-RESOURCE)."))
 
 (defclass file-resource (resource)
-  ((path :reader resource-path :initarg :path))
+  ((filepath :reader filepath :initarg :filepath
+             :initform (error "File resources MUST have a filepath.")))
   (:documentation "File resources are resources that get loaded from files."))
 
 (defgeneric load-resource (resource)

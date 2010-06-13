@@ -2,8 +2,7 @@
 
 (defpackage until-it-dies
   (:nicknames :uid)
-  (:use :cl :sheeple)
-  (:shadow :step)
+  (:use :cl :alexandria)
   (:export
 
    ;; time
@@ -17,72 +16,47 @@
    :init
    :teardown
    :run
-   :update
-   :draw
+   :step-engine
 
    :attach
    :detach
    :detach-all
 
    ;; events
-   :key-up
-   :key-down
-   :key-down-p
-   :mouse-up
-   :mouse-down
-   :mouse-move
-   :joystick-button-down
-   :joystick-button-up
-   :joystick-move
-   :window-resized
-   :step-engine
-
-   ;; joysticks
-   :=joystick=
-   :joystick-number
-   :num-axes
-   :num-buttons
-   :axis-positions
-   :button-states
+   :on-update
+   :on-draw
+   :on-key-down
+   :on-key-up
+   :on-mouse-down
+   :on-mouse-up
+   :on-mouse-move
+   :on-resize
+   :on-expose
+   :on-obscured
+   :on-unobscured
+   :on-focus
+   :on-blur
+   :on-close
 
    ;; Engine
-   :=engine=
-   :*engine*
-   :create-engine
-   :with-engine
+   :engine
    :runningp
    :initializedp
-   :dt
-   :event-queue
-   :resource-manager
-   :clear-color
-   :pausedp
+   :time-delta
+   :windows
+
+   ;; Window
+   :window
+   :title
+   :width
+   :height
+   :fullscreenp
    :resizablep
-   :windowedp
    :key-repeat-p
-   :mouse-visible-p
    :mouse-x
    :mouse-y
-   :joysticks
-   :window-width
-   :window-height
-   :current-view
-   :title
-   :fps
-   :quit
-   :cumulative-mean-fps
-   :last-fps
-   :mean-fps
-
-   ;; Views
-   :=view=
-   :view-left
-   :view-right
-   :view-bottom
-   :view-top
-   :view-far
-   :view-near
-   :create-view
+   :set-gl-window
+   :swap-buffers
 
    ;; primitives
    :make-color
@@ -116,58 +90,12 @@
    :draw-polygon
 
    ;; resources
-   :=resource=
-   :=resource-manager=
+   :resource
+   :resource-manager
+   :file-resource
    :*resource-manager*
-   :=file-resource=
    :load-resource
    :unload-resource
    :loadedp
 
-   ;; textures
-   :=texture=
-   :=file-texture=
-   :bind-texture
-   :unbind-texture
-   :create-texture
-
-   ;; sounds
-   :=sound=
-   :=file-sound=
-   :create-sound
-   :source-position
-   :source-velocity
-   :source-direction
-   :sound-state
-   :play
-   :stop
-   :pause
-   :rewind
-
-   ;; fonts
-   :=font=
-   :create-font
-   :*font*
-   :with-font
-   :size
-   :res
-
-   ;; sprites
-   :draw
-   :draw-at
-   :create-image
-   :width
-   :height
-   :filepath
-   :create-animation
-   :num-frames
-   :frame-delay
-   :frame-width
-   :frame-height
-   :animation-type
-
-   ;; events
-   :*event-queue*
-   :fork
-   :with-event-queue
    ))

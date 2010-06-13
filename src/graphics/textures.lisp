@@ -12,10 +12,10 @@
 ;;;
 ;;; - Textures manage opengl texture objects, and handle their binding.
 (defclass texture (resource)
-  ((tex-id :accessor tex-id)
+  ((tex-id :accessor tex-id :initform nil)
    (target :initform :texture-2d :accessor target)
-   (height :accessor height)
-   (width :accessor width)))
+   (height :accessor height :initform 0)
+   (width :accessor width :initform 0)))
 
 (defgeneric bind-texture (texture)
   (:method ((texture texture))

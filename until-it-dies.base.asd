@@ -18,6 +18,7 @@
                       ((:file "opengl-hacks")
                        (:file "priority-queue")
                        (:file "finalizers")
+                       (:file "split-sequence")
                        (:file "utils")))
              (:file "colors" :depends-on ("util"))
              (:file "primitives" :depends-on ("colors"))
@@ -43,7 +44,7 @@
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "BSD-style"
-  :depends-on (until-it-dies.base zpb-ttf split-sequence)
+  :depends-on (until-it-dies.base zpb-ttf)
   :components
   ((:module "src"
             :components

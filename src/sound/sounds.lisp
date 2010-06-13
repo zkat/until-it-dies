@@ -11,49 +11,53 @@
 ;;; Sound
 ;;;
 ;; TODO - check for errors when loading/unloading/playing
-(defproto =sound= =resource=
-  ((buffer-id nil)
-   (source-id nil)
-   (source-position '(0 0 0))
-   (source-velocity '(0 0 0))
-   (source-direction '(0 0 0))
-   (source-relative-p nil)))
+(defclass sound (resource)
+  ((buffer-id :initform nil :accessor buffer-id)
+   (source-id :initform nil :accessor source-id)
+   (source-position :initform '(0 0 0) :accessor source-position)
+   (source-velocity :initform '(0 0 0) :accessor source-velocity)
+   (source-direction :initform '(0 0 0) :accessor source-direction)
+   (source-relative-p :initform nil :accessor source-relative-p)))
 
-(defreply load-resource :before ((sound =sound=))
+(defmethod load-resource :before ((sound sound))
   (when (or (buffer-id sound)
             (source-id sound))
     (unload-resource sound)))
 
-(defreply unload-resource ((sound =sound=))
+(defmethod unload-resource ((sound sound))
   (al:delete-source (source-id sound))
   (al:delete-buffer (buffer-id sound))
   (setf (buffer-id sound) nil
         (source-id sound) nil))
 
-(defreply loadedp ((sound =sound=))
-  (with-properties (buffer-id source-id) sound
-    (when (and buffer-id (al:bufferp buffer-id)
-               source-id (al:sourcep source-id))
+(defmethod loadedp ((sound sound))
+  (let ((bid (buffer-id sound))
+        (sid (source-id sound)))
+    (when (and bid (al:bufferp bid)
+               sid (al:sourcep sid))
       t)))
 
-(defreply source-position :after ((sound =sound=))
+(defmethod source-position :after ((sound sound))
   (when (loadedp sound)
     (al:source (source-id sound) :position (source-position sound))))
 
-(defreply source-velocity :after ((sound =sound=))
+(defmethod source-velocity :after ((sound sound))
   (when (loadedp sound)
     (al:source (source-id sound) :velocity (source-velocity sound))))
 
-(defreply source-direction :after ((sound =sound=))
+(defmethod source-direction :after ((sound sound))
   (when (loadedp sound)
     (al:source (source-id sound) :direction (source-direction sound))))
 
 ;;; File sounds
-(defproto =file-sound= (=file-resource= =sound=))
+(defclass file-sound (file-resource sound)
+  ())
 
-(defreply load-resource ((sound =file-sound=))
-  (with-properties (buffer-id source-id source-position source-velocity
-                    source-direction source-relative-p filepath)
+(defmethod load-resource ((sound file-sound))
+  (with-accessors ((buffer-id buffer-id) (source-id source-id)
+                   (source-position source-position) (source-velocity source-velocity)
+                   (source-direction source-direction) (source-relative-p source-relative-p)
+                   (filepath filepath))
       sound
     (setf buffer-id (alut:create-buffer-from-file (namestring (truename filepath))))
     (setf source-id (al:gen-source))
@@ -64,46 +68,40 @@
     (al:source source-id :source-relative source-relative-p))
   sound)
 
-(defreply make ((sound =file-sound=) &key filepath)
-  (defobject =file-sound= ((filepath filepath))))
+(defgeneric sound-state (sound)
+  (:documentation "Returns one of: '(:PLAYING :PAUSED :STOPPED :INITIAL). If sound resource is not
+loaded yet, returns NIL.")
+  (:method ((sound sound))
+    (when (loadedp sound)
+      (al:get-source (source-id sound) :source-state))))
 
-(defun make-sound (filepath)
-  (defobject =file-sound= ((filepath filepath))))
+(defgeneric play (sound)
+  (:method :before ((sound sound))
+    (unless (loadedp sound)
+      (load-resource sound)))
+  (:method ((sound sound))
+    (al:source-play (source-id sound))))
 
-(defmessage sound-state (sound))
-(defreply sound-state ((sound =sound=))
-  "Returns one of: '(:PLAYING :PAUSED :STOPPED :INITIAL). If sound resource is not loaded yet,
-returns NIL."
-  (when (loadedp sound)
-    (al:get-source (source-id sound) :source-state)))
+(defgeneric stop (sound)
+  (:method :before ((sound sound))
+    (unless (loadedp sound)
+      (load-resource sound)))
+  (:method ((sound sound))
+    (al:source-stop (source-id sound))))
 
-(defmessage play (sound))
-(defreply play :before ((sound =sound=))
-  (unless (loadedp sound)
-    (load-resource sound)))
-(defreply play ((sound =sound=))
-  (al:source-play (source-id sound)))
+(defgeneric pause (sound)
+  (:method :before ((sound sound))
+    (unless (loadedp sound)
+      (load-resource sound)))
+  (:method ((sound sound))
+    (al:source-pause (source-id sound))))
 
-(defmessage stop (sound))
-(defreply stop :before ((sound =sound=))
-  (unless (loadedp sound)
-    (load-resource sound)))
-(defreply stop ((sound =sound=))
-  (al:source-stop (source-id sound)))
-
-(defmessage pause (sound))
-(defreply pause :before ((sound =sound=))
-  (unless (loadedp sound)
-    (load-resource sound)))
-(defreply pause ((sound =sound=))
-  (al:source-pause (source-id sound)))
-
-(defmessage rewind (sound))
-(defreply rewind :before ((sound =sound=))
-  (unless (loadedp sound)
-    (load-resource sound)))
-(defreply rewind ((sound =sound=))
-  (al:source-rewind (source-id sound)))
+(defgeneric rewind (sound)
+  (:method :before ((sound sound))
+    (unless (loadedp sound)
+      (load-resource sound)))
+  (:method ((sound sound))
+    (al:source-rewind (source-id sound))))
 
 (eval-when (:load-toplevel :execute)
   (alut:init))

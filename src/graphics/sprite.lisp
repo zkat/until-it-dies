@@ -13,7 +13,7 @@
 ;;;
 (defclass sprite () ())
 
-(defgeneric draw (obj &key x y))
+(defgeneric draw (obj &key))
 
 (defun draw-at (x y obj &rest all-keys)
   (apply #'draw obj :x x :y y all-keys))
@@ -35,7 +35,7 @@ facilities for drawing textures onto components."))
   (filepath (texture textured)))
 
 (defgeneric calculate-tex-coords (texture)
-  (:method ((textured =textured=))
+  (:method ((textured textured))
     (vector 0 0 1 1)))
 
 (defmethod draw :before ((textured textured) &key)
@@ -45,7 +45,7 @@ facilities for drawing textures onto components."))
   (when (texture textured)
     (bind-texture (texture textured))))
 
-(defmethod draw :after ((textured =textured=) &key)
+(defmethod draw :after ((textured textured) &key)
   "Once we're done drawing it, we should unbind the texture."
   (unbind-texture (texture textured))
   (gl:disable :texture-2d))
@@ -79,7 +79,7 @@ texture they are drawn with. Their TEXTURE property should contain a texture."))
                         :v2 (elt tex-coords 3))))))
 
 (defclass animation (image)
-  ((current-frame :initform 0 :initarg :num-frames :accessor current-frame)
+  ((current-frame :initform 0 :initarg :current-frame :accessor current-frame)
    (num-frames :initarg :num-frames :accessor num-frames)
    (frame-delay :initarg :frame-delay :accessor frame-delay)
    (frame-width :initarg :frame-width :accessor frame-width)

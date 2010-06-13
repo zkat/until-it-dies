@@ -27,7 +27,8 @@
   (zpb-ttf:advance-width (zpb-ttf:find-glyph #\Space font-loader)))
 
 (defun format-text (text &key (width 100) (height 100) (font *font*) (wrap t) (align :left) (valign :bottom))
-  (with-properties ((font-loader font-pointer) (size size)) font
+  (with-accessors ((font-loader font-pointer) (size size))
+      font
     (let ((unit-width (/ width (scale-factor size font-loader)))
           (unit-height (/ height (scale-factor size font-loader)))
           (line-height (line-height font-loader))

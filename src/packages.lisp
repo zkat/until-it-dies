@@ -48,6 +48,21 @@
    :time-delta
    :windows
 
+   ;; Views
+   :left-edge
+   :right-edge
+   :bottom-edge
+   :top-edge
+   :far-edge
+   :near-edge
+   :zoom
+   :view-width
+   :view-height
+   :zoom-view
+   :move-view
+   :update-view
+   :set-view
+
    ;; Window
    :window
    :title
@@ -59,6 +74,7 @@
    :mouse-x
    :mouse-y
    :set-gl-window
+   :view
    :swap-buffers
 
    ;; primitives

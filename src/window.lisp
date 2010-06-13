@@ -173,10 +173,6 @@
 (defmethod on-close ((window window))
   (teardown window))
 
-(defmethod on-resize ((window window) width height)
-  (set-gl-window window)
-  (set-view (view window)))
-
 #+nil(defun key-down-p (engine key)
   "Is KEY being held down?"
   (values (gethash key (keys-held-down engine))))

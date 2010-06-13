@@ -11,24 +11,38 @@
 ;;; Standard textures
 ;;;
 ;;; - Textures manage opengl texture objects, and handle their binding.
-(defproto =texture= (=resource=)
-  ((tex-id nil)
-   (target :texture-2d)
-   (height 0)
-   (width 0)))
+(defclass texture (resource)
+  ((tex-id :accessor tex-id)
+   (target :initform :texture-2d :accessor target)
+   (height :accessor height)
+   (width :accessor width)))
 
-(defreply bind-texture ((texture =texture=))
-  (with-properties (tex-id target) texture
-    (when (or (null tex-id)
-              (not (gl:texturep tex-id)))
-      (load-resource texture))
-    (gl:bind-texture target tex-id)))
+(defgeneric bind-texture (texture)
+  (:method ((texture texture))
+    (with-accessors ((tex-id tex-id) (target target))
+        texture
+      ;; TODO - maybe put this in a :before?
+      (when (or (null tex-id)
+                (not (gl:texturep tex-id)))
+        (load-resource texture))
+      (gl:bind-texture target tex-id))))
 
-(defreply unbind-texture ((texture =texture=))
-  (with-properties (target) texture
-    (gl:bind-texture target 0)))
+(defgeneric unbind-texture (texture)
+  (:method ((texture texture))
+    (gl:bind-texture (target texture) 0)))
 
-(defreply unload-resource ((texture =texture=))
+(defmethod load-resource :before ((texture texture))
+  (when (tex-id texture)
+    (unload-resource texture)))
+
+(defmethod load-resource :after ((texture texture))
+  (let ((id (tex-id texture)))
+    (finalize texture (lambda ()
+                        (when (and (integerp id)
+                                   (gl:texturep id))
+                          (gl:delete-texture id))))))
+
+(defmethod unload-resource ((texture texture))
   (let ((id (tex-id texture)))
     (setf (tex-id texture) nil)
     (handler-case
@@ -37,37 +51,32 @@
           (gl:delete-texture id))
       #+cl-opengl-checks-errors(%gl::opengl-error (c) (values nil c)))))
 
-(defreply loadedp ((texture =texture=))
-  (with-properties (tex-id) texture
-    (when (and tex-id
-               (gl:texturep tex-id))
+(defmethod loadedp ((texture texture))
+  (let ((tex-id (tex-id texture)))
+    (when (and tex-id (gl:texturep tex-id))
       t)))
 
-(defreply width :before ((texture =texture=))
+(defmethod width :before ((texture texture))
   (unless (loadedp texture)
     (load-resource texture)))
 
-(defreply height :before ((texture =texture=))
+(defmethod height :before ((texture texture))
   (unless (loadedp texture)
     (load-resource texture)))
 
 ;;;
 ;;; File textures
 ;;;
-(defproto =file-texture= (=file-resource= =texture=)
+(defclass file-texture (file-resource texture)
   ()
-  :documentation "A file texture is loaded from an image file.")
-
-(defreply load-resource :before ((texture =texture=))
-  (when (tex-id texture)
-    (unload-resource texture)))
+  (:documentation "A file texture is loaded from an image file."))
 
 (defun check-devil-error ()
   (let ((err (uid-il:get-error)))
     (unless (eq err :no-error)
       (error "Texture error: ~A" err))))
 
-(defreply load-resource ((texture =file-texture=))
+(defmethod load-resource ((texture file-texture))
   (uid-ilut:renderer :opengl)
   (uid-ilut:enable :opengl-conv)
   (let* ((texture-name (uid-ilut:gl-load-image (namestring (filepath texture)))))
@@ -84,19 +93,3 @@
   (uid-il:bind-image 0)
   (check-devil-error)
   texture)
-
-(defreply load-resource :after ((texture =texture=))
-  (let ((id (tex-id texture)))
-    (finalize texture (lambda ()
-                        (when (and (integerp id)
-                                   (gl:texturep id))
-                          (gl:delete-texture id))))))
-
-(defreply make ((texture =file-texture=) &key filepath)
-  (defobject (=file-texture=)
-      ((filepath filepath))))
-
-(defun make-texture (filepath)
-  (defobject (=file-texture=)
-      ((filepath filepath))))
-

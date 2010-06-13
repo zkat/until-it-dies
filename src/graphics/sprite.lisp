@@ -11,7 +11,9 @@
 ;;;
 ;;; Sprite prototype
 ;;;
-(defproto =sprite= ())
+(defclass sprite () ())
+
+(defgeneric draw (obj &key x y))
 
 (defun draw-at (x y obj &rest all-keys)
   (apply #'draw obj :x x :y y all-keys))
@@ -19,59 +21,47 @@
 ;;;
 ;;; Textured prototype
 ;;;
-(defproto =textured= =sprite=
-  ((texture =texture=))
-  :documentation
-  "Not to be confused with =texture=; =textured= is a mixin that provides
-facilities for drawing textures onto components.")
+(defclass textured (sprite)
+  ((texture :initarg :texture :accessor texture
+            :initform (error "Textured objects must have a texture object associated with them.")))
+  (:documentation "Not to be confused with TEXTURE; TEXTURED is a mixin that provides
+facilities for drawing textures onto components."))
 
-(defreply calculate-tex-coords ((textured =textured=))
-  (declare (ignore textured))
-  (vector 0 0 1 1))
+(defmethod height ((textured textured))
+  (height (texture textured)))
+(defmethod width ((textured textured))
+  (width (texture textured)))
+(defmethod filepath ((textured textured))
+  (filepath (texture textured)))
 
-(defreply draw :before ((textured =textured=) &key x y)
+(defgeneric calculate-tex-coords (texture)
+  (:method ((textured =textured=))
+    (vector 0 0 1 1)))
+
+(defmethod draw :before ((textured textured) &key)
   "Before we a draw textured sprite, we should bind its texture."
-  (declare (ignore x y))
   (gl:enable :texture-2d :blend)
   (gl:blend-func :src-alpha :one-minus-src-alpha)
   (when (texture textured)
     (bind-texture (texture textured))))
 
-(defreply draw :after ((textured =textured=) &key x y)
+(defmethod draw :after ((textured =textured=) &key)
   "Once we're done drawing it, we should unbind the texture."
-  (declare (ignore x y))
   (unbind-texture (texture textured))
   (gl:disable :texture-2d))
 
 ;;;
-;;; Image prototype
+;;; Images
 ;;;
-(defproto =image= =textured=
-  (texture)
-  :documentation
-  "Images are textured components that are initialized to be the same size as the
-texture they are drawn with. Their TEXTURE property should contain a texture.")
+(defclass image (textured)
+  ()
+  (:documentation
+   "Images are textured components that are initialized to be the same size as the
+texture they are drawn with. Their TEXTURE property should contain a texture."))
 
-(defreply make ((image =image=) &key filepath)
-  (defobject =image= ((texture (make-texture filepath)))))
-
-(defun make-image (filepath)
-  (let* ((texture (make-texture filepath)))
-    (defobject (=image=) ((texture texture)))))
-
-(defreply height ((image =image=))
-  (with-properties (texture) image
-    (height texture)))
-(defreply width ((image =image=))
-  (with-properties (texture) image
-    (width texture)))
-(defreply filepath ((image =image=))
-  (with-properties (texture) image
-    (filepath texture)))
-
-(defreply draw ((image =image=)
-                &key x y x-scale y-scale
-                rotation (z 0) (x-offset 0) (y-offset 0))
+(defmethod draw ((image image)
+                 &key x y x-scale y-scale
+                 rotation (z 0) (x-offset 0) (y-offset 0))
   (let ((x (+ x x-offset))
         (y (+ y y-offset))
         (tex-coords (calculate-tex-coords image))
@@ -88,49 +78,31 @@ texture they are drawn with. Their TEXTURE property should contain a texture.")
                         :u2 (elt tex-coords 2)
                         :v2 (elt tex-coords 3))))))
 
-(defproto =animation= (=image=)
-  ((current-frame 0)
-   (num-frames 14)
-   (frame-delay 50)
-   (frame-width 15)
-   (frame-height 14)
-   (frame-step 1)
-   (timer 0)
-   (animation-type :loop))
-  :documentation
+(defclass animation (image)
+  ((current-frame :initform 0 :initarg :num-frames :accessor current-frame)
+   (num-frames :initarg :num-frames :accessor num-frames)
+   (frame-delay :initarg :frame-delay :accessor frame-delay)
+   (frame-width :initarg :frame-width :accessor frame-width)
+   (frame-height :initarg :frame-height :accessor frame-height)
+   (frame-step :initform 1 :initarg :frame-step :accessor frame-step)
+   (timer :initform 0 :accessor timer)
+   (animation-type :initform :loop :initarg :type :accessor animation-type))
+  (:documentation
   "Animations are like images, but they use the provided texture
 as a sprite sheet. Based on certain provided parameters, they
-figure out which frames to draw.")
+figure out which frames to draw."))
 
-(defreply height ((animation =animation=))
+(defmethod height ((animation animation))
   (frame-height animation))
-(defreply width ((animation =animation=))
+(defmethod width ((animation animation))
   (frame-width animation))
 
-(defreply make ((animation =animation=) &key filepath frame-width
-                  frame-height frame-delay num-frames (type :loop))
-  (defobject (=animation=)
-      ((texture (make-texture filepath))
-       (frame-width frame-width)
-       (frame-height frame-height)
-       (frame-delay frame-delay)
-       (num-frames num-frames)
-       (animation-type type))))
-
-(defun make-animation (filepath frame-width frame-height frame-delay
-                         num-frames &optional (type :loop))
-  (defobject (=animation=)
-      ((texture (make-texture filepath))
-       (frame-width frame-width)
-       (frame-height frame-height)
-       (frame-delay frame-delay)
-       (num-frames num-frames)
-       (animation-type type))))
-
-(defreply update ((animation =animation=) dt &key)
+(defmethod on-update ((animation animation) dt)
   ;; TODO - this needs to update an animation properly regardless of framerate.
   ;;        That probably means that frames should sometimes be skipped.
-  (with-properties (timer num-frames current-frame frame-delay animation-type frame-step)
+  (with-accessors ((timer timer) (num-frames num-frames)
+                   (current-frame current-frame) (frame-delay frame-delay)
+                   (animation-type animation-type) (frame-step frame-step))
       animation
     (incf timer dt)
     (when (> timer frame-delay)
@@ -156,10 +128,13 @@ figure out which frames to draw.")
                    (< current-frame 0))
            (setf current-frame 0)))))))
 
-(defreply calculate-tex-coords ((animation =animation=))
-  (with-properties (current-frame num-frames frame-width frame-height texture)
+(defmethod calculate-tex-coords ((animation animation))
+  (with-accessors ((current-frame current-frame) (num-frames num-frames)
+                   (frame-width frame-width) (frame-height frame-height)
+                   (texture texture))
       animation
-    (with-properties ((tex-height height) (tex-width width)) texture
+    (with-accessors ((tex-height height) (tex-width width))
+        texture
       (when (loadedp texture)
         (vector (/ (* (1- current-frame) frame-width) tex-width)
                 0 (/ (* current-frame frame-width) tex-width) (/ frame-height tex-height))))))
@@ -167,13 +142,13 @@ figure out which frames to draw.")
 ;;;
 ;;; Text prototype
 ;;;
-(defproto =text= =sprite=
-  ((string-to-draw "Hello World")))
+(defclass text (sprite)
+  ((string-to-draw :initform "Hello World" :initarg :string :accessor string-to-draw)))
 
-(defreply draw ((string =string=)
-                &key x y x-scale y-scale
-                rotation (font *font*)
-                (z 0) (x-offset 0) (y-offset 0))
+(defmethod draw ((string string)
+                 &key x y x-scale y-scale
+                 rotation (font *font*)
+                 (z 0) (x-offset 0) (y-offset 0))
   (unless (loadedp font)
     (load-resource font))
   (gl:with-pushed-matrix
@@ -185,12 +160,12 @@ figure out which frames to draw.")
       (gl:scale (or x-scale 1) (or y-scale 1) 1)
       (draw-string (font-pointer font) string :size (size font)))))
 
-(defreply draw ((text =text=)
-                &key x y width height
-                x-scale y-scale
-                rotation (wrap t) (align :left) (valign :bottom)
-                (font *font*) (z 0)
-                (x-offset 0) (y-offset 0))
+(defmethod draw ((text text)
+                 &key x y width height
+                 x-scale y-scale
+                 rotation (wrap t) (align :left) (valign :bottom)
+                 (font *font*) (z 0)
+                 (x-offset 0) (y-offset 0))
   (unless (loadedp font)
     (load-resource font))
   (gl:with-pushed-matrix
@@ -204,20 +179,10 @@ figure out which frames to draw.")
                 (draw-at (units->pixels (first line) (font-pointer font) (size font))
                          (units->pixels (second line) (font-pointer font) (size font))
                          (third line) :font font))
-              (format-text (string-to-draw text)
-                           :width width
-                           :height height
-                           :font font
-                           :wrap wrap
-                           :align align
-                           :valign valign)))))
-
-(defreply create ((text =text=) &key (string ""))
-  (defobject =text= ((string-to-draw string))))
-
-(defreply make ((text =text=) &key (string ""))
-  (defobject =text= ((string-to-draw string))))
-
-(defun make-text (string)
-  (defobject (=text=) ((string-to-draw string))))
-
+            (format-text (string-to-draw text)
+                         :width width
+                         :height height
+                         :font font
+                         :wrap wrap
+                         :align align
+                         :valign valign)))))

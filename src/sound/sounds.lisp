@@ -49,25 +49,6 @@
   (when (loadedp sound)
     (al:source (source-id sound) :direction (source-direction sound))))
 
-;;; File sounds
-(defclass file-sound (file-resource sound)
-  ())
-
-(defmethod load-resource ((sound file-sound))
-  (with-accessors ((buffer-id buffer-id) (source-id source-id)
-                   (source-position source-position) (source-velocity source-velocity)
-                   (source-direction source-direction) (source-relative-p source-relative-p)
-                   (filepath filepath))
-      sound
-    (setf buffer-id (alut:create-buffer-from-file (namestring (truename filepath))))
-    (setf source-id (al:gen-source))
-    (al:source source-id :buffer buffer-id)
-    (al:source source-id :position source-position)
-    (al:source source-id :velocity source-velocity)
-    (al:source source-id :direction source-direction)
-    (al:source source-id :source-relative source-relative-p))
-  sound)
-
 (defgeneric sound-state (sound)
   (:documentation "Returns one of: '(:PLAYING :PAUSED :STOPPED :INITIAL). If sound resource is not
 loaded yet, returns NIL.")
@@ -102,6 +83,25 @@ loaded yet, returns NIL.")
       (load-resource sound)))
   (:method ((sound sound))
     (al:source-rewind (source-id sound))))
+
+;;; File sounds
+(defclass file-sound (file-resource sound)
+  ())
+
+(defmethod load-resource ((sound file-sound))
+  (with-accessors ((buffer-id buffer-id) (source-id source-id)
+                   (source-position source-position) (source-velocity source-velocity)
+                   (source-direction source-direction) (source-relative-p source-relative-p)
+                   (filepath filepath))
+      sound
+    (setf buffer-id (alut:create-buffer-from-file (namestring (truename filepath))))
+    (setf source-id (al:gen-source))
+    (al:source source-id :buffer buffer-id)
+    (al:source source-id :position source-position)
+    (al:source source-id :velocity source-velocity)
+    (al:source source-id :direction source-direction)
+    (al:source source-id :source-relative source-relative-p))
+  sound)
 
 (eval-when (:load-toplevel :execute)
   (alut:init))

@@ -9,41 +9,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
-(defproto =color= ()
-  ((red 1)
-   (green 1)
-   (blue 1)
-   (alpha 1))
-  :documentation
-  "A color is an object that represents a certain RGBA value.
-The values are used directly by opengl, and should range between 0 and 1 (instead of 0-255)")
-(defun make-color (&key (r 1) (g 1) (b 1) (a 1) (name nil name-supplied-p))
-  ;; Ugly hack needed because of defobject's macroness
-  (if name-supplied-p
-      (defobject =color= ((red r) (green g) (blue b) (alpha a)) :nickname name)
-      (defobject =color= ((red r) (green g) (blue b) (alpha a)))))
+(defstruct color
+  (red 1)
+  (green 1)
+  (blue 1)
+  (alpha 1)
+  (name ""))
 
 ;; Some standard colors
-(defproto *black* (=color=)
-  ((red 0) (green 0) (blue 0)))
-(defproto *white* (=color=)
-  ((red 1) (green 1) (blue 1)))
-(defproto *magenta* (=color=)
-  ((red 1) (green 0) (blue 1)))
-(defproto *red* (=color=)
-  ((red 1) (green 0) (blue 0)))
-(defproto *green* (=color=)
-  ((red 0) (green 1) (blue 0)))
-(defproto *blue* (=color=)
-  ((red 0) (green 0) (blue 1)))
-(defproto *yellow* (=color=)
-  ((red 1) (green 1) (blue 0)))
-(defproto *orange* (=color=)
-  ((red 1) (green 0.4) (blue 0)))
-(defproto *brown* (=color=)
-  ((red 0.34) (green 0.165) (blue 0.165)))
+(defmacro defcolor (name red green blue &optional (nickname ""))
+  `(defparameter ,name (make-color :red ,red :green ,green :blue ,blue :name ,nickname)))
+
+(defcolor *black* 0 0 0 "black")
+(defcolor *white* 1 1 1 "white")
+(defcolor *magenta* 1 0 1 "magenta")
+(defcolor *red* 1 0 0 "red")
+(defcolor *green* 0 1 0 "green")
+(defcolor *blue* 0 0 1 "blue")
+(defcolor *yellow* 1 1 0 "yellow")
+(defcolor *orange* 1 0.4 0 "orange")
+(defcolor *brown* 0.34 0.165 0.165 "brown")
 
 (defvar *color* *white*)
+
 (defun mix-colors (&rest colors)
   (declare (dynamic-extent colors))
   (cond ((null colors)
@@ -53,23 +41,24 @@ The values are used directly by opengl, and should range between 0 and 1 (instea
         (t (reduce #'%mix-colors colors))))
 
 (defun %mix-colors (color1 color2)
-  (let* ((r1 (red color1))
-         (g1 (green color1))
-         (b1 (blue color1))
-         (a1 (alpha color1))
-         (r2 (red color2))
-         (g2 (green color2))
-         (b2 (blue color2))
-         (a2 (alpha color2)))
-    (make-color :r (/ (+ r1 r2) 2)
-                :g (/ (+ g1 g2) 2)
-                :b (/ (+ b1 b2) 2)
-                :a (/ (+ a1 a2) 2))))
+  (let* ((r1 (color-red color1))
+         (g1 (color-green color1))
+         (b1 (color-blue color1))
+         (a1 (color-alpha color1))
+         (r2 (color-red color2))
+         (g2 (color-green color2))
+         (b2 (color-blue color2))
+         (a2 (color-alpha color2)))
+    (make-color :red (/ (+ r1 r2) 2)
+                :green (/ (+ g1 g2) 2)
+                :blue (/ (+ b1 b2) 2)
+                :alpha (/ (+ a1 a2) 2))))
 
 (defun color-equal (color1 color2)
-  (with-properties ((r1 red) (g1 green) (b1 blue) (a1 alpha)) color1
-    (with-properties ((r2 red) (g2 green) (b2 blue) (a2 alpha)) color2
-      (when (and (= r1 r2) (= g1 g2) (= b1 b2) (= a1 a2)) t))))
+  (with-accessors ((r1 color-red) (g1 color-green) (b1 color-blue) (a1 color-alpha)) color1
+    (with-accessors ((r2 color-red) (g2 color-green) (b2 color-blue) (a2 color-alpha)) color2
+      (when (and (= r1 r2) (= g1 g2) (= b1 b2) (= a1 a2))
+        t))))
 
 (defmacro with-color (color &body body)
   (let ((color-name (gensym "COLOR-"))
@@ -86,5 +75,7 @@ The values are used directly by opengl, and should range between 0 and 1 (instea
          (when ,rebindp (bind-color *color*))))))
 
 (defun bind-color (color)
-  (with-properties (red green blue alpha) color
+  (with-accessors ((red color-red) (green color-green)
+                   (blue color-blue) (alpha color-alpha))
+      color
     (gl:color red green blue alpha)))

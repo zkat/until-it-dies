@@ -21,6 +21,11 @@
      when (openp window)
      do (on-draw window)))
 
+(defmethod on-update ((engine engine) dt)
+  (loop for window in (windows engine)
+     when (openp window)
+     do (on-update window (time-delta engine))))
+
 (defun update-time (engine)
   (with-accessors ((dt time-delta) (last-time last-tick-time)) engine
     (multiple-value-bind (new-dt now)

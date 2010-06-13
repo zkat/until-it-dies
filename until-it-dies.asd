@@ -6,13 +6,13 @@
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "MIT"
-  :depends-on (until-it-dies.base))
+  :depends-on (until-it-dies.base until-it-dies.graphics))
 
-(cl:defpackage until-it-dies.demo.resource-info
+(cl:defpackage until-it-dies.examples.resource-info
   (:export :*resource-directory*))
 
-(cl:defvar until-it-dies.demo.resource-info:*resource-directory*
-  (print (merge-pathnames "demo/res/" *load-truename*)))
+(cl:defvar until-it-dies.examples.resource-info:*resource-directory*
+  (print (merge-pathnames "examples/res/" *load-truename*)))
 
 (asdf:defsystem until-it-dies.examples
   :version "0.1 (unreleased)"

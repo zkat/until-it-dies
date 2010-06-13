@@ -78,7 +78,7 @@
       (gl:ortho left-edge right-edge bottom-edge top-edge near-edge far-edge)
       (gl:matrix-mode :modelview)
       (gl:load-identity)
-      (let* ((x-scale (if (> left-edge right-edge) -1 1))
+#+nil      (let* ((x-scale (if (> left-edge right-edge) -1 1))
              (x-translate (if (= x-scale 1) 0 (- (- left-edge right-edge))))
              (y-scale (if (> bottom-edge top-edge) -1 1))
              (y-translate (if (= y-scale 1) 0 (- (- bottom-edge top-edge))))

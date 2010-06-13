@@ -116,4 +116,25 @@
    :load-resource
    :unload-resource
    :loadedp
+
+   ;; Fonts
+   :font
+   :size
+   :res
+   :*font*
+   :with-font
+
+   ;; Sprites
+   :sprite
+   :draw
+   :draw-at
+   :textured
+   :height
+   :width
+   :filepath
+   :calculate-tex-coords
+   :image
+   :animation
+   :text
+   
    ))

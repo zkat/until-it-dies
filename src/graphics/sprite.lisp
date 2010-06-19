@@ -166,7 +166,7 @@ figure out which frames to draw."))
       (draw-string (font-pointer font) string :size (size font)))))
 
 (defmethod draw ((text text)
-                 &key x y width height
+                 &key x y (width 100) (height 100)
                  x-scale y-scale
                  rotation (wrap t) (align :left) (valign :bottom)
                  (font *font*) (z 0)

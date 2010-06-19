@@ -40,8 +40,14 @@
    (mouse-x :initform 0 :accessor mouse-x)
    (mouse-y :initform 0 :accessor mouse-y)
    (glop-window :initform nil :accessor glop-window)
-   (view :initform (make-instance 'view :right-edge 800 :top-edge 600)
-         :accessor view :initarg :view)))
+   (view :accessor view :initarg :view)))
+
+(defmethod initialize-instance :after ((window window) &key)
+  (unless (slot-boundp window 'view)
+    (setf (view window)
+          (make-instance 'view
+                         :top-edge (height window)
+                         :right-edge (width window)))))
 
 (defmethod (setf title) :after (new-value (window window))
   (glop:set-window-title (glop-window window) new-value))
@@ -176,6 +182,10 @@
 
 (defmethod on-close ((window window))
   (teardown window))
+
+(defmethod on-resize ((window window) width height)
+  (update-view (view window) 0 0 width height)
+  (set-view (view window)))
 
 #+nil(defun key-down-p (engine key)
   "Is KEY being held down?"

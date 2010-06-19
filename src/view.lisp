@@ -71,8 +71,9 @@
   (:method ((view view))
     (with-accessors ((left-edge left-edge) (right-edge right-edge)
                      (top-edge top-edge) (bottom-edge bottom-edge)
-                     (far-edge far-edge) (near-edge near-edge))
+                     (near-edge near-edge) (far-edge far-edge))
         view
+      (gl:viewport left-edge bottom-edge right-edge top-edge)
       (gl:matrix-mode :projection)
       (gl:load-identity)
       (gl:ortho left-edge right-edge bottom-edge top-edge near-edge far-edge)

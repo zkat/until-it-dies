@@ -22,10 +22,15 @@
 ;;; Textured prototype
 ;;;
 (defclass textured (sprite)
-  ((texture :initarg :texture :accessor texture
-            :initform (error "Textured objects must have a texture object associated with them.")))
+  ((texture :initarg :texture :accessor texture))
   (:documentation "Not to be confused with TEXTURE; TEXTURED is a mixin that provides
 facilities for drawing textures onto components."))
+
+(defmethod initialize-instance :after ((textured textured) &key image-path)
+  (when (and (not (slot-boundp textured 'texture))
+             image-path)
+    (setf (texture textured)
+          (make-instance 'file-texture :filepath image-path))))
 
 (defmethod height ((textured textured))
   (height (texture textured)))

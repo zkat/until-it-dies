@@ -8,4 +8,5 @@
   :components
   ((:module "examples" :components
             ((:file "basic")
-             (:file "text")))))
+             (:file "text")
+             (:file "image")))))

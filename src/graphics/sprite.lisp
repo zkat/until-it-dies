@@ -27,10 +27,12 @@
 facilities for drawing textures onto components."))
 
 (defmethod initialize-instance :after ((textured textured) &key image-path)
-  (when (and (not (slot-boundp textured 'texture))
-             image-path)
-    (setf (texture textured)
-          (make-instance 'file-texture :filepath image-path))))
+  (cond (image-path
+         (setf (texture textured)
+               (make-instance 'file-texture :filepath image-path)))
+        ((not (slot-boundp textured 'texture))
+         (error "Textured objects must be given a texture."))
+        (t nil)))
 
 (defmethod height ((textured textured))
   (height (texture textured)))

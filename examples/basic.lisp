@@ -1,6 +1,7 @@
-(defpackage #:basic-uid-example
-  (:use :cl))
-(in-package :basic-uid-example)
+(defpackage #:until-it-dies.examples.basic
+  (:use :cl)
+  (:nicknames :uid.ex.basic))
+(in-package :uid.ex.basic)
 
 (defclass my-engine (uid:engine)
   ())

@@ -1,7 +1,7 @@
-(defpackage #:uid-text-rendering-example
+(defpackage #:until-it-dies.examples.text
   (:use :cl)
-  (:nicknames #:uid-ex-text))
-(in-package :uid-ex-text)
+  (:nicknames :uid.ex.text))
+(in-package :uid.ex.text)
 
 (defvar *resource-directory*
   (merge-pathnames "res/" (load-time-value (or #.*compile-file-truename* *load-truename*))))

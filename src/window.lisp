@@ -79,7 +79,7 @@
                                :fullscreen (fullscreenp window)
                                :double-buffer t
                                :stencil-buffer t
-                               :stencil-size 16
+                               :stencil-size 1
                                :accum-buffer t))
      (set-gl-window window)
      (set-view (view window))

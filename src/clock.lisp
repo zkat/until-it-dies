@@ -7,3 +7,5 @@
    (fps-limit :accessor fps-limit :initform nil)
    (cumulative-time :initform 0 :accessor cumulative-time)))
 
+(defgeneric tick (clock))
+(defgeneric fps (clock))

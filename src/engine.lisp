@@ -14,6 +14,7 @@
   ((last-tick-time :initform (now) :accessor last-tick-time)
    (time-delta :initform 0 :accessor time-delta)
    (initializedp :initform nil :accessor initializedp)
+   (resource-path :accessor resource-path :initform *default-pathname-defaults*)
    (windows :initform nil :accessor windows :initarg :windows)))
 
 (defmethod on-draw ((engine engine))

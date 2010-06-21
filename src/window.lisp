@@ -177,6 +177,9 @@
   (declare (ignore dt))
   (values))
 
+(defmethod on-draw :before ((window window))
+  (uid:set-gl-window window))
+
 (defmethod on-draw ((window window))
   (values))
 

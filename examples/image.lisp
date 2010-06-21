@@ -1,7 +1,6 @@
 (defpackage #:until-it-dies.examples.image
-  (:use :cl)
-  (:nicknames :uid.ex.image))
-(in-package :uid.ex.image)
+  (:use :cl))
+(in-package #:until-it-dies.examples.image)
 
 (defvar *resource-directory*
   (merge-pathnames "res/" (load-time-value (or #.*compile-file-truename* *load-truename*))))

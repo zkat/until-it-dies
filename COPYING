@@ -1,5 +1,8 @@
-Until It Dies is Copyright © 2009 Kat Marchán, Adlai Chadrasekhar
+-----------
 
+Until It Dies is Copyright © 2009, 2010 Kat Marchán, Adlai Chadrasekhar
+
+=====
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -17,4 +20,32 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+=====
 
+-----------
+
+Various parts of UID have also been written based on code in glaw
+(http://github.com/patzy/glaw). Specifically, the view system was derived from glaw's. glaw is
+licensed, like UID, under the MIT license (found above)
+
+-----------
+
+Until It Dies' font rendering code is based on code written by Patrick Stein, with the following
+license (found at http://old.nklein.com/etc/copyright.php):
+
+=====
+We made all images (except for the xhtml, css, and paypal icons at the bottom), text, software, and
+other stuff on this web site. We authorize you to do anything you like with these so long as you do
+not restrict the rights of others to do what they like with them. We're not saying you have to give
+away your products. We're just saying that all of the items on this site have a Universal,
+Non-Exclusive License.
+
+For example, if you wanted to take some of these images or some of this software and plaster your
+name on them and sell them, fine. But, you cannot keep Sally Q. Public from taking those same items
+and plastering her name on them and selling them. You just can't. It's all as hers as it is yours.
+
+All of that said, it'd please us plenty if you slung appreciation, accolades, credit, and/or cash
+our way as you see fit.
+=====
+
+-----------

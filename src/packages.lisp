@@ -82,10 +82,13 @@
    :mouse-y
    :set-gl-window
    :view
+   :clear
    :swap-buffers
    :open-window
    :close-window
-
+   :clear-color
+   :clear-buffers
+   
    ;; primitives
    :make-color
    :mix-colors

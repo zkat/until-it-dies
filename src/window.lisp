@@ -39,6 +39,9 @@
    (key-repeat-p :initform nil :accessor key-repeat-p)
    (mouse-x :initform 0 :accessor mouse-x)
    (mouse-y :initform 0 :accessor mouse-y)
+   (clear-color :initform *black* :accessor clear-color :initarg :clear-color)
+   (clear-buffers :initform '(:color-buffer-bit :depth-buffer-bit) :initarg :clear-buffers
+                  :accessor clear-buffers)
    (glop-window :initform nil :accessor glop-window)
    (view :accessor view :initarg :view)))
 
@@ -63,6 +66,11 @@
   (:method ((window window))
     (glop:set-gl-window (glop-window window))
     window))
+
+(defgeneric clear (window)
+  (:method ((window window))
+    (apply #'gl:clear-color (color->list (clear-color window)))
+    (apply #'gl:clear (clear-buffers window))))
 
 (defgeneric swap-buffers (window)
   (:method ((window window))

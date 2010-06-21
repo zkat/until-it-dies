@@ -13,7 +13,6 @@
 (defclass engine ()
   ((initializedp :initform nil :accessor initializedp)
    (clock :accessor clock :initarg :clock)
-   (resource-path :accessor resource-path :initform *default-pathname-defaults*)
    (windows :initform (list (make-instance 'window)) :accessor windows :initarg :windows)))
 
 (defmethod initialize-instance :after ((engine engine) &key fps-limit)

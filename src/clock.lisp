@@ -8,14 +8,16 @@
    (fps-limit :accessor fps-limit :initform nil :initarg :fps-limit)
    (cumulative-time :initform 0.0 :accessor cumulative-time)))
 
-(defmethod max-times-stored ((clock clock))
-  (queue-length (times clock)))
-
-(defmethod (setf max-times-stored) (new-value (clock clock))
-  (setf (times clock) (make-queue new-value)))
-
 (defmethod initialize-instance :after ((clock clock) &key (max-times-stored 10))
   (setf (times clock) (make-queue max-times-stored)))
+
+(defgeneric max-times-stored (clock)
+  (:method ((clock clock))
+    (queue-length (times clock))))
+
+(defgeneric (setf max-times-stored) (new-value clock)
+  (:method (new-value (clock clock))
+    (setf (times clock) (make-queue new-value))))
 
 (defgeneric tick (clock)
   (:method :before ((clock clock))

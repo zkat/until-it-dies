@@ -18,6 +18,11 @@
                       50 50 :color uid:*red*)
   (uid:swap-buffers window))
 
+(defmethod uid:on-key-down ((window my-window) keycode keysym string)
+  (format t "~&Keycode: [~S], Keysym: [~S], String: [~S]~%" keycode keysym string)
+  (when (eq keysym :escape)
+    (uid:close-window window)))
+
 (defparameter *engine* (make-instance 'my-engine))
 
 (defun run ()

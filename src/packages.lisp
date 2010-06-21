@@ -76,6 +76,8 @@
    :set-gl-window
    :view
    :swap-buffers
+   :open-window
+   :close-window
 
    ;; primitives
    :make-color

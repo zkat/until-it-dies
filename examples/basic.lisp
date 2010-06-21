@@ -24,10 +24,7 @@
   (when (eq keysym :escape)
     (uid:close-window window)))
 
-(defparameter *engine* (make-instance 'my-engine))
+(defparameter *engine* (make-instance 'my-engine :windows (list (make-instance 'my-window))))
 
 (defun run ()
-  (let ((window1 (make-instance 'my-window))
-        (window2 (make-instance 'my-window)))
-    (setf (uid:windows *engine*) (list window1 window2))
-    (uid:run *engine*)))
+  (uid:run *engine*))

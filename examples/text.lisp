@@ -35,9 +35,7 @@
 
       (uid:draw-at 10 50 *string-to-draw*
                    :align :left :valign :middle
-                   :width 400 :height 400)))
-
-  (uid:swap-buffers window))
+                   :width 400 :height 400))))
 
 (defun run ()
   (setf (uid:windows *engine*) (list (make-instance 'text-window

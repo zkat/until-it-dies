@@ -18,8 +18,7 @@
 
 (defmethod uid:on-draw ((window my-window))
   (uid:clear window)
-  (uid:draw *image* :x 100 :y 100)
-  (uid:swap-buffers window))
+  (uid:draw *image* :x 100 :y 100))
 
 (defparameter *engine* (make-instance 'my-engine
                                       :windows

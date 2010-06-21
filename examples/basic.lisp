@@ -18,8 +18,7 @@
   (uid:clear window)
   (uid:draw-rectangle (- (/ (uid:right-edge (uid:view window)) 2) 25)
                       (- (/ (uid:top-edge (uid:view window)) 2) 25)
-                      50 50 :color uid:*red*)
-  (uid:swap-buffers window))
+                      50 50 :color uid:*red*))
 
 (defmethod uid:on-key-down ((window my-window) keycode keysym string)
   (format t "~&Keycode: [~S], Keysym: [~S], String: [~S]~%" keycode keysym string)

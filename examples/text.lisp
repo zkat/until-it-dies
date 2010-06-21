@@ -24,14 +24,17 @@
   (gl:clear :color-buffer-bit :depth-buffer-bit)
 
   (uid:with-color uid:*black*
-   (uid:with-font *our-font*
+    (uid:with-font *our-font*
 
-     (uid:draw "Some text: " :x 150 :y 350)
+      (uid:draw (format nil "FPS: ~,2f" (uid::fps (uid::clock *engine*)))
+                :x 0 :y 0)
 
-     (uid:draw-at 10 50 *string-to-draw*
-                  :align :left :valign :middle
-                  :width 400 :height 400)))
-  
+      (uid:draw "Some text: " :x 150 :y 350)
+
+      (uid:draw-at 10 50 *string-to-draw*
+                   :align :left :valign :middle
+                   :width 400 :height 400)))
+
   (uid:swap-buffers window))
 
 (defparameter *engine* (make-instance 'text-engine))

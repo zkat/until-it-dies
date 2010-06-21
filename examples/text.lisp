@@ -11,6 +11,8 @@
 (defclass text-window (uid:window)
   ())
 
+(defparameter *engine* (make-instance 'text-engine))
+
 (defparameter *our-font* (make-instance 'uid:font
                                         :filepath (merge-pathnames "example.ttf" *resource-directory*)
                                         :size 14))
@@ -36,8 +38,6 @@
                    :width 400 :height 400)))
 
   (uid:swap-buffers window))
-
-(defparameter *engine* (make-instance 'text-engine))
 
 (defun run ()
   (setf (uid:windows *engine*) (list (make-instance 'text-window

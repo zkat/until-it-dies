@@ -9,4 +9,6 @@
   ((:module "examples" :components
             ((:file "basic")
              (:file "text")
-             (:file "image")))))
+             (:file "image")
+             (:file "multi-window")
+             (:file "basic-no-subclass")))))

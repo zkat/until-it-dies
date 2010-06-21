@@ -191,6 +191,9 @@
 (defmethod on-draw ((window window))
   (values))
 
+(defmethod on-draw :after ((window window))
+  (uid:swap-buffers window))
+
 (defmethod on-close ((window window))
   (teardown window))
 

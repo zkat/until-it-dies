@@ -4,7 +4,9 @@
 (in-package :uid.ex.basic)
 
 (defclass my-engine (uid:engine)
-  ())
+  ()
+  (:default-initargs :fps-limit 60))
+
 (defclass my-window (uid:window)
   ())
 

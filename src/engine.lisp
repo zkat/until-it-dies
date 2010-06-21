@@ -11,11 +11,14 @@
 ;;; Engine Prototype
 ;;;
 (defclass engine ()
-  ((last-tick-time :initform (now) :accessor last-tick-time)
-   (time-delta :initform 0 :accessor time-delta)
-   (initializedp :initform nil :accessor initializedp)
+  ((initializedp :initform nil :accessor initializedp)
+   (clock :accessor clock :initarg :clock)
    (resource-path :accessor resource-path :initform *default-pathname-defaults*)
-   (windows :initform nil :accessor windows :initarg :windows)))
+   (windows :initform (list (make-instance 'window)) :accessor windows :initarg :windows)))
+
+(defmethod initialize-instance :after ((engine engine) &key fps-limit)
+  (setf (clock engine)
+        (make-instance 'clock :fps-limit fps-limit)))
 
 (defmethod on-draw ((engine engine))
   (loop for window in (windows engine)
@@ -27,24 +30,15 @@
      when (openp window)
      do (on-update window dt)))
 
-(defun update-time (engine)
-  (with-accessors ((dt time-delta) (last-time last-tick-time)) engine
-    (multiple-value-bind (new-dt now)
-        (time-difference last-time)
-      (setf last-time now
-            dt new-dt)))
-  t)
-
 (defgeneric step-engine (engine)
   (:method :before ((engine engine))
-    (update-time engine))
+    (tick (clock engine)))
   (:method ((engine engine))
-    (on-update engine (time-delta engine))
+    (on-update engine (time-delta (clock engine)))
     (on-draw engine)))
 
 (defmethod init :before ((engine engine))
-  (setf (last-tick-time engine) (now)
-        cl-opengl-bindings:*gl-get-proc-address* #'glop:gl-get-proc-address)
+  (setf cl-opengl-bindings:*gl-get-proc-address* #'glop:gl-get-proc-address)
   (mapc #'init (windows engine)))
 
 (defmethod init ((engine engine))
@@ -55,7 +49,6 @@
 
 (defmethod teardown ((engine engine))
   engine)
-
 
 (defmethod teardown :after ((engine engine))
   (mapc #'teardown (windows engine))

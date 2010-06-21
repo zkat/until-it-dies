@@ -41,6 +41,13 @@
    :on-blur
    :on-close
 
+   ;; Clock
+   :clock
+   :max-times-stored
+   :tick
+   :limit-fps
+   :fps
+
    ;; Engine
    :engine
    :runningp

@@ -16,7 +16,6 @@
                                      (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
 
 (defmethod uid:on-draw ((window my-window))
-  (uid:set-gl-window window)
   (gl:clear-color 0 0 0 0)
   (gl:clear :color-buffer-bit :depth-buffer-bit)
 

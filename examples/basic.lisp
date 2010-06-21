@@ -9,7 +9,6 @@
   ())
 
 (defmethod uid:on-draw ((window my-window))
-  (uid:set-gl-window window)
   (gl:clear-color 0 1 1 1)
   (gl:clear :color-buffer-bit :depth-buffer-bit)
   (uid:draw-rectangle (/ (uid:right-edge (uid:view window)) 2)

@@ -76,7 +76,7 @@
       (gl:viewport left-edge bottom-edge right-edge top-edge)
       (gl:matrix-mode :projection)
       (gl:load-identity)
-      (gl:ortho left-edge right-edge top-edge bottom-edge near-edge far-edge)
+      (gl:ortho left-edge right-edge bottom-edge top-edge near-edge far-edge)
       (gl:matrix-mode :modelview)
       (gl:load-identity)
       (let* ((x-scale (if (> left-edge right-edge) -1 1))

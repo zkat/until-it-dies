@@ -8,13 +8,16 @@
   (:default-initargs :fps-limit 60))
 
 (defclass my-window (uid:window)
-  ())
+  ()
+  (:default-initargs
+   :clear-color (uid:mix-colors uid:*blue* uid:*white* uid:*green*)
+    :width 400
+    :height 400))
 
 (defmethod uid:on-draw ((window my-window))
-  (gl:clear-color 0 1 1 1)
-  (gl:clear :color-buffer-bit :depth-buffer-bit)
-  (uid:draw-rectangle (/ (uid:right-edge (uid:view window)) 2)
-                      (/ (uid:top-edge (uid:view window)) 2)
+  (uid:clear window)
+  (uid:draw-rectangle (- (/ (uid:right-edge (uid:view window)) 2) 25)
+                      (- (/ (uid:top-edge (uid:view window)) 2) 25)
                       50 50 :color uid:*red*)
   (uid:swap-buffers window))
 

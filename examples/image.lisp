@@ -9,18 +9,16 @@
 (defclass my-engine (uid:engine)
   ())
 (defclass my-window (uid:window)
-  ())
+  ()
+  (:default-initargs :clear-color uid:*black*))
 
 (defparameter *image* (make-instance 'uid:image
                                      :image-path
                                      (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
 
 (defmethod uid:on-draw ((window my-window))
-  (gl:clear-color 0 0 0 0)
-  (gl:clear :color-buffer-bit :depth-buffer-bit)
-
+  (uid:clear window)
   (uid:draw *image* :x 100 :y 100)
-  
   (uid:swap-buffers window))
 
 (defparameter *engine* (make-instance 'my-engine

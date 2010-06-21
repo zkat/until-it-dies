@@ -41,16 +41,18 @@
 
 (defgeneric limit-fps (clock)
   (:method ((clock clock))
-    (let* ((now (now))
-           (sleep-time (* 2 (- (next-target-time clock) now))))
-      (setf (next-target-time clock)
-            (+ (/ (fps-limit clock))
-               now))
-      (when (plusp sleep-time)
-       (sleep (float sleep-time))))))
+    (when (fps-limit clock)
+     (let* ((now (now))
+            (sleep-time (* 2 (- (next-target-time clock) now))))
+       (setf (next-target-time clock)
+             (+ (/ (fps-limit clock))
+                now))
+       (when (plusp sleep-time)
+         (sleep (float sleep-time)))))))
 
 (defgeneric fps (clock)
   (:method ((clock clock))
-    (/ (queue-count (times clock))
-       (cumulative-time clock))))
-
+    (if (zerop (cumulative-time clock))
+        0
+        (/ (queue-count (times clock))
+           (cumulative-time clock)))))

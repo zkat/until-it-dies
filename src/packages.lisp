@@ -89,12 +89,17 @@
    ;; primitives
    :make-color
    :mix-colors
+   :color-equal
+   :bind-color
+   :with-color
+   :color->list
+   :color->vector
+   :sequence->color
    :red
    :green
    :blue
    :alpha
    :*color*
-   :with-color
    :*black*
    :*white*
    :*magenta*

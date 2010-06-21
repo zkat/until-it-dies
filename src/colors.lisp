@@ -41,24 +41,12 @@
         (t (reduce #'%mix-colors colors))))
 
 (defun %mix-colors (color1 color2)
-  (let* ((r1 (color-red color1))
-         (g1 (color-green color1))
-         (b1 (color-blue color1))
-         (a1 (color-alpha color1))
-         (r2 (color-red color2))
-         (g2 (color-green color2))
-         (b2 (color-blue color2))
-         (a2 (color-alpha color2)))
-    (make-color :red (/ (+ r1 r2) 2)
-                :green (/ (+ g1 g2) 2)
-                :blue (/ (+ b1 b2) 2)
-                :alpha (/ (+ a1 a2) 2))))
+  (flet ((average (x y)
+           (/ (+ x y) 2)))
+    (sequence->color (map 'vector #'average (color->vector color1) (color->vector color2)))))
 
 (defun color-equal (color1 color2)
-  (with-accessors ((r1 color-red) (g1 color-green) (b1 color-blue) (a1 color-alpha)) color1
-    (with-accessors ((r2 color-red) (g2 color-green) (b2 color-blue) (a2 color-alpha)) color2
-      (when (and (= r1 r2) (= g1 g2) (= b1 b2) (= a1 a2))
-        t))))
+  (equal (color->vector color1) (color->vector color2)))
 
 (defmacro with-color (color &body body)
   (let ((color-name (gensym "COLOR-"))
@@ -74,8 +62,18 @@
               ,@body)
          (when ,rebindp (bind-color *color*))))))
 
+(defun color->vector (color)
+  (vector (color-red color) (color-green color) (color-blue color) (color-alpha color)))
+
+(defun color->list (color)
+  (list (color-red color) (color-green color) (color-blue color) (color-alpha color)))
+
+(defun sequence->color (sequence)
+  (make-color :red (elt sequence 0)
+              :green (elt sequence 1)
+              :blue (elt sequence 2)
+              :alpha (elt sequence 3)))
+
 (defun bind-color (color)
-  (with-accessors ((red color-red) (green color-green)
-                   (blue color-blue) (alpha color-alpha))
-      color
-    (gl:color red green blue alpha)))
+  (apply #'gl:color (color->list color)))
+

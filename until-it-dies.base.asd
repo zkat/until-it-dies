@@ -26,5 +26,5 @@
              (:file "primitives" :depends-on ("colors"))
              (:file "resources" :depends-on ("util"))
              (:file "view" :depends-on ("util"))
-             (:file "window" :depends-on ("util" "view"))
+             (:file "window" :depends-on ("util" "view" "colors"))
              (:file "engine" :depends-on ("util" "window" "clock"))))))

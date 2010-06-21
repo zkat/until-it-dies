@@ -9,6 +9,9 @@ UID uses OpenGL to draw graphics, and is built on top of CLOS for flexibility an
 
 UID itself is MIT licensed, and all its dependencies use permissive licenses. See below for specifics.
 
+For more information, issue tracking, etc, check out the project page at
+<http://redmine.sykosomatic.org/projects/uid>
+
 Getting it to run
 =================
 

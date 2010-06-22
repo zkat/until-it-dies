@@ -1,5 +1,6 @@
 (defpackage #:until-it-dies.examples.text
-  (:use :cl))
+  (:use :cl)
+  (:export :run))
 (in-package #:until-it-dies.examples.text)
 
 (defvar *resource-directory*

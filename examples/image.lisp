@@ -12,7 +12,7 @@
   (:default-initargs :clear-color uid:*black*))
 
 (defparameter *image* (make-instance 'uid:image
-                                     :image-path
+                                     :texture-filepath
                                      (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
 
 (defmethod uid:on-draw ((window my-window))

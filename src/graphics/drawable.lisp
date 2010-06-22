@@ -2,69 +2,69 @@
 
 ;;;; This file is part of Until It Dies
 
-;;;; sprite.lisp
+;;;; drawable.lisp
 ;;;;
-;;;; A sprite is a graphical object, be it an animation or an image.
+;;;; Basic drawable objects
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
 ;;;
-;;; Sprite prototype
+;;; Drawable base
 ;;;
-(defclass sprite () ())
+(defclass drawable () ())
 
-(defgeneric draw (obj &key))
+(defgeneric draw (drawable &key))
 
 (defun draw-at (x y obj &rest all-keys)
   (apply #'draw obj :x x :y y all-keys))
 
 ;;;
-;;; Textured prototype
+;;; Sprite
 ;;;
-(defclass textured (sprite)
+(defclass sprite (drawable) 
+  ()
+  (:documentation "Sprites are 2D drawable objects."))
+
+;;;
+;;; Textured
+;;;
+(defclass textured (drawable)
   ((texture :initarg :texture :accessor texture))
   (:documentation "Not to be confused with TEXTURE; TEXTURED is a mixin that provides
-facilities for drawing textures onto components."))
+facilities for drawing textures."))
 
-(defmethod initialize-instance :after ((textured textured) &key image-path)
-  (cond (image-path
+(defmethod initialize-instance :after ((textured textured) &key texture-filepath)
+  (cond (texture-filepath
          (setf (texture textured)
-               (make-instance 'file-texture :filepath image-path)))
+               (make-instance 'file-texture :filepath texture-filepath)))
         ((not (slot-boundp textured 'texture))
          (error "Textured objects must be given a texture."))
         (t nil)))
 
-(defmethod height ((textured textured))
-  (height (texture textured)))
-(defmethod width ((textured textured))
-  (width (texture textured)))
-(defmethod filepath ((textured textured))
-  (filepath (texture textured)))
+(defgeneric calculate-tex-coords (textured))
 
-(defgeneric calculate-tex-coords (texture)
-  (:method ((textured textured))
-    (vector 0 0 1 1)))
+;;;
+;;; Image
+;;;
+(defclass image (sprite textured)
+  ()
+  (:documentation "Images are 2d sprites with textures drawn on them."))
 
-(defmethod draw :before ((textured textured) &key)
+;; Can't resize them right now. Just pull in the image's dimensions.
+(defmethod height ((image image))
+  (height (texture image)))
+(defmethod width ((image image))
+  (width (texture image)))
+
+(defmethod calculate-tex-coords ((image image))
+  (vector 0 0 1 1))
+
+(defmethod draw :before ((image image) &key)
   "Before we a draw textured sprite, we should bind its texture."
   (gl:enable :texture-2d :blend)
   (gl:blend-func :src-alpha :one-minus-src-alpha)
-  (when (texture textured)
-    (bind-texture (texture textured))))
-
-(defmethod draw :after ((textured textured) &key)
-  "Once we're done drawing it, we should unbind the texture."
-  (unbind-texture (texture textured))
-  (gl:disable :texture-2d))
-
-;;;
-;;; Images
-;;;
-(defclass image (textured)
-  ()
-  (:documentation
-   "Images are textured components that are initialized to be the same size as the
-texture they are drawn with. Their TEXTURE property should contain a texture."))
+  (when (texture image)
+    (bind-texture (texture image))))
 
 (defmethod draw ((image image)
                  &key x y x-scale y-scale
@@ -85,6 +85,14 @@ texture they are drawn with. Their TEXTURE property should contain a texture."))
                         :u2 (elt tex-coords 2)
                         :v2 (elt tex-coords 3))))))
 
+(defmethod draw :after ((image image) &key)
+  "Once we're done drawing it, we should unbind the texture."
+  (unbind-texture (texture image))
+  (gl:disable :texture-2d))
+
+;;;
+;;; Animation
+;;;
 (defclass animation (image)
   ((current-frame :initform 0 :initarg :current-frame :accessor current-frame)
    (num-frames :initarg :num-frames :accessor num-frames)

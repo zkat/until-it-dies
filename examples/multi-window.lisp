@@ -14,12 +14,14 @@
 (defclass my-big-window (my-window)
   ()
   (:default-initargs
-   :width 800 :height 600))
+   :width 800 :height 600
+   :title "Big UID Example Window"))
 
 (defclass my-small-window (my-window)
   ()
   (:default-initargs
-   :width 640 :height 480))
+   :width 640 :height 480
+   :title "Small UID Example Window"))
 
 (defmethod uid:on-draw ((window my-window))
   (uid:clear window)

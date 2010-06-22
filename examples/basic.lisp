@@ -12,7 +12,8 @@
   (:default-initargs
    :clear-color (uid:mix-colors uid:*blue* uid:*white* uid:*green*)
     :width 400
-    :height 400))
+    :height 400
+    :title "Basic UID Example"))
 
 (defmethod uid:on-draw ((window my-window))
   (uid:clear window)

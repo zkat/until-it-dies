@@ -12,6 +12,7 @@
 ;;
 
 (defparameter *window* (make-instance 'uid:window
+                                      :title "Basic UID Example (no subclasses)"
                                       :clear-color (uid:mix-colors uid:*blue* uid:*white* uid:*green*)
                                       :width 400
                                       :height 400))

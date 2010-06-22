@@ -10,7 +10,8 @@
   ())
 (defclass text-window (uid:window)
   ()
-  (:default-initargs :clear-color uid:*white*))
+  (:default-initargs :clear-color uid:*white*
+    :title "UID Text Rendering Example"))
 
 (defparameter *engine* (make-instance 'text-engine))
 

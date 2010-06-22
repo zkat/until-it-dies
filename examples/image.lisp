@@ -10,7 +10,8 @@
   ())
 (defclass my-window (uid:window)
   ()
-  (:default-initargs :clear-color uid:*black*))
+  (:default-initargs :clear-color uid:*black*
+    :title "UID Image-drawing example."))
 
 (defparameter *image* (make-instance 'uid:image
                                      :texture-filepath

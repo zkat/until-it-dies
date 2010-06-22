@@ -15,4 +15,4 @@
                        (:file "font-backend")
                        (:file "fonts" :depends-on ("font-backend"))
                        (:file "font-format" :depends-on ("fonts"))
-                       (:file "sprite" :depends-on ("font-format" "textures"))))))))
+                       (:file "drawable" :depends-on ("font-format" "textures"))))))))

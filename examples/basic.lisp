@@ -1,5 +1,6 @@
 (defpackage #:until-it-dies.examples.basic
-  (:use :cl))
+  (:use :cl)
+  (:export :run))
 (in-package #:until-it-dies.examples.basic)
 
 (defclass my-engine (uid:engine)

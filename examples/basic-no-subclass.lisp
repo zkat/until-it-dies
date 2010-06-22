@@ -1,5 +1,6 @@
 (defpackage #:until-it-dies.examples.basic-no-subclass
-  (:use :cl))
+  (:use :cl)
+  (:export :run))
 (in-package #:until-it-dies.examples.basic-no-subclass)
 
 ;; This example is mostly identical to the basic example, but it doesn't create new classes.

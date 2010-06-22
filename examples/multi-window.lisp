@@ -1,5 +1,6 @@
 (defpackage #:until-it-dies.examples.multi-window
-  (:use :cl))
+  (:use :cl)
+  (:export :run))
 (in-package #:until-it-dies.examples.multi-window)
 
 (defclass my-engine (uid:engine)

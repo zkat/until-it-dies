@@ -44,3 +44,8 @@ directory for a variety of examples that showcase some of UID's features.
 
 If you're working on something and want help, feel free to e-mail me (kzm@sykosomatic.org), or
 show up it #sykosomatic@freenode on IRC, and I'll do my best to help you get going.
+
+Wahhh, I hate Lisp
+==================
+
+Check out Pyglet: <http://www.pyglet.org>.

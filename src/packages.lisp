@@ -55,6 +55,15 @@
    :time-delta
    :windows
 
+   ;; Simple Game Engine
+   :simple-game-engine
+   :simple-game-window
+   :path
+   :main-window
+   :engine
+   :window-width
+   :window-height
+
    ;; Views
    :left-edge
    :right-edge

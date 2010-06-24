@@ -7,29 +7,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
-;;;
-;;; Base Events
-;;;
-(defgeneric init (object)
-  (:documentation
-   "Initializes OBJECT."))
-
-(defgeneric teardown (object)
-  (:documentation
-   "Wraps up any loose ends with OBJECT."))
-
-(defgeneric on-update (object dt)
-  (:documentation
-   "Updates the state of OBJECT by DT (delta time, in seconds)"))
-
-(defgeneric on-draw (object)
-  (:documentation
-   "Renders the object in its current state."))
+;; TODO: Non-glop-specific stuff should be moved into this class,
+;;       along with non-glop-specific methods.
+(defclass base-window () ())
 
 ;;;
 ;;; Windows
 ;;;
-(defclass window ()
+(defclass window (base-window)
   ((title :initform "UID Window" :accessor title :initarg :title)
    (width :initform 800 :accessor width :initarg :width)
    (height :initform 600 :accessor height :initarg :height)
@@ -163,6 +148,9 @@
 
   (dispatch glop:close-event
     (on-close window)))
+
+(defmethod init :before ((window window))
+  (setf cl-opengl-bindings:*gl-get-proc-address* #'glop:gl-get-proc-address))
 
 (defmethod init ((window window))
   (open-window window)

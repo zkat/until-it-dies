@@ -29,7 +29,7 @@
    (main-window :accessor main-window)))
 
 (defmethod initialize-instance :after ((engine simple-game-engine) &key fps-limit
-                                       (window-height 400) (window-width 400)
+                                       (height 400) (width 400)
                                        (title "Simple UID Game") (clear-color *black*))
   (setf (clock engine)
         (make-instance 'clock :fps-limit fps-limit)
@@ -37,7 +37,7 @@
         (main-window engine)
         (make-instance 'simple-game-window
                        :engine engine
-                       :height window-height :width window-width
+                       :height height :width width
                        :title title :clear-color clear-color)))
 
 (defmethod width ((engine simple-game-engine))

@@ -160,44 +160,56 @@ figure out which frames to draw."))
 (defclass text (sprite)
   ((string-to-draw :initform "Hello World" :initarg :string :accessor string-to-draw)))
 
-(defmethod draw ((string string)
-                 &key x y x-scale y-scale
-                 rotation (font *font*)
-                 (z 0) (x-offset 0) (y-offset 0))
-  (unless (loadedp font)
-    (load-resource font))
-  (gl:with-pushed-matrix
-    (let ((x (+ x x-offset))
-          (y (+ y y-offset)))
-      (gl:translate x y z)
-      (when rotation
-        (gl:rotate (- rotation) 0 0 1))
-      (gl:scale (or x-scale 1) (or y-scale 1) 1)
-      (draw-string (font-pointer font) string :size (size font)))))
+(defmethod draw ((string string) &key (font *font*) &rest all-keys)
+  (apply #'draw-text string all-keys))
 
-(defmethod draw ((text text)
-                 &key x y (width 100) (height 100)
-                 x-scale y-scale
-                 rotation (wrap t) (align :left) (valign :bottom)
-                 (font *font*) (z 0)
-                 (x-offset 0) (y-offset 0))
-  (unless (loadedp font)
-    (load-resource font))
-  (gl:with-pushed-matrix
+(defgeneric draw-text (text font &key)
+
+  (:method ((text string) (font ftgl-font)
+            &key x y x-scale y-scale rotation 
+            wrap (z 0) (x-offset 0) (y-offset 0)) 
+    ;; TODO - use the format-text stuff to enable wrapping.
     (let ((x (+ x x-offset))
           (y (+ y y-offset)))
-      (gl:translate x y z)
-      (when rotation
-        (gl:rotate (- rotation) 0 0 1))
-      (gl:scale (or x-scale 1) (or y-scale 1) 1)
-      (mapc #'(lambda (line)
-                (draw-at (units->pixels (first line) (font-pointer font) (size font))
-                         (units->pixels (second line) (font-pointer font) (size font))
-                         (third line) :font font))
-            (format-text (string-to-draw text)
-                         :width width
-                         :height height
-                         :font font
-                         :wrap wrap
-                         :align align
-                         :valign valign)))))
+      (when wrap
+        (warn "FTGL text doesn't support wrapping of text right now."))
+      (unless (loadedp font)
+        (load-resource font))
+      (gl:with-pushed-matrix
+        (gl:translate x y z)
+        (when rotation
+          (gl:rotate (- rotation) 0 0 1))
+        (gl:scale (or x-scale 1) (or y-scale 1) 1)
+        (uid-ftgl:render-font (font-pointer font) string :all))))
+
+  (:method ((text string) (font zpb-ttf-font)
+            &key x y x-scale y-scale rotation
+            (z 0) (x-offset 0) (y-offset 0))
+    (unless (loadedp font)
+      (load-resource font))
+    (gl:with-pushed-matrix
+      (let ((x (+ x x-offset))
+            (y (+ y y-offset)))
+        (gl:translate x y z)
+        (when rotation
+          (gl:rotate (- rotation) 0 0 1))
+        (gl:scale (or x-scale 1) (or y-scale 1) 1)
+        (mapc #'(lambda (line)
+                  (gl:with-pushed-matrix
+                    (let ((x (+ (units->pixels (first line) (font-pointer font) (size font))
+                                x-offset))
+                          (y (+ (units->pixels (second line) (font-pointer font) (size font))
+                                y-offset)))
+                      (gl:translate x y z)
+                      (when rotation
+                        (gl:rotate (- rotation) 0 0 1))
+                      (gl:scale (or x-scale 1) (or y-scale 1) 1)
+                      (draw-string (font-pointer font) (third line) :size (size font)))))
+              (format-text (string-to-draw text)
+                           :width width
+                           :height height
+                           :font font
+                           :wrap wrap
+                           :align align
+                           :valign valign))))))
+

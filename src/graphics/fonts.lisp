@@ -30,7 +30,29 @@
 ;;;
 ;;; FTGL fonts
 ;;;
+(defclass ftgl-font (file-resource)
+  ())
 
+(defmethod load-resource ((font zpb-ttf-font))
+  (setf (font-pointer font)
+        (uid-ftgl:create-texture-font (namestring (filepath font))))
+  (uid-ftgl:set-font-face-size (font-pointer font)
+                           (size font)
+                           (res font))
+  (setf (loadedp font) t)
+  font)
+
+(defmethod unload-resource ((font ftgl-font))
+  (uid-ftgl:destroy-font (font-pointer font))
+  (setf (font-pointer font) nil)
+  (setf (loadedp font) nil)
+  font)
+
+(defmethod load-resource :after ((font zpb-ttf-font))
+  (let ((ptr (font-pointer font)))
+    ;; TODO - I should have a more extensible finalization system...
+    (finalize font (lambda ()
+                     (uid-ftgl:destroy-font ptr)))))
 
 ;;;
 ;;; ZPB-TTF fonts

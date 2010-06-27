@@ -160,12 +160,6 @@ figure out which frames to draw."))
 (defclass text (sprite)
   ((string-to-draw :initform "Hello World" :initarg :string :accessor string-to-draw)))
 
-(defmethod draw ((string string) &key (font *font*)
-                 x y x-scale y-scale rotation (z 0)
-                 (x-offset 0) (y-offset 0))
-  (draw-text string font :x x :y y :x-scale x-scale :y-scale y-scale
-             :rotation rotation :z z :x-offset x-offset :y-offset y-offset))
-
 (defgeneric draw-text (text font &key)
   ;; TODO - add wrapping support
 
@@ -215,3 +209,9 @@ figure out which frames to draw."))
                            :wrap wrap
                            :align align
                            :valign valign))))))
+
+(defmethod draw ((string string) &key (font *font*)
+                 x y x-scale y-scale rotation (z 0)
+                 (x-offset 0) (y-offset 0))
+  (draw-text string font :x x :y y :x-scale x-scale :y-scale y-scale
+             :rotation rotation :z z :x-offset x-offset :y-offset y-offset))

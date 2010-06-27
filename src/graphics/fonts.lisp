@@ -10,7 +10,9 @@
 ;;;
 ;;; Fonts
 ;;;
-(defclass font () ())
+(defclass font ()
+  ((size :initarg :size :accessor size)
+   (res :initarg :res :accessor res :initform 100)))
 
 (defvar *font*)
 
@@ -19,7 +21,7 @@
   `(let ((*font* ,font))
      ,@body))
 
-(defclass file-font (file-resource)
+(defclass file-font (font file-resource)
   ())
 
 (defmethod load-resource :before ((font file-font))
@@ -30,7 +32,8 @@
 ;;; FTGL fonts
 ;;;
 (defclass ftgl-font (file-font)
-  ())
+  ((font-pointer :initarg :font-pointer :accessor font-pointer :initform nil)
+   (loadedp :accessor loadedp :initform nil)))
 
 (defmethod load-resource ((font ftgl-font))
   (setf (font-pointer font)
@@ -58,8 +61,6 @@
 ;;;
 (defclass zpb-ttf-font (file-font)
   ((font-pointer :initarg :font-pointer :accessor font-pointer :initform nil)
-   (size :initarg :size :accessor size)
-   (res :initarg :res :accessor res :initform 100)
    (loadedp :accessor loadedp :initform nil))
   (:documentation "A font is used by the text-drawing system to draw strings to screen."))
 
@@ -88,4 +89,3 @@
 (defmethod (setf res) :after (new-res (font zpb-ttf-font))
   (declare (ignore new-res))
   (load-resource font))
-

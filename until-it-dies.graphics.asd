@@ -11,8 +11,9 @@
             ((:module "graphics"
                       :components
                       ((:file "devil")
+                       (:file "ftgl")
                        (:file "textures" :depends-on ("devil"))
                        (:file "font-backend")
-                       (:file "fonts" :depends-on ("font-backend"))
+                       (:file "fonts" :depends-on ("font-backend" "ftgl"))
                        (:file "font-format" :depends-on ("fonts"))
                        (:file "drawable" :depends-on ("font-format" "textures"))))))))

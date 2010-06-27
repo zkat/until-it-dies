@@ -10,5 +10,5 @@
             ((:file "basic")
              (:file "text")
              (:file "image")
-             (:file "multi-window")
+             #+nil(:file "multi-window")
              (:file "basic-no-subclass")))))

@@ -8,8 +8,8 @@
   (:default-initargs :title "Basic UID Example"
     :fps-limit 60
     :clear-color (uid:mix-colors uid:*blue* uid:*white* uid:*green*)
-    :window-width 400
-    :window-height 400))
+    :width 400
+    :height 400))
 
 (defmethod uid:on-draw ((game my-basic-game))
   (uid:clear game)

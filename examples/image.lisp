@@ -7,18 +7,18 @@
   (merge-pathnames "res/" (load-time-value (or #.*compile-file-truename* *load-truename*))))
 
 (defclass image-example (uid:simple-game-engine)
-  ()
+  ((image :initarg :image :accessor image))
   (:default-initargs :title "UID Image-drawing example."
-    :window-width 400
-    :window-height 400))
-
-(defparameter *image* (make-instance 'uid:image
-                                     :texture-filepath
-                                     (merge-pathnames "lisplogo_alien_256.png" *resource-directory*)))
+    :width 400
+    :height 400
+    :image (make-instance 'uid:image
+                          :texture-filepath
+                          (merge-pathnames "lisplogo_alien_256.png"
+                                           *resource-directory*))))
 
 (defmethod uid:on-draw ((game image-example))
   (uid:clear game)
-  (uid:draw *image* :x 100 :y 100))
+  (uid:draw (image game) :x 100 :y 100))
 
 (defmethod uid:on-key-down ((game image-example) keycode keysym string)
   (declare (ignore keycode string))

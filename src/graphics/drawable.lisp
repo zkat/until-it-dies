@@ -21,7 +21,7 @@
 ;;;
 ;;; Sprite
 ;;;
-(defclass sprite (drawable) 
+(defclass sprite (drawable)
   ()
   (:documentation "Sprites are 2D drawable objects."))
 
@@ -160,19 +160,20 @@ figure out which frames to draw."))
 (defclass text (sprite)
   ((string-to-draw :initform "Hello World" :initarg :string :accessor string-to-draw)))
 
-(defmethod draw ((string string) &key (font *font*) &rest all-keys)
-  (apply #'draw-text string all-keys))
+(defmethod draw ((string string) &key (font *font*)
+                 x y x-scale y-scale rotation (z 0)
+                 (x-offset 0) (y-offset 0))
+  (draw-text string font :x x :y y :x-scale x-scale :y-scale y-scale
+             :rotation rotation :z z :x-offset x-offset :y-offset y-offset))
 
 (defgeneric draw-text (text font &key)
+  ;; TODO - add wrapping support
 
   (:method ((text string) (font ftgl-font)
-            &key x y x-scale y-scale rotation 
-            wrap (z 0) (x-offset 0) (y-offset 0)) 
-    ;; TODO - use the format-text stuff to enable wrapping.
+            &key x y x-scale y-scale rotation
+            (z 0) (x-offset 0) (y-offset 0))
     (let ((x (+ x x-offset))
           (y (+ y y-offset)))
-      (when wrap
-        (warn "FTGL text doesn't support wrapping of text right now."))
       (unless (loadedp font)
         (load-resource font))
       (gl:with-pushed-matrix
@@ -180,7 +181,7 @@ figure out which frames to draw."))
         (when rotation
           (gl:rotate (- rotation) 0 0 1))
         (gl:scale (or x-scale 1) (or y-scale 1) 1)
-        (uid-ftgl:render-font (font-pointer font) string :all))))
+        (uid-ftgl:render-font (font-pointer font) text :all))))
 
   (:method ((text string) (font zpb-ttf-font)
             &key x y x-scale y-scale rotation
@@ -194,7 +195,9 @@ figure out which frames to draw."))
         (when rotation
           (gl:rotate (- rotation) 0 0 1))
         (gl:scale (or x-scale 1) (or y-scale 1) 1)
-        (mapc #'(lambda (line)
+        (draw-string (font-pointer font) text :size (size font))
+        ;; TODO - Make this usable again.
+        #+nil(mapc #'(lambda (line)
                   (gl:with-pushed-matrix
                     (let ((x (+ (units->pixels (first line) (font-pointer font) (size font))
                                 x-offset))
@@ -212,4 +215,3 @@ figure out which frames to draw."))
                            :wrap wrap
                            :align align
                            :valign valign))))))
-

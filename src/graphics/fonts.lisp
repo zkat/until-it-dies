@@ -29,7 +29,7 @@
 ;;;
 ;;; FTGL fonts
 ;;;
-(defclass ftgl-font (file-resource)
+(defclass ftgl-font (file-font)
   ())
 
 (defmethod load-resource ((font ftgl-font))
@@ -56,7 +56,7 @@
 ;;;
 ;;; ZPB-TTF fonts
 ;;;
-(defclass zpb-ttf-font (file-resource)
+(defclass zpb-ttf-font (file-font)
   ((font-pointer :initarg :font-pointer :accessor font-pointer :initform nil)
    (size :initarg :size :accessor size)
    (res :initarg :res :accessor res :initform 100)

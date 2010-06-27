@@ -10,12 +10,7 @@
 ;;;
 ;;; Fonts
 ;;;
-(defclass font (file-resource)
-  ((font-pointer :initarg :font-pointer :accessor font-pointer :initform nil)
-   (size :initarg :size :accessor size)
-   (res :initarg :res :accessor res :initform 100)
-   (loadedp :accessor loadedp :initform nil))
-  (:documentation "A font is used by the text-drawing system to draw strings to screen."))
+(defclass font () ())
 
 (defvar *font*)
 
@@ -24,32 +19,52 @@
   `(let ((*font* ,font))
      ,@body))
 
-(defmethod load-resource :before ((font font))
+(defclass file-font (file-resource)
+  ()
+  ())
+
+(defmethod load-resource :before ((font file-font))
   (when (font-pointer font)
     (unload-resource font)))
 
-(defmethod load-resource ((font font))
+;;;
+;;; FTGL fonts
+;;;
+
+
+;;;
+;;; ZPB-TTF fonts
+;;;
+(defclass zpb-ttf-font (file-resource)
+  ((font-pointer :initarg :font-pointer :accessor font-pointer :initform nil)
+   (size :initarg :size :accessor size)
+   (res :initarg :res :accessor res :initform 100)
+   (loadedp :accessor loadedp :initform nil))
+  (:documentation "A font is used by the text-drawing system to draw strings to screen."))
+
+(defmethod load-resource ((font zpb-ttf-font))
   (setf (font-pointer font)
         (zpb-ttf:open-font-loader (namestring (filepath font))))
   (setf (loadedp font) t)
   font)
 
-(defmethod load-resource :after ((font font))
+(defmethod load-resource :after ((font zpb-ttf-font))
   (let ((ptr (font-pointer font)))
+    ;; TODO - I should have a more extensible finalization system...
     (finalize font (lambda ()
                      (zpb-ttf:close-font-loader ptr)))))
 
-(defmethod unload-resource ((font font))
+(defmethod unload-resource ((font zpb-ttf-font))
   (zpb-ttf:close-font-loader (font-pointer font))
   (setf (font-pointer font) nil)
   (setf (loadedp font) nil)
   font)
 
-(defmethod (setf size) :after (new-size (font font))
+(defmethod (setf size) :after (new-size (font zpb-ttf-font))
   (declare (ignore new-size))
   (load-resource font))
 
-(defmethod (setf res) :after (new-res (font font))
+(defmethod (setf res) :after (new-res (font zpb-ttf-font))
   (declare (ignore new-res))
   (load-resource font))
 

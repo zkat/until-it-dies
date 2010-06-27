@@ -16,4 +16,4 @@
                        (:file "font-backend")
                        (:file "fonts" :depends-on ("font-backend" "ftgl"))
                        (:file "font-format" :depends-on ("fonts"))
-                       (:file "drawable" :depends-on ("font-format" "textures"))))))))
+                       (:file "drawable" :depends-on ("font-format" "fonts" "textures"))))))))

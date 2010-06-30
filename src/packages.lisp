@@ -144,9 +144,11 @@
    :loadedp
 
    ;; Fonts
-   :font
+   :base-font
+   :ftgl-font
+   :zpb-ttf-font
    :size
-   :res
+   :resolution
    :*font*
    :with-font
 

@@ -4,7 +4,7 @@
 (in-package :uid-il)
 
 (define-foreign-library il
-  (:unix (:or "libIL" "libIL.so.1"))
+  (:unix (:or "libIL.so" "libIL.so.1"))
   (:windows "DevIL.dll")
   (t (:default "libIL")))
 (use-foreign-library il)
@@ -85,7 +85,7 @@
 (in-package :uid-ilut)
 
 (define-foreign-library ilut
-  (:unix (:or "libILUT" "libILUT.so.1"))
+  (:unix (:or "libILUT.so" "libILUT.so.1"))
   (:windows "ILUT.dll")
   (t (:default "libILUT")))
 (use-foreign-library ilut)

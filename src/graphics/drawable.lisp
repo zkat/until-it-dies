@@ -160,55 +160,55 @@ figure out which frames to draw."))
 (defclass text (sprite)
   ((string-to-draw :initform "Hello World" :initarg :string :accessor string-to-draw)))
 
-(defgeneric draw-text (text font &key)
+(defgeneric draw-text (text font &key))
+
+(defmethod draw-text ((text string) (font ftgl-font)
+                      &key x y x-scale y-scale rotation
+                      (z 0) (x-offset 0) (y-offset 0))
   ;; TODO - add wrapping support
-
-  (:method ((text string) (font ftgl-font)
-            &key x y x-scale y-scale rotation
-            (z 0) (x-offset 0) (y-offset 0))
-    (let ((x (+ x x-offset))
-          (y (+ y y-offset)))
-      (unless (loadedp font)
-        (load-resource font))
-      (gl:with-pushed-matrix
-        (gl:translate x y z)
-        (when rotation
-          (gl:rotate (- rotation) 0 0 1))
-        (gl:scale (or x-scale 1) (or y-scale 1) 1)
-        (uid-ftgl:render-font (font-pointer font) text :all))))
-
-  (:method ((text string) (font zpb-ttf-font)
-            &key x y x-scale y-scale rotation
-            (z 0) (x-offset 0) (y-offset 0))
+  (let ((x (+ x x-offset))
+        (y (+ y y-offset)))
     (unless (loadedp font)
       (load-resource font))
     (gl:with-pushed-matrix
-      (let ((x (+ x x-offset))
-            (y (+ y y-offset)))
-        (gl:translate x y z)
-        (when rotation
-          (gl:rotate (- rotation) 0 0 1))
-        (gl:scale (or x-scale 1) (or y-scale 1) 1)
-        (draw-string (font-pointer font) text :size (size font))
-        ;; TODO - Make this usable again.
-        #+nil(mapc #'(lambda (line)
-                  (gl:with-pushed-matrix
-                    (let ((x (+ (units->pixels (first line) (font-pointer font) (size font))
-                                x-offset))
-                          (y (+ (units->pixels (second line) (font-pointer font) (size font))
-                                y-offset)))
-                      (gl:translate x y z)
-                      (when rotation
-                        (gl:rotate (- rotation) 0 0 1))
-                      (gl:scale (or x-scale 1) (or y-scale 1) 1)
-                      (draw-string (font-pointer font) (third line) :size (size font)))))
-              (format-text (string-to-draw text)
-                           :width width
-                           :height height
-                           :font font
-                           :wrap wrap
-                           :align align
-                           :valign valign))))))
+      (gl:translate x y z)
+      (when rotation
+        (gl:rotate (- rotation) 0 0 1))
+      (gl:scale (or x-scale 1) (or y-scale 1) 1)
+      (uid-ftgl:render-font (font-pointer font) text :all))))
+
+(defmethod draw-text ((text string) (font zpb-ttf-font)
+                      &key x y x-scale y-scale rotation
+                      (z 0) (x-offset 0) (y-offset 0))
+  (unless (loadedp font)
+    (load-resource font))
+  (gl:with-pushed-matrix
+    (let ((x (+ x x-offset))
+          (y (+ y y-offset)))
+      (gl:translate x y z)
+      (when rotation
+        (gl:rotate (- rotation) 0 0 1))
+      (gl:scale (or x-scale 1) (or y-scale 1) 1)
+      (draw-string (font-pointer font) text :size (size font))
+      ;; TODO - Make this usable again.
+      #+nil(mapc #'(lambda (line)
+                     (gl:with-pushed-matrix
+                       (let ((x (+ (units->pixels (first line) (font-pointer font) (size font))
+                                   x-offset))
+                             (y (+ (units->pixels (second line) (font-pointer font) (size font))
+                                   y-offset)))
+                         (gl:translate x y z)
+                         (when rotation
+                           (gl:rotate (- rotation) 0 0 1))
+                         (gl:scale (or x-scale 1) (or y-scale 1) 1)
+                         (draw-string (font-pointer font) (third line) :size (size font)))))
+                 (format-text (string-to-draw text)
+                              :width width
+                              :height height
+                              :font font
+                              :wrap wrap
+                              :align align
+                              :valign valign)))))
 
 (defmethod draw ((string string) &key (font *font*)
                  x y x-scale y-scale rotation (z 0)

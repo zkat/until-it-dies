@@ -10,7 +10,7 @@
 ;;;
 ;;; Fonts
 ;;;
-(defclass font ()
+(defclass base-font ()
   ((size :initarg :size :accessor size)
    (res :initarg :res :accessor res :initform 100)))
 
@@ -21,7 +21,7 @@
   `(let ((*font* ,font))
      ,@body))
 
-(defclass file-font (font file-resource)
+(defclass file-font (base-font file-resource)
   ())
 
 (defmethod load-resource :before ((font file-font))

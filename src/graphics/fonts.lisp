@@ -12,7 +12,7 @@
 ;;;
 (defclass base-font ()
   ((size :initarg :size :accessor size)
-   (res :initarg :res :accessor res :initform 100)))
+   (resolution :initarg :resolution :accessor resolution :initform 100)))
 
 (defvar *font*)
 
@@ -40,7 +40,7 @@
         (uid-ftgl:create-texture-font (namestring (filepath font))))
   (uid-ftgl:set-font-face-size (font-pointer font)
                            (size font)
-                           (res font))
+                           (resolution font))
   (setf (loadedp font) t)
   font)
 
@@ -86,6 +86,6 @@
   (declare (ignore new-size))
   (load-resource font))
 
-(defmethod (setf res) :after (new-res (font zpb-ttf-font))
+(defmethod (setf resolution) :after (new-res (font zpb-ttf-font))
   (declare (ignore new-res))
   (load-resource font))

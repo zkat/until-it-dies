@@ -13,8 +13,8 @@
 
 (defmethod uid:on-draw ((game my-basic-game))
   (uid:clear game)
-  (uid:draw-rectangle (- (uid:width game) 25)
-                      (- (uid:height game) 25)
+  (uid:draw-rectangle (- (/ (uid:width game) 2) 25)
+                      (- (/ (uid:height game) 2) 25)
                       50 50 :color uid:*red*))
 
 (defmethod uid:on-key-down ((game my-basic-game) keycode keysym string)

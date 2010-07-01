@@ -7,7 +7,7 @@
   ((engine :initarg :engine :accessor engine)))
 
 (macrolet ((defev (name (window-name &rest rest-of-lambda-list))
-             `(defmethod ,name ((,window-name simple-game-window) ,@rest-of-lambda-list)
+             `(defmethod ,name :after ((,window-name simple-game-window) ,@rest-of-lambda-list)
                 (,name (engine ,window-name) ,@rest-of-lambda-list))))
   (defev on-key-down (window keycode keysym string))
   (defev on-key-up (window keycode keysym string))

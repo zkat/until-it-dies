@@ -88,3 +88,7 @@
   (il:bind-image 0)
   (il:check-error)
   texture)
+
+;; TODO - This is dumb. Do this better.
+(ilut:init)
+(il:init)

@@ -22,6 +22,7 @@
                        (:file "split-sequence")
                        (:file "utils")))
              (:file "base-api":depends-on ("util"))
+             (:file "task" :depends-on ("util"))
              (:file "clock" :depends-on ("util" "base-api"))
              (:file "colors" :depends-on ("util" "base-api"))
              (:file "primitives" :depends-on ("colors" "base-api"))

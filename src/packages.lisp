@@ -25,6 +25,22 @@
    :detach
    :detach-all
 
+   ;; Tasks
+   :task
+   :fork
+   :with-task-queue
+   :*task-queue*
+   :execute-task
+   :cookedp
+   :task-queue
+   :push-task
+   :peek-next-task
+   :pop-next-task
+   :task-available-p
+   :clear-tasks
+   :process-next-task
+   :process-cooked-tasks
+
    ;; events
    :on-update
    :on-draw

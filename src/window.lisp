@@ -7,88 +7,43 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (in-package :until-it-dies)
 
-;; TODO: Non-glop-specific stuff should be moved into this class,
-;;       along with non-glop-specific methods.
-(defclass base-window () ())
-
 ;;;
-;;; Windows
+;;; Abstract, Base window
 ;;;
-(defclass window (base-window)
+(defclass base-window ()
   ((title :initform "UID Window" :accessor title :initarg :title)
    (width :initform 800 :accessor width :initarg :width)
    (height :initform 600 :accessor height :initarg :height)
    (fullscreenp :initform nil :accessor fullscreenp :initarg :fullscreenp)
    (resizablep :initform nil :accessor resizablep :initarg :resizablep)
-   (openp :initform nil :accessor openp)
    (key-repeat-p :initform nil :accessor key-repeat-p)
-   (mouse-x :initform 0 :accessor mouse-x)
-   (mouse-y :initform 0 :accessor mouse-y)
    (clear-color :initform *black* :accessor clear-color :initarg :clear-color)
    (clear-buffers :initform '(:color-buffer-bit :depth-buffer-bit) :initarg :clear-buffers
-                  :accessor clear-buffers)
-   (glop-window :initform nil :accessor glop-window)
-   (view :accessor view :initarg :view)))
+                  :accessor clear-buffers)))
 
-(defmethod initialize-instance :after ((window window) &key)
-  (unless (slot-boundp window 'view)
-    (setf (view window)
-          (make-instance 'view
-                         :top-edge (height window)
-                         :right-edge (width window)))))
-
-(defmethod (setf title) :after (new-value (window window))
-  (glop:set-window-title (glop-window window) new-value))
-
-(defmethod (setf fullscreenp) :after (new-value (window window))
-  (glop:set-fullscreen (glop-window window) new-value))
-
-;; TODO - not sure if glop supports this yet
 (defgeneric (setf height) (new-value window))
 (defgeneric (setf width) (new-value window))
 
-(defgeneric set-gl-window (window)
-  (:method ((window window))
-    (glop:set-gl-window (glop-window window))
-    window))
+(defgeneric set-gl-window (window))
 
 (defgeneric clear (window)
-  (:method ((window window))
+  (:method ((window base-window))
     (apply #'gl:clear-color (color->list (clear-color window)))
     (apply #'gl:clear (clear-buffers window))))
 
-(defgeneric swap-buffers (window)
-  (:method ((window window))
-    (glop:swap-buffers (glop-window window))
-    window))
+(defgeneric swap-buffers (window))
 
-(defgeneric open-window (window)
-  (:method ((window window))
-    (unless (openp window)
-     (setf (glop-window window)
-           (glop:create-window (title window)
-                               (width window)
-                               (height window)
-                               :fullscreen (fullscreenp window)
-                               :double-buffer t
-                               :stencil-buffer t
-                               :stencil-size 1
-                               :accum-buffer t))
-     (set-gl-window window)
-     (set-view (view window))
-     (setf (openp window) t))
-    window))
+(defgeneric open-window (window))
 
-(defgeneric close-window (window)
-  (:method ((window window))
-    (when (openp window)
-     (glop:destroy-window (glop-window window))
-     (setf (openp window) nil))
-    window))
+(defgeneric close-window (window))
 
-;;;
-;;; Events
-;;;
+(defmethod init ((window base-window))
+  (open-window window))
+
+(defmethod teardown ((window base-window))
+  (close-window window))
+
+;; Event API
 (macrolet ((defev (name lambda-list &body options)
                `(defgeneric ,name ,lambda-list
                   (:method ,lambda-list
@@ -100,6 +55,9 @@
   (defev on-mouse-down (window button))
   (defev on-mouse-up (window button))
   (defev on-mouse-move (window x y))
+  (defev on-joy-button-down (window joystick button))
+  (defev on-joy-button-up (window joystick button))
+  (defev on-joy-move (window joystick old-axes new-axes))
   (defev on-resize (window width height))
   (defev on-expose (window))
   (defev on-obscured (window))
@@ -108,9 +66,72 @@
   (defev on-blur (window))
   (defev on-close (window)))
 
-(defgeneric dispatch-event (window event))
+(defmethod on-update ((window base-window) dt)
+  (declare (ignore dt))
+  (values))
+
+(defmethod on-draw :before ((window base-window))
+  (uid:set-gl-window window))
+
+(defmethod on-draw ((window base-window))
+  (values))
+
+(defmethod on-draw :after ((window base-window))
+  (uid:swap-buffers window))
+
+(defmethod on-close ((window base-window))
+  (teardown window))
+
+;;;
+;;; Glop Windows
+;;;
+(defclass glop-window (base-window)
+  ((openp :initform nil :accessor openp)
+   (mouse-x :initform 0 :accessor mouse-x)
+   (mouse-y :initform 0 :accessor mouse-y)
+   (glop-window :initform nil :accessor glop-window)))
+
+(defmethod (setf title) :after (new-value (window glop-window))
+  (when (openp window)
+    (glop:set-window-title (glop-window window) new-value)))
+
+(defmethod (setf fullscreenp) :after (new-value (window glop-window))
+  (when (openp window)
+    (glop:set-fullscreen (glop-window window) new-value)))
+
+(defmethod set-gl-window ((window glop-window))
+  (glop:set-gl-window (glop-window window))
+  window)
+
+(defmethod swap-buffers ((window glop-window))
+  (glop:swap-buffers (glop-window window))
+  window)
+
+(defmethod open-window ((window glop-window))
+  (unless (openp window)
+    (setf (glop-window window)
+          (glop:create-window (title window)
+                              (width window)
+                              (height window)
+                              :fullscreen (fullscreenp window)
+                              :double-buffer t
+                              :stencil-buffer t
+                              :stencil-size 1
+                              :accum-buffer t))
+    (set-gl-window window)
+    (set-view (view window))
+    (setf (openp window) t))
+  window)
+
+(defmethod close-window ((window glop-window))
+  (when (openp window)
+    (glop:destroy-window (glop-window window))
+    (setf (openp window) nil))
+  window)
+
+(defgeneric dispatch-glop-event (window event))
 (macrolet ((dispatch (event-class-name &body body)
-             `(defmethod dispatch-event ((window window) (event ,event-class-name))
+             `(defmethod dispatch-glop-event ((window glop-window) (event ,event-class-name))
                 ,@body)))
 
   (dispatch glop:key-press-event
@@ -149,104 +170,42 @@
   (dispatch glop:close-event
     (on-close window)))
 
-(defmethod init :before ((window window))
+(defmethod init :before ((window glop-window))
   (setf cl-opengl-bindings:*gl-get-proc-address* #'glop:gl-get-proc-address))
 
-(defmethod init ((window window))
-  (open-window window)
-  (values))
-
-(defmethod teardown ((window window))
-  (close-window window)
-  (values))
-
-(defmethod on-update :before ((window window) dt)
+(defmethod on-update :before ((window glop-window) dt)
   (declare (ignore dt))
   (when (openp window)
    (loop
       while (openp window)
       for event = (glop:next-event (glop-window window) :blocking nil)
       while event
-      do (dispatch-event window event))))
-
-(defmethod on-update ((window window) dt)
-  (declare (ignore dt))
-  (values))
-
-(defmethod on-draw :before ((window window))
-  (uid:set-gl-window window))
-
-(defmethod on-draw ((window window))
-  (values))
-
-(defmethod on-draw :after ((window window))
-  (uid:swap-buffers window))
-
-(defmethod on-close ((window window))
-  (teardown window))
-
-(defmethod on-resize ((window window) width height)
-  (update-view (view window) 0 0 width height)
-  (set-view (view window)))
+      do (dispatch-glop-event window event))))
 
 #+nil(defun key-down-p (engine key)
   "Is KEY being held down?"
   (values (gethash key (keys-held-down engine))))
 
-;;; Mouse event handling
-
-(defmethod on-mouse-move :before ((window window) x y)
+(defmethod on-mouse-move :before ((window glop-window) x y)
   (with-accessors ((wx mouse-x) (wy mouse-y))
       window
     (setf wx x
           wy y)))
 
+;;;
+;;; Compatibility window
+;;;
+(defclass window (glop-window)
+  ((view :accessor view :initarg :view)))
 
-;;; joystick events
-;; (defreply joystick-button-down ((engine =engine=) joystick button)
-;;   (declare (ignore joystick button))
-;;   (values))
+(defmethod initialize-instance :after ((window window) &key)
+  (unless (slot-boundp window 'view)
+    (setf (view window)
+          (make-instance 'view
+                         :top-edge (height window)
+                         :right-edge (width window)))))
 
-;; (defreply joystick-button-up ((engine =engine=) joystick button)
-;;   (declare (ignore joystick button))
-;;   (values))
+(defmethod on-resize ((window window) width height)
+  (update-view (view window) 0 0 width height)
+  (set-view (view window)))
 
-;; (defreply joystick-move ((engine =engine=) joystick axis state)
-;;   (declare (ignore joystick axis state))
-;;   (values))
-
-;; (defun update-joystick (engine joystick)
-;;   (with-properties (joystick-number num-axes num-buttons axis-positions button-states)
-;;       joystick
-;;     (let ((old-axis-positions axis-positions)
-;;           (old-button-states button-states)
-;;           (new-axis-positions (glfw-joystick-axis-positions joystick-number num-axes))
-;;           (new-button-states (glfw-joystick-button-states joystick-number num-buttons)))
-;;       (maybe-fire-joystick-axis-events engine joystick old-axis-positions new-axis-positions)
-;;       (maybe-fire-joystick-button-events engine joystick old-button-states new-button-states)
-;;       (setf axis-positions new-axis-positions
-;;             button-states new-button-states)
-;;       t)))
-
-;; (defun maybe-fire-joystick-axis-events (engine joystick old-axes new-axes)
-;;   (loop for old-axis in old-axes
-;;      for new-axis in new-axes
-;;      for axis-id from 0
-;;      unless (= old-axis new-axis)
-;;      do (joystick-move engine joystick axis-id new-axis)))
-
-;; (defun maybe-fire-joystick-button-events (engine joystick old-buttons new-buttons)
-;;   (loop for old-button in old-buttons
-;;      for new-button in new-buttons
-;;      for button-id from 0
-;;      unless (eq old-button new-button)
-;;      do (if (eq new-button :released)
-;;             (joystick-button-up engine joystick button-id)
-;;             (joystick-button-down engine joystick button-id))))
-
-;;; Other events
-#+nil(defreply window-resized (engine width height)
-  "We don't really care about resize events right now."
-  (setf (window-width engine) width)
-  (setf (window-height engine) height)
-  (values))

@@ -177,10 +177,11 @@
   (declare (ignore dt))
   (when (openp window)
    (loop
-      while (openp window)
       for event = (glop:next-event (glop-window window) :blocking nil)
-      while event
-      do (dispatch-glop-event window event))))
+      while (openp window)
+      do (if event
+             (dispatch-glop-event window event)
+             (return)))))
 
 #+nil(defun key-down-p (engine key)
   "Is KEY being held down?"

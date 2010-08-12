@@ -4,7 +4,7 @@
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "MIT"
-  :depends-on (until-it-dies.base cl-openal)
+  :depends-on (until-it-dies.base cl-openal cl-alc cl-alut)
   :components
   ((:module "src"
             :components
